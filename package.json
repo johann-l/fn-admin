@@ -1,0 +1,16 @@
+{
+  "name": "major-proj",
+  "version": "1.0.0",
+  "description": "Admin app for fleetNow",
+  "main": "main.js",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development electron ."
+  },
+  "author": "Johann, Gladlin, Ashwin, Ayman",
+  "license": "ISC",
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "electron": "^35.1.4",
+    "electron-packager": "^17.1.2"
+  }
+}

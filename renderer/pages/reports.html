@@ -1,0 +1,120 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="height=device-height, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline'">
+  <link href="https://fonts.googleapis.com/css?family=Inter" rel="stylesheet">
+  <title>FleetNow</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body style="margin: 0; font-family: 'Inter', sans-serif; background-color: #d9d5d5;">
+  <div class="top-bar">
+    <a href="index.html" class="square" style="margin: auto 1rem">Dashboard</a>
+    <a href="#" class="square" style="margin: auto 1rem">Live Tracking</a>
+    <a href="#" class="square" style="margin: auto 1rem; cursor:default; background-color: rgb(137, 149, 145);">Reports</a>
+    <p class="square" style="margin: auto 14rem auto auto;">... 4 ...</p>
+  </div>
+
+  <div class="layout">
+    <h1 class="logo">FleetNow</h1>
+    <aside class="sidebar">
+      <ul style="padding-top: 50%; font-family: Poppins,sans-serif;font-size: x-large;">
+        <li>Notifications</li>
+        <li style="padding: 2rem 0;">Main boards
+          <ul style="font-size: large;">
+            <li>Drivers board</li>
+            <li>Passenger board</li>
+          </ul>
+        </li>
+        <li style="padding: 2rem 0;">Manage
+          <ul style="font-size: large;">
+            <li>Drivers</li>
+            <li>Passengers</li>
+            <li>Routes</li>
+            <li>Documents</li>
+            <li>Payments</li>
+          </ul>
+        </li>
+      </ul>
+    </aside>
+
+    <div class="content">
+      <main class="main">
+        <h2>Reports</h2>
+        <div style="display: inline-flex; flex-wrap: wrap; margin-left: 1.3rem;">
+          <div style="display: inline-block; flex-wrap: wrap; margin-right: 10rem;">
+            <div class="report-container">
+              <h3>Total Expenses</h3>
+              <div style=" padding-left: 1rem;">
+                <h2>₹<span id="totalval">0</span></h2>
+                <p>Expense Allocation</p>
+                <div id="graph-bar">
+                  <div id="bar1"></div>
+                  <div id="bar2"></div>
+                  <div id="bar3"></div>
+                  <div id="bar4"></div>
+                </div>                
+                <ul class="expense-divisions" style="display: flex; flex-wrap: wrap; column-gap: 3rem;">
+                  <li id="exp1">
+                    <p>Fuel</p>
+                    <p>₹<span id="1val">250</span></p>
+                  </li>
+                  <li id="exp2">
+                    <p>Highway</p>
+                    <p>₹<span id="2val">250</span></p>
+                  </li>
+                  <li id="exp3">
+                    <p>Services</p>
+                    <p>₹<span id="3val">250</span></p>
+                  </li>
+                  <li id="exp4">
+                    <p>Misc</p>
+                    <p>₹<span id="4val">250</span></p>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="report-container">
+              <h3>Vehicles</h3>
+              <div style="display: inline-flex; padding-left: 1rem;">
+                <div class="piechart"></div>
+                <table>
+                  <tr>
+                    <td><div class="square" style="display: inline-block;"><ul><li>Bus No 1</li></ul><p>₹0</p></div></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div>
+            <p>a</p>
+          </div>
+        </div>
+      </main>
+    </div>
+
+  </div>
+
+  <script>
+    const var1 = parseFloat(document.getElementById("1val").innerText);
+    const var2 = parseFloat(document.getElementById("2val").innerText);
+    const var3 = parseFloat(document.getElementById("3val").innerText);
+    const var4 = parseFloat(document.getElementById("4val").innerText);
+  
+    const totalval = var1 + var2 + var3 + var4;
+    document.getElementById("totalval").innerText = totalval;
+  
+    const percent = val => totalval > 0 ? (val / totalval) * 100 : 0;
+  
+    document.getElementById("bar1").style.width = percent(var1) + "%";
+    document.getElementById("bar2").style.width = percent(var2) + "%";
+    document.getElementById("bar3").style.width = percent(var3) + "%";
+    document.getElementById("bar4").style.width = percent(var4) + "%";
+  </script>
+  
+</body>
+
+</html>

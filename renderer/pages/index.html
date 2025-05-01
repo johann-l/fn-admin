@@ -1,0 +1,153 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="height=device-height, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline'">
+  <link href="https://fonts.googleapis.com/css?family=Inter" rel="stylesheet">
+  <link rel="stylesheet" href="../css/style.css">
+  <title>FleetNow</title>
+</head>
+
+<body style="margin: 0; font-family: 'Inter', sans-serif; background-color: #ffffff;">
+  <div class="top-bar">
+    <a href="#" class="square" style="margin: auto 1rem;  cursor:default; background-color: rgb(137, 149, 145);">Dashboard</a>
+    <a href="#" class="square" style="margin: auto 1rem">Live Tracking</a>
+    <a href="reports.html" class="square" style="margin: auto 1rem">Reports</a>
+    <p class="square" style="margin: auto 14rem auto auto;">... 4 ...</p>
+  </div>
+
+  <div class="layout">
+    <h1 class="logo">FleetNow</h1>
+    <aside class="sidebar">
+      <ul style="padding-top: 50%; font-family: Poppins,sans-serif;font-size: x-large;">
+        <li>Notifications</li>
+        <li style="padding: 2rem 0;">Main boards
+          <ul style="font-size: large;">
+            <li>Drivers board</li>
+            <li>Passenger board</li>
+          </ul>
+        </li>
+        <li style="padding: 2rem 0;">Manage
+          <ul style="font-size: large;">
+            <li>Drivers</li>
+            <li>Passengers</li>
+            <li>Routes</li>
+            <li>Documents</li>
+            <li>Payments</li>
+          </ul>
+        </li>
+      </ul>
+
+    </aside>
+
+    <div class="content">
+      <main class="main">
+        <h2>Fleet Activity Status</h2>
+        <div style="display: inline-flex; column-gap: 30px; flex-wrap: wrap; margin-left: 1.3rem;">
+          <div class="activity-square" style="background-color: #53ff40; color: #0d5a17; border-color: #0d5a17;">
+            <p>Active Vehicles</p>
+            <p id="activeno" style="font-size: 20px">3</p>
+          </div>
+          <div class="activity-square" style="background-color: #f35050; color: #8d0b0b; border-color: #8d0b0b;">
+            <p>faltu Vehicles</p>
+            <p id="inactiveno" style="font-size: 20px">1</p>
+          </div>
+        </div>
+
+        <div style="width: 100%; max-width: 1900px;">
+          <h2>Map Overview</h2>
+          <div style="aspect-ratio: 4 / 1.8; position: relative; margin: 0 2% 0;">
+            <iframe src="https://maps.google.com/maps?q=st+joseph+vamanjoor&amp;output=embed" loading="lazy"
+              allowfullscreen=""
+              style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;"></iframe>
+          </div>
+        </div>
+
+        <div>
+          <h2>Fleet</h2>
+          <table id="fleetTable"
+            style="width: 100%; border-collapse: collapse; border: 2px double black; color: white; text-align: center; margin: 1rem;">
+            <thead style="background-color: #001F54; ">
+              <tr>
+                <th>Vehicle ID</th>
+                <th>Route No</th>
+                <th>Driver Assigned</th>
+                <th>Current Location</th>
+                <th>Type of route</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>#233</td>
+                <td>6</td>
+                <td>Johann Lobo</td>
+                <td>Urwa, Mangalore</td>
+                <td>Pickup</td>
+                <td>
+                  <li>Inactive</li>
+                </td>
+              </tr>
+              <tr>
+                <td>#234</td>
+                <td>7</td>
+                <td>Ayman Sheikh</td>
+                <td>Northen Sky, Pumpwell</td>
+                <td>Pickup</td>
+                <td>
+                  <li>Active</li>
+                </td>
+              </tr>
+              <tr>
+                <td>#231</td>
+                <td>5</td>
+                <td>Ashwin M V</td>
+                <td>Moodibidri</td>
+                <td>Outreach</td>
+                <td>
+                  <li>Inactive</li>
+                </td>
+              </tr>
+              <tr>
+                <td>#236</td>
+                <td>10</td>
+                <td>Gladlin Mascarenhas</td>
+                <td>Northen Sky, Pumpwell</td>
+                <td>Drop</td>
+                <td>
+                  <li>Active</li>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const statuses = document.querySelectorAll('#fleetTable td li');
+    let activecount = 0;
+    let inactivecount = 0;
+
+    statuses.forEach(li => {
+      const status = li.textContent.trim();
+      if (status === 'Active') {
+        li.style.color = '#53ff40';
+        activecount++;
+      } else if (status === 'Inactive') {
+        li.style.color = '#e52323';
+        inactivecount++;
+      }
+    });
+
+    document.getElementById("activeno").innerHTML = activecount;
+    document.getElementById("inactiveno").innerHTML = inactivecount;
+  </script>
+
+
+</body>
+
+</html>

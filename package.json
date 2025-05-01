@@ -1,6 +1,6 @@
 {
   "name": "major-proj",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Admin app for fleetNow",
   "main": "main.js",
   "scripts": {
@@ -11,9 +11,19 @@
   "devDependencies": {
     "cross-env": "^7.0.3",
     "electron": "^35.1.4",
+    "electron-builder": "^26.0.12",
     "electron-packager": "^17.1.2"
   },
   "dependencies": {
     "electron-updater": "^6.6.2"
+  },
+  "build": {
+    "appId": "com.fleetnow.adminapp",
+    "productName": "FleetNow Admin",
+    "publish": {
+      "provider": "github",
+      "owner": "johann-l",
+      "repo": "fn-admin"
+    }
   }
 }

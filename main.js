@@ -13,7 +13,7 @@ function createMainWindow(){
  if (isDev) { 
     win.webContents.openDevTools();
  }
- win.loadFile(path.join(__dirname, './renderer/pages/reports.html'));
+ win.loadFile(path.join(__dirname, './renderer/pages/index.html'));
  win.maximize();
 }
 

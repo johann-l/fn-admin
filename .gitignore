@@ -1,0 +1,35 @@
+# Dependency folders
+node_modules/
+
+# Electron build output
+dist/
+out/
+build/
+
+# OS-specific clutter
+.DS_Store
+Thumbs.db
+
+# Logs and runtime files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Compiled binaries (Electron, etc.)
+*.exe
+*.dll
+*.so
+*.dmg
+*.app
+*.snap
+
+# Git LFS (you’ll use this for large binaries)
+*.zip
+*.tar.gz
+*.7z
+
+# Environment files
+.env
+.env.local
+

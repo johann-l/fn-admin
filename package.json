@@ -12,5 +12,8 @@
     "cross-env": "^7.0.3",
     "electron": "^35.1.4",
     "electron-packager": "^17.1.2"
+  },
+  "dependencies": {
+    "electron-updater": "^6.6.2"
   }
 }

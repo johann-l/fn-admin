@@ -6,9 +6,11 @@ then run "npx electronmon ."
 Each time you want to ship a new version:
 
 Bump version in package.json:
-> {.."version": "1.0.3"..} 
+
+> {.."version": "1.0.3"..}
 
 Run on bash:
+
 > npx electron-builder --publish always
 
 That’s it. 🎉 All installed apps will auto-update.

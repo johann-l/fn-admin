@@ -6,8 +6,8 @@ then run "npx electronmon ."
 Each time you want to ship a new version:
 
 Bump version in package.json:
-
-> {.."version": "1.0.3"..}
+X is the new version
+> {.."version": "1.0.X"..}
 
 Run on bash:
 

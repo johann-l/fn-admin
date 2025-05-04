@@ -88,11 +88,11 @@ html, body {
   margin: 5px 0;
 }
 
-tbody {
+#fleetTable tbody {
   background-color: #4f6fa8;
 }
 
-table *:not(li) {
+#fleetTable *:not(li) {
   padding: 8px;
   border: 1px solid white;
 }
@@ -109,9 +109,35 @@ table *:not(li) {
 
 .report-container{
   background-color: #afaba8;
-  width:112%; 
+  width: 100%;
   margin-bottom: 5rem;
   border-radius: 2rem;
+}
+
+.trans-hist{
+  background-color: #afaba8;
+  width: 100%;
+  margin: auto auto 5rem 2rem;
+  border-radius: 2rem;
+  padding-bottom: 1.5rem;
+}
+
+.trans-hist h3{
+  color: #f5f5f5;
+  background-color: #111169;
+  padding: 0.4rem 0 0.4rem 0.7rem;
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+}
+
+.trans-hist .square {
+  display: flex;
+  align-items: center;
+  background-color: #f2f2f2;
+  padding: 1rem;
+  margin: 0.5rem 0;
+  border-radius: 1rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .report-container h3{
@@ -152,4 +178,19 @@ table *:not(li) {
       #45acce 0 235deg,
       orange 0 280deg
   );
+}
+
+.report-container table td{
+  padding-right: 0%;
+  padding-left: 0rem;
+}
+
+.report-container table .square {
+  display: inline-block;
+  box-shadow: none;
+}
+
+.report-container table .square > *{
+  margin: 0.2rem 1rem;
+  padding: 1px 8px;
 }

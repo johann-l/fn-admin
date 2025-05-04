@@ -17,7 +17,7 @@ function createMainWindow() {
     win.webContents.openDevTools();
   }
 
-  win.loadFile(path.join(__dirname, './renderer/pages/index.html'));
+  win.loadFile(path.join(__dirname, './renderer/pages/reports.html'));
   win.maximize();
 }
 

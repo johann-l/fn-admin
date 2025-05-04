@@ -14,7 +14,8 @@
   <div class="top-bar">
     <a href="index.html" class="square" style="margin: auto 1rem">Dashboard</a>
     <a href="#" class="square" style="margin: auto 1rem">Live Tracking</a>
-    <a href="#" class="square" style="margin: auto 1rem; cursor:default; background-color: rgb(137, 149, 145);">Reports</a>
+    <a href="#" class="square"
+      style="margin: auto 1rem; cursor:default; background-color: rgb(137, 149, 145);">Reports</a>
     <p class="square" style="margin: auto 14rem auto auto;">... 4 ...</p>
   </div>
 
@@ -45,7 +46,7 @@
       <main class="main">
         <h2>Reports</h2>
         <div style="display: inline-flex; flex-wrap: wrap; margin-left: 1.3rem;">
-          <div style="display: inline-block; flex-wrap: wrap; margin-right: 10rem;">
+          <div style="display: inline-block; flex-wrap: wrap; margin-right: 3rem;">
             <div class="report-container">
               <h3>Total Expenses</h3>
               <div style=" padding-left: 1rem;">
@@ -56,7 +57,7 @@
                   <div id="bar2"></div>
                   <div id="bar3"></div>
                   <div id="bar4"></div>
-                </div>                
+                </div>
                 <ul class="expense-divisions" style="display: flex; flex-wrap: wrap; column-gap: 3rem;">
                   <li id="exp1">
                     <p>Fuel</p>
@@ -79,20 +80,75 @@
             </div>
             <div class="report-container">
               <h3>Vehicles</h3>
-              <div style="display: inline-flex; padding-left: 1rem;">
+              <div style="display: inline-flex; padding-left: 1rem; ">
                 <div class="piechart"></div>
-                <table>
+                <table style="margin-left: 3rem; padding-right: 0rem;">
                   <tr>
-                    <td><div class="square" style="display: inline-block;"><ul><li>Bus No 1</li></ul><p>₹0</p></div></td>
+                    <td>
+                      <div class="square">
+                        <ul>
+                          <li>Bus No 1</li>
+                        </ul>
+                        <p>₹0</p>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="square">
+                        <ul>
+                          <li>Bus No 2</li>
+                        </ul>
+                        <p>₹0</p>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="square">
+                        <ul>
+                          <li>Bus No 3</li>
+                        </ul>
+                        <p>₹0</p>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="square">
+                        <ul>
+                          <li>Bus No 4</li>
+                        </ul>
+                        <p>₹0</p>
+                      </div>
+                    </td>
                   </tr>
                 </table>
               </div>
             </div>
           </div>
-          <div>
-            <p>a</p>
+
+          <div style="margin-left: 0rem;">
+            <div class="trans-hist">
+              <h3>Transition History</h3>
+              <div style="max-height: 2.7rem; overflow-y: scroll; display: flex; flex-direction: column; gap:1; padding-bottom: 85.4%;">
+                <div class="square" style="display: inline-flex; box-shadow: none; margin:0.5rem 0.5rem 0.2rem 0.7rem;">
+                  <img src="indianoil.png" alt="IndianOil" style="width: 60px; padding: 0.1rem 3rem 0.1rem 0rem;">
+                  <div style="margin-right: 3rem; margin-left: 0rem;">
+                    <strong>Bus number 7</strong><br>
+                    Fuel: 12 Ltrs &nbsp;&nbsp; Fuel rate: ₹100/-<br>
+                    <small>27 February 2025</small>
+                  </div>  
+                  <div style="top:0; right: 0; position: relative; font-weight:bold;">₹1,200.00</div>
+                </div>
+                <div class="square" style="display: inline-flex; box-shadow: none; margin:0.5rem 0.5rem 0.2rem 0.7rem;">
+                  <img src="indianoil.png" alt="IndianOil" style="width: 60px; padding: 0.1rem 3rem 0.1rem 0rem;">
+                  <div style="margin-right: 3rem; margin-left: 0rem;">
+                    <strong>Bus number 7</strong><br>
+                    Fuel: 12 Ltrs &nbsp;&nbsp; Fuel rate: ₹100/-<br>
+                    <small>27 February 2025</small>
+                  </div>
+                  <div style="top:0; right: 0; position: relative; font-weight:bold;">₹1,200.00</div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
       </main>
     </div>
 
@@ -103,18 +159,18 @@
     const var2 = parseFloat(document.getElementById("2val").innerText);
     const var3 = parseFloat(document.getElementById("3val").innerText);
     const var4 = parseFloat(document.getElementById("4val").innerText);
-  
+
     const totalval = var1 + var2 + var3 + var4;
     document.getElementById("totalval").innerText = totalval;
-  
+
     const percent = val => totalval > 0 ? (val / totalval) * 100 : 0;
-  
+
     document.getElementById("bar1").style.width = percent(var1) + "%";
     document.getElementById("bar2").style.width = percent(var2) + "%";
     document.getElementById("bar3").style.width = percent(var3) + "%";
     document.getElementById("bar4").style.width = percent(var4) + "%";
   </script>
-  
+
 </body>
 
 </html>

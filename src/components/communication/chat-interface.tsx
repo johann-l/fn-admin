@@ -17,7 +17,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 
 export default function ChatInterface() {
-  const { drivers, passes } = useAppData()
+  const { drivers, passes, vehicles } = useAppData()
   
   const [selectedContactId, setSelectedContactId] = React.useState(chatContacts[0].id)
   const [messages, setMessages] = React.useState<Message[]>(allMessages[chatContacts[0].id] || [])
@@ -54,12 +54,26 @@ export default function ChatInterface() {
                 type: pass.holderType
             }));
         
-        // Use name for uniqueness as ID is random and can cause issues on hot-reload
-        const uniqueMembers = Array.from(new Map(passHolders.map(item => [item.name, item])).values());
-        return uniqueMembers;
+        const uniquePassHolders = Array.from(new Map(passHolders.map(item => [item.name, item])).values());
+        
+        const vehicleForRoute = vehicles.find(v => v.route === selectedContact.route);
+        const driverForRoute = drivers.find(d => d.id === vehicleForRoute?.driverId);
+        
+        const allMembers = [...uniquePassHolders];
+        
+        if (driverForRoute) {
+            allMembers.unshift({
+                id: driverForRoute.id,
+                name: driverForRoute.name,
+                avatarUrl: `${driverForRoute.avatarUrl}?m=${driverForRoute.id}`,
+                type: 'Driver'
+            });
+        }
+        
+        return allMembers;
     }
     return [];
-  }, [selectedContact, drivers, passes]);
+  }, [selectedContact, drivers, passes, vehicles]);
 
 
   React.useEffect(() => {

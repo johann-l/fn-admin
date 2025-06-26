@@ -73,6 +73,7 @@ export default function ReportsDashboard() {
   const [timeFrame, setTimeFrame] = React.useState<"3m" | "6m" | "1y">("6m");
 
   const expenseData = React.useMemo(() => {
+    if (!expenses) return [];
     const byType = expenses.reduce((acc, expense) => {
       acc[expense.type] = (acc[expense.type] || 0) + expense.amount
       return acc
@@ -86,6 +87,7 @@ export default function ReportsDashboard() {
   }, [expenses])
   
   const totalExpenses = React.useMemo(() => {
+    if (!expenseData) return 0;
     return expenseData.reduce((acc, curr) => acc + curr.amount, 0)
   }, [expenseData])
 
@@ -170,22 +172,49 @@ export default function ReportsDashboard() {
     return payments.filter((p) => p.type === 'Incoming' && p.status === 'Paid');
   }, [payments]);
 
-  const outgoingPayments = React.useMemo(() => {
-    if (!payments) return [];
-    return payments.filter((p) => p.type === 'Outgoing' && p.status === 'Paid');
-  }, [payments]);
-
   const totalIncome = React.useMemo(() => {
     return incomePayments.reduce((acc, p) => acc + p.amount, 0);
   }, [incomePayments]);
 
-  const totalExpensesFromPayments = React.useMemo(() => {
-    return outgoingPayments.reduce((acc, p) => acc + p.amount, 0);
-  }, [outgoingPayments]);
+  const paidExpenses = React.useMemo(() => {
+    if (!expenses) return [];
+    return expenses.filter((e) => e.status === "Paid");
+  }, [expenses]);
+
+  const totalPaidExpenses = React.useMemo(() => {
+    return paidExpenses.reduce((acc, e) => acc + e.amount, 0);
+  }, [paidExpenses]);
 
   const netProfit = React.useMemo(() => {
-    return totalIncome - totalExpensesFromPayments;
-  }, [totalIncome, totalExpensesFromPayments]);
+    return totalIncome - totalPaidExpenses;
+  }, [totalIncome, totalPaidExpenses]);
+
+  const categorizedIncome = React.useMemo(() => {
+    if (!incomePayments) return [];
+    const byCategory = incomePayments.reduce((acc, payment) => {
+        let category = "Other Revenue";
+        if (payment.description.toLowerCase().includes('bus pass fee')) {
+            category = "Bus Pass Fees";
+        }
+        acc[category] = (acc[category] || 0) + payment.amount;
+        return acc;
+    }, {} as Record<string, number>);
+    
+    return Object.entries(byCategory)
+      .map(([category, amount]) => ({ category, amount }))
+      .sort((a, b) => b.amount - a.amount);
+  }, [incomePayments]);
+
+  const categorizedExpenses = React.useMemo(() => {
+    if (!paidExpenses) return [];
+    const byCategory = paidExpenses.reduce((acc, expense) => {
+        acc[expense.type] = (acc[expense.type] || 0) + expense.amount;
+        return acc;
+    }, {} as Record<string, number>);
+    return Object.entries(byCategory)
+      .map(([category, amount]) => ({ category, amount }))
+      .sort((a,b) => b.amount - a.amount);
+  }, [paidExpenses]);
 
 
   return (
@@ -288,7 +317,7 @@ export default function ReportsDashboard() {
                       </Pie>
                       <ChartLegend
                         content={<ChartLegendContent nameKey="type" />}
-                        className="-mt-4 flex-wrap"
+                        className="-mt-4 flex-wrap gap-x-4 gap-y-1"
                       />
                     </PieChart>
                     </ChartContainer>
@@ -428,7 +457,7 @@ export default function ReportsDashboard() {
                       </Pie>
                       <ChartLegend
                         content={<ChartLegendContent nameKey="status" />}
-                        className="-mt-4 flex-wrap"
+                        className="-mt-4 flex-wrap gap-x-4 gap-y-1"
                       />
                     </PieChart>
                     </ChartContainer>
@@ -464,18 +493,15 @@ export default function ReportsDashboard() {
                             <Table>
                                 <TableHeader className="sticky top-0 bg-card/95 backdrop-blur-sm">
                                 <TableRow>
-                                    <TableHead>Description</TableHead>
+                                    <TableHead>Category</TableHead>
                                     <TableHead className="text-right">Amount</TableHead>
                                 </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                {[...incomePayments].sort((a,b) => b.date.getTime() - a.date.getTime()).map((p) => (
-                                    <TableRow key={p.id}>
-                                    <TableCell>
-                                        <div className="font-medium">{p.description}</div>
-                                        <div className="text-xs text-muted-foreground">{format(p.date, "LLL dd, y")}</div>
-                                    </TableCell>
-                                    <TableCell className="text-right font-medium text-primary">+${p.amount.toFixed(2)}</TableCell>
+                                {categorizedIncome.map((p) => (
+                                    <TableRow key={p.category}>
+                                      <TableCell className="font-medium">{p.category}</TableCell>
+                                      <TableCell className="text-right font-medium text-primary">+${p.amount.toFixed(2)}</TableCell>
                                     </TableRow>
                                 ))}
                                 </TableBody>
@@ -494,18 +520,15 @@ export default function ReportsDashboard() {
                             <Table>
                                 <TableHeader className="sticky top-0 bg-card/95 backdrop-blur-sm">
                                 <TableRow>
-                                    <TableHead>Description</TableHead>
+                                    <TableHead>Category</TableHead>
                                     <TableHead className="text-right">Amount</TableHead>
                                 </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                {[...outgoingPayments].sort((a,b) => b.date.getTime() - a.date.getTime()).map((p) => (
-                                    <TableRow key={p.id}>
-                                    <TableCell>
-                                        <div className="font-medium">{p.description}</div>
-                                        <div className="text-xs text-muted-foreground">{format(p.date, "LLL dd, y")}</div>
-                                    </TableCell>
-                                    <TableCell className="text-right font-medium text-destructive">-${p.amount.toFixed(2)}</TableCell>
+                                {categorizedExpenses.map((e) => (
+                                    <TableRow key={e.category}>
+                                      <TableCell className="font-medium">{e.category}</TableCell>
+                                      <TableCell className="text-right font-medium text-destructive">-${e.amount.toFixed(2)}</TableCell>
                                     </TableRow>
                                 ))}
                                 </TableBody>
@@ -513,7 +536,7 @@ export default function ReportsDashboard() {
                            </div>
                            <div className="flex justify-between items-center text-lg font-bold p-4 border-t bg-card/95 backdrop-blur-sm">
                               <span>Total Expenses</span>
-                              <span className="text-destructive">${totalExpensesFromPayments.toFixed(2)}</span>
+                              <span className="text-destructive">${totalPaidExpenses.toFixed(2)}</span>
                            </div>
                         </div>
                     </div>

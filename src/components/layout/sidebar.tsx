@@ -33,6 +33,7 @@ import {
   Sun,
   Moon,
   Truck,
+  AreaChart,
 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
@@ -45,6 +46,7 @@ const links = [
   { href: "/expenses", label: "Expenses", icon: Banknote },
   { href: "/payments", label: "Payments", icon: CreditCard },
   { href: "/communication", label: "Communication", icon: MessageSquare },
+  { href: "/reports", label: "Reports", icon: AreaChart },
   { href: "/optimize", label: "AI Optimization", icon: Wand2 },
 ]
 

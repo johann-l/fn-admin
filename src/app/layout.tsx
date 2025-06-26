@@ -8,7 +8,7 @@ import { AppDataProvider } from '@/context/app-data-context';
 
 export const metadata: Metadata = {
   title: 'FleetNow',
-  description: 'AI-Powered Fleet Management',
+  description: 'School Bus Fleet Management',
 };
 
 export default function RootLayout({

@@ -92,7 +92,7 @@ export default function ChatInterface() {
                 <div className="p-4 border-b">
                      <TabsList className="grid w-full grid-cols-2">
                         <TabsTrigger value="drivers">Drivers</TabsTrigger>
-                        <TabsTrigger value="passengers">Passengers</TabsTrigger>
+                        <TabsTrigger value="parents">Parents/Students</TabsTrigger>
                     </TabsList>
                 </div>
 
@@ -104,7 +104,7 @@ export default function ChatInterface() {
                     </ScrollArea>
                 </TabsContent>
 
-                <TabsContent value="passengers" className="flex-1 overflow-auto">
+                <TabsContent value="parents" className="flex-1 overflow-auto">
                     <ScrollArea className="h-full">
                         <div className="p-2 space-y-1">
                             {passengerGroupChats.map(contact => (
@@ -175,7 +175,7 @@ export default function ChatInterface() {
                                   if (senderDriver) {
                                     senderAvatarUrl = senderDriver.avatarUrl;
                                   } else {
-                                    // It's a passenger
+                                    // It's a student/parent
                                     senderAvatarUrl = `https://placehold.co/100x100.png?text=${fallback}`;
                                   }
                                 }

@@ -50,7 +50,7 @@ import BusPassCard from "./bus-pass-card"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 const passFormSchema = z.object({
-  passengerName: z.string().min(1, "Passenger name is required"),
+  studentName: z.string().min(1, "Student name is required"),
   vehicleId: z.string().min(1, "Vehicle selection is required"),
   seat: z.string().min(1, "Seat is required"),
   validFrom: z.date({ required_error: "A start date is required." }),
@@ -75,7 +75,7 @@ export default function BusPassAdmin() {
   const handleEditClick = (pass: BusPass) => {
     setSelectedPass(pass)
     form.reset({
-      passengerName: pass.passengerName,
+      studentName: pass.studentName,
       vehicleId: pass.vehicleId,
       seat: pass.seat,
       validFrom: pass.validFrom,
@@ -87,7 +87,7 @@ export default function BusPassAdmin() {
   const handleCreateClick = () => {
     setSelectedPass(null);
     form.reset({
-      passengerName: "",
+      studentName: "",
       vehicleId: "",
       seat: "",
       validFrom: undefined,
@@ -141,8 +141,8 @@ export default function BusPassAdmin() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
             <div>
-                <CardTitle>Passenger Bus Passes</CardTitle>
-                <CardDescription>Create, edit, and verify passenger bus passes.</CardDescription>
+                <CardTitle>Student Bus Passes</CardTitle>
+                <CardDescription>Create, edit, and verify student bus passes.</CardDescription>
             </div>
             <Button onClick={handleCreateClick}>
                 <PlusCircle className="mr-2 h-4 w-4" />
@@ -154,7 +154,7 @@ export default function BusPassAdmin() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Passenger</TableHead>
+                  <TableHead>Student</TableHead>
                   <TableHead>Assignment</TableHead>
                   <TableHead>Validity</TableHead>
                   <TableHead>Status</TableHead>
@@ -173,7 +173,7 @@ export default function BusPassAdmin() {
                       transition={{ type: "spring", stiffness: 350, damping: 35 }}
                       className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
                     >
-                      <TableCell className="font-medium">{pass.passengerName}</TableCell>
+                      <TableCell className="font-medium">{pass.studentName}</TableCell>
                       <TableCell>
                         <div>{vehicles.find(v => v.id === pass.vehicleId)?.name}</div>
                         <div className="text-sm text-muted-foreground">Seat {pass.seat}</div>
@@ -231,9 +231,9 @@ export default function BusPassAdmin() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
               <FormField
                 control={form.control}
-                name="passengerName"
+                name="studentName"
                 render={({ field }) => (
-                  <FormItem><FormLabel>Passenger Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                  <FormItem><FormLabel>Student Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
                 )}
               />
               <div className="grid grid-cols-2 gap-4">
@@ -313,9 +313,9 @@ export default function BusPassAdmin() {
           {selectedPassForView && (
             <>
               <DialogHeader className="sr-only">
-                <DialogTitle>Bus Pass: {selectedPassForView.passengerName}</DialogTitle>
+                <DialogTitle>Bus Pass: {selectedPassForView.studentName}</DialogTitle>
                 <DialogDescription>
-                  View and print the passenger&apos;s bus pass.
+                  View and print the student&apos;s bus pass.
                 </DialogDescription>
               </DialogHeader>
               <BusPassCard pass={selectedPassForView} />
@@ -329,7 +329,7 @@ export default function BusPassAdmin() {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the bus pass for {passToDelete?.passengerName}.
+              This action cannot be undone. This will permanently delete the bus pass for {passToDelete?.studentName}.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

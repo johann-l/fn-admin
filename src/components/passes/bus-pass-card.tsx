@@ -19,7 +19,7 @@ export default function BusPassCard({ pass }: BusPassCardProps) {
   const vehicle = vehicles.find(v => v.id === pass.vehicleId);
   const qrValue = JSON.stringify({
     passId: pass.id,
-    passengerName: pass.passengerName,
+    studentName: pass.studentName,
     vehicleId: pass.vehicleId,
     validUntil: pass.validUntil.toISOString(),
   });
@@ -64,16 +64,16 @@ export default function BusPassCard({ pass }: BusPassCardProps) {
                 </div>
                 <div className="absolute -bottom-10 right-6">
                     <Avatar className="h-20 w-20 border-4 border-card bg-card">
-                        <AvatarImage src={`https://placehold.co/100x100.png?text=${pass.passengerName.charAt(0)}`} alt={pass.passengerName} data-ai-hint="person avatar"/>
-                        <AvatarFallback>{pass.passengerName.substring(0, 2).toUpperCase()}</AvatarFallback>
+                        <AvatarImage src={`https://placehold.co/100x100.png?text=${pass.studentName.charAt(0)}`} alt={pass.studentName} data-ai-hint="person avatar"/>
+                        <AvatarFallback>{pass.studentName.substring(0, 2).toUpperCase()}</AvatarFallback>
                     </Avatar>
                 </div>
             </div>
             <CardContent className="p-6 pt-12 space-y-4">
                 <div className="flex justify-between items-center">
                     <div className="text-left">
-                        <h3 className="text-xl font-semibold">{pass.passengerName}</h3>
-                        <p className="text-sm text-muted-foreground">Bus Pass</p>
+                        <h3 className="text-xl font-semibold">{pass.studentName}</h3>
+                        <p className="text-sm text-muted-foreground">Student Bus Pass</p>
                     </div>
                     <div className="p-1 bg-white rounded-md">
                         <QRCode value={qrValue} size={64} />

@@ -28,7 +28,7 @@ export type Driver = {
 
 export type BusPass = {
   id:string;
-  passengerName: string;
+  studentName: string;
   bloodGroup: string;
   vehicleId: string;
   route: string;
@@ -60,7 +60,7 @@ export type Expense = {
 
 export type Message = {
   id: string;
-  sender: 'Admin' | string; // driver name or passenger name
+  sender: 'Admin' | string; // driver name or student name
   content: string;
   timestamp: Date;
 };
@@ -68,11 +68,11 @@ export type Message = {
 export type ChatContact = {
   id: string;
   name: string;
-  type: 'Group' | 'Driver' | 'Passenger';
+  type: 'Group' | 'Driver' | 'Student';
   avatarUrl: string;
   lastMessage: string;
   lastMessageTime: string;
-  route?: string; // For passengers
+  route?: string; // For students
 };
 
 export type Payment = {
@@ -102,16 +102,16 @@ export const vehicles: Vehicle[] = [
 ];
 
 export const passes: BusPass[] = [
-  { id: 'p001', passengerName: 'Alice Williams', bloodGroup: 'A+', vehicleId: 'v001', route: '101', seat: '12A', validFrom: new Date('2024-07-01'), validUntil: new Date('2024-07-31'), status: 'Active' },
-  { id: 'p002', passengerName: 'Bob Brown', bloodGroup: 'O-', vehicleId: 'v002', route: '202', seat: '5B', validFrom: new Date('2024-06-01'), validUntil: new Date('2024-06-30'), status: 'Expired' },
-  { id: 'p003', passengerName: 'Charlie Green', bloodGroup: 'B+', vehicleId: 'v003', route: '303', seat: '21F', validFrom: new Date('2024-07-10'), validUntil: new Date('2024-08-10'), status: 'Active' },
-  { id: 'p004', passengerName: 'Diana Prince', bloodGroup: 'AB+', vehicleId: 'v001', route: '101', seat: '3C', validFrom: new Date('2024-01-01'), validUntil: new Date('2024-01-01'), status: 'Invalid' },
+  { id: 'p001', studentName: 'Liam Miller', bloodGroup: 'A+', vehicleId: 'v001', route: '101', seat: '12A', validFrom: new Date('2024-07-01'), validUntil: new Date('2024-12-31'), status: 'Active' },
+  { id: 'p002', studentName: 'Olivia Garcia', bloodGroup: 'O-', vehicleId: 'v002', route: '202', seat: '5B', validFrom: new Date('2024-01-01'), validUntil: new Date('2024-06-30'), status: 'Expired' },
+  { id: 'p003', studentName: 'Noah Martinez', bloodGroup: 'B+', vehicleId: 'v003', route: '303', seat: '21F', validFrom: new Date('2024-07-10'), validUntil: new Date('2024-12-31'), status: 'Active' },
+  { id: 'p004', studentName: 'Emma Rodriguez', bloodGroup: 'AB+', vehicleId: 'v001', route: '101', seat: '3C', validFrom: new Date('2024-01-01'), validUntil: new Date('2024-01-01'), status: 'Invalid' },
 ];
 
 export const documents: Document[] = [
   { id: 'doc001', name: 'Registration-Bus-1.pdf', vehicleId: 'v001', uploadDate: new Date('2024-01-15'), expiryDate: new Date('2025-01-14'), status: 'Valid', url: 'https://placehold.co/850x1100.png' },
   { id: 'doc002', name: 'Insurance-Bus-2.pdf', vehicleId: 'v002', uploadDate: new Date('2023-08-01'), expiryDate: new Date('2024-07-31'), status: 'Expiring Soon', url: 'https://placehold.co/850x1100.png' },
-  { id: 'doc003', name: 'Maintenance-Bus-3.pdf', vehicleId: 'v003', uploadDate: new Date('2024-05-20'), expiryDate: new Date('2024-06-19'), status: 'Expired', url: 'https://placehold.co/850x1100.png' },
+  { id: 'doc003', name: 'Maintenance-Log-Bus-3.pdf', vehicleId: 'v003', uploadDate: new Date('2024-05-20'), expiryDate: new Date('2024-06-19'), status: 'Expired', url: 'https://placehold.co/850x1100.png' },
   { id: 'doc004', name: 'Permit-Bus-4.pdf', vehicleId: 'v004', uploadDate: new Date('2024-03-10'), expiryDate: new Date('2026-03-09'), status: 'Valid', url: 'https://placehold.co/850x1100.png' },
 ];
 
@@ -120,29 +120,29 @@ export const expenses: Expense[] = [
   { id: 'exp002', vehicleId: 'v002', type: 'Maintenance', description: 'Brake pad replacement', amount: 350.00, date: new Date('2024-07-14'), status: 'Unpaid' },
   { id: 'exp003', vehicleId: 'v003', type: 'Insurance', description: 'Monthly premium', amount: 500.00, date: new Date('2024-07-01'), status: 'Paid' },
   { id: 'exp004', vehicleId: 'v004', type: 'Fuel', description: 'Refuel for Bus 4', amount: 180.50, date: new Date('2024-07-16'), status: 'Unpaid' },
-  { id: 'exp005', vehicleId: 'v001', type: 'Other', description: 'Tire cleaning supplies', amount: 45.25, date: new Date('2024-07-12'), status: 'Paid' },
+  { id: 'exp005', vehicleId: 'v001', type: 'Other', description: 'Cleaning supplies', amount: 45.25, date: new Date('2024-07-12'), status: 'Paid' },
   { id: 'exp006', vehicleId: 'v005', type: 'Maintenance', description: 'Oil change and filter', amount: 120.00, date: new Date('2024-07-10'), status: 'Unpaid' },
-  { id: 'exp007', vehicleId: 'v002', type: 'Tolls', description: 'Downtown Bridge Toll', amount: 12.50, date: new Date('2024-07-18'), status: 'Paid' },
-  { id: 'exp008', vehicleId: 'v004', type: 'Misc', description: 'Driver meal allowance', amount: 25.00, date: new Date('2024-07-19'), status: 'Paid' },
+  { id: 'exp007', vehicleId: 'v002', type: 'Tolls', description: 'Toll for school trip', amount: 12.50, date: new Date('2024-07-18'), status: 'Paid' },
+  { id: 'exp008', vehicleId: 'v004', type: 'Misc', description: 'Driver meal for field trip', amount: 25.00, date: new Date('2024-07-19'), status: 'Paid' },
 ];
 
 export const payments: Payment[] = [
-  { id: 'pay001', description: 'Bus Pass Fee - A. Williams', amount: 55.00, date: new Date('2024-07-01T10:00:00Z'), status: 'Paid', type: 'Incoming', method: 'Credit Card' },
+  { id: 'pay001', description: 'Semester Bus Pass Fee - L. Miller', amount: 250.00, date: new Date('2024-07-01T10:00:00Z'), status: 'Paid', type: 'Incoming', method: 'Credit Card' },
   { id: 'pay002', description: 'Fuel Supplier Invoice #FS-1024', amount: 1250.50, date: new Date('2024-07-05T11:30:00Z'), status: 'Paid', type: 'Outgoing', method: 'Bank Transfer' },
-  { id: 'pay003', description: 'Bus Pass Fee - C. Green', amount: 55.00, date: new Date('2024-07-10T14:00:00Z'), status: 'Paid', type: 'Incoming', method: 'Credit Card' },
+  { id: 'pay003', description: 'Semester Bus Pass Fee - N. Martinez', amount: 250.00, date: new Date('2024-07-10T14:00:00Z'), status: 'Paid', type: 'Incoming', method: 'Credit Card' },
   { id: 'pay004', description: 'Tire Replacement - Bus 2', amount: 800.00, date: new Date('2024-07-12T09:45:00Z'), status: 'Paid', type: 'Outgoing', method: 'Credit Card' },
-  { id: 'pay005', description: 'Ad Revenue - Route 5 Billboards', amount: 750.00, date: new Date('2024-07-15T16:20:00Z'), status: 'Paid', type: 'Incoming', method: 'Bank Transfer' },
+  { id: 'pay005', description: 'Field Trip Charter - History Dept.', amount: 750.00, date: new Date('2024-07-15T16:20:00Z'), status: 'Paid', type: 'Incoming', method: 'Bank Transfer' },
   { id: 'pay006', description: 'Office Cleaning Services', amount: 150.00, date: new Date('2024-07-18T18:00:00Z'), status: 'Pending', type: 'Outgoing', method: 'Bank Transfer' },
-  { id: 'pay007', description: 'Special Event Charter', amount: 1200.00, date: new Date('2024-07-20T10:30:00Z'), status: 'Failed', type: 'Incoming', method: 'Credit Card' },
-  { id: 'pay008', description: 'On-board Ticket - Route 202', amount: 2.50, date: new Date('2024-07-21T09:15:00Z'), status: 'Paid', type: 'Incoming', method: 'Cash' },
-  { id: 'pay009', description: 'Charter Service Deposit', amount: 500.00, date: new Date('2024-07-22T14:00:00Z'), status: 'Pending', type: 'Incoming', method: 'Bank Transfer' },
-  { id: 'pay010', description: 'Bus Pass Fee - B. Brown', amount: 55.00, date: new Date('2024-07-23T11:20:00Z'), status: 'Paid', type: 'Incoming', method: 'Credit Card' },
+  { id: 'pay007', description: 'Late Bus Pass Fee - O. Garcia', amount: 275.00, date: new Date('2024-07-20T10:30:00Z'), status: 'Failed', type: 'Incoming', method: 'Credit Card' },
+  { id: 'pay008', description: 'Sports Team Transport', amount: 300.00, date: new Date('2024-07-21T09:15:00Z'), status: 'Paid', type: 'Incoming', method: 'Bank Transfer' },
+  { id: 'pay009', description: 'School Trip Deposit', amount: 500.00, date: new Date('2024-07-22T14:00:00Z'), status: 'Pending', type: 'Incoming', method: 'Bank Transfer' },
+  { id: 'pay010', description: 'Bus Pass Renewal - E. Rodriguez', amount: 250.00, date: new Date('2024-07-23T11:20:00Z'), status: 'Paid', type: 'Incoming', method: 'Credit Card' },
 ];
 
 export const chatContacts: ChatContact[] = [
     { id: 'group_drivers', name: 'All Drivers', type: 'Group', avatarUrl: '', lastMessage: 'Remember to complete pre-trip inspections.', lastMessageTime: '8:30 AM' },
-    { id: 'group_route_101', name: 'Route 101 Passengers', type: 'Group', avatarUrl: '', lastMessage: 'I left my umbrella on the bus.', lastMessageTime: '10:05 AM', route: '101' },
-    { id: 'group_route_303', name: 'Route 303 Passengers', type: 'Group', avatarUrl: '', lastMessage: 'Is the bus running on schedule?', lastMessageTime: '9:15 AM', route: '303' },
+    { id: 'group_route_101', name: 'Route 101 Parents/Students', type: 'Group', avatarUrl: '', lastMessage: 'I left my backpack on the bus.', lastMessageTime: '10:05 AM', route: '101' },
+    { id: 'group_route_303', name: 'Route 303 Parents/Students', type: 'Group', avatarUrl: '', lastMessage: 'Is the bus running on schedule?', lastMessageTime: '9:15 AM', route: '303' },
 ];
 
 export const messages: Record<string, Message[]> = {
@@ -153,13 +153,13 @@ export const messages: Record<string, Message[]> = {
     { id: 'msg_gd_4', sender: 'Admin', content: 'Thanks, John and Jane. Drive safe!', timestamp: new Date(new Date().setHours(8, 40, 0)) },
   ],
   'group_route_101': [
-     { id: 'msg_r101_1', sender: 'Alice Williams', content: 'I lost my wallet on the bus, has anyone found it?', timestamp: new Date(new Date().setDate(new Date().getDate() - 1)) },
-     { id: 'msg_r101_2', sender: 'Admin', content: 'Which bus were you on, Alice? We can check with the driver.', timestamp: new Date(new Date().setDate(new Date().getDate() - 1)) },
-     { id: 'msg_r101_3', sender: 'Diana Prince', content: 'I think I left my blue umbrella on the bus this morning.', timestamp: new Date(new Date().setHours(10, 5, 0)) },
-     { id: 'msg_r101_4', sender: 'Admin', content: 'I will check with the driver, Diana.', timestamp: new Date(new Date().setHours(10, 6, 0)) },
+     { id: 'msg_r101_1', sender: 'Liam Miller', content: 'I may have left my science project on the bus, has anyone found it?', timestamp: new Date(new Date().setDate(new Date().getDate() - 1)) },
+     { id: 'msg_r101_2', sender: 'Admin', content: 'Which bus were you on, Liam? We can check with the driver.', timestamp: new Date(new Date().setDate(new Date().getDate() - 1)) },
+     { id: 'msg_r101_3', sender: 'Emma Rodriguez', content: 'I think I left my blue backpack on the bus this morning.', timestamp: new Date(new Date().setHours(10, 5, 0)) },
+     { id: 'msg_r101_4', sender: 'Admin', content: 'I will check with the driver, Emma.', timestamp: new Date(new Date().setHours(10, 6, 0)) },
   ],
   'group_route_303': [
-    { id: 'msg_r303_1', sender: 'Charlie Green', content: 'Hi, is the bus running on schedule today?', timestamp: new Date(new Date().setHours(9, 15, 0)) },
+    { id: 'msg_r303_1', sender: 'Noah Martinez', content: 'Hi, is the bus running on schedule today?', timestamp: new Date(new Date().setHours(9, 15, 0)) },
     { id: 'msg_r303_2', sender: 'Admin', content: 'Yes, everything is on time so far. You can track the bus live on the main dashboard map.', timestamp: new Date(new Date().setHours(9, 16, 0)) },
   ],
 };

@@ -229,7 +229,7 @@ export default function DriverManagement() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Assigned Vehicle</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value || ""}>
+                      <Select onValueChange={field.onChange} value={field.value ?? "none"}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select a vehicle" />

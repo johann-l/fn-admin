@@ -23,7 +23,6 @@ import {
   LayoutDashboard,
   Users,
   Ticket,
-  Wand2,
   FileText,
   MessageSquare,
   Settings,
@@ -47,7 +46,6 @@ const links = [
   { href: "/payments", label: "Payments", icon: CreditCard },
   { href: "/communication", label: "Communication", icon: MessageSquare },
   { href: "/reports", label: "Reports", icon: AreaChart },
-  { href: "/optimize", label: "AI Optimization", icon: Wand2 },
 ]
 
 export default function AppSidebar() {

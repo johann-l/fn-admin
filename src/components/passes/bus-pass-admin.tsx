@@ -48,7 +48,6 @@ import { CalendarIcon, Edit, PlusCircle, Eye, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import BusPassCard from "./bus-pass-card"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Label } from "@/components/ui/label"
 
 const passFormSchema = z.object({
   holderName: z.string().min(1, "Pass holder name is required"),
@@ -162,36 +161,30 @@ export default function BusPassAdmin() {
             </Button>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap items-center gap-4 py-4">
-            <div className="flex items-center gap-2">
-              <Label htmlFor="bus-filter">Filter by Bus</Label>
-              <Select value={busFilter} onValueChange={setBusFilter}>
-                <SelectTrigger id="bus-filter" className="w-[200px]">
-                  <SelectValue placeholder="Select a bus" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Buses</SelectItem>
-                  {vehicles.map(vehicle => (
-                    <SelectItem key={vehicle.id} value={vehicle.id}>
-                      {vehicle.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex items-center gap-2">
-              <Label htmlFor="type-filter">Filter by Type</Label>
-              <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger id="type-filter" className="w-[180px]">
-                  <SelectValue placeholder="Select a type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="Student">Student</SelectItem>
-                  <SelectItem value="Faculty">Faculty</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="flex flex-wrap items-center gap-2 py-4">
+            <Select value={busFilter} onValueChange={setBusFilter}>
+              <SelectTrigger className="w-auto md:w-[200px]">
+                <SelectValue placeholder="Filter by Bus" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Buses</SelectItem>
+                {vehicles.map((vehicle) => (
+                  <SelectItem key={vehicle.id} value={vehicle.id}>
+                    {vehicle.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger className="w-auto md:w-[180px]">
+                <SelectValue placeholder="Filter by Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="Student">Student</SelectItem>
+                <SelectItem value="Faculty">Faculty</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <TooltipProvider>
             <Table>

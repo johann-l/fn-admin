@@ -143,6 +143,9 @@ export default function ReportsDashboard() {
                         />
                     ))}
                   </Pie>
+                  <ChartLegend
+                    content={<ChartLegendContent nameKey="type" />}
+                  />
                 </PieChart>
                 </ChartContainer>
             </CardContent>
@@ -151,10 +154,6 @@ export default function ReportsDashboard() {
                     <span>Total</span>
                     <span>${totalExpenses.toFixed(2)}</span>
                 </div>
-                 <ChartLegend
-                    content={<ChartLegendContent nameKey="type" />}
-                    data={expenseData}
-                />
             </CardContent>
         </Card>
 
@@ -279,6 +278,9 @@ export default function ReportsDashboard() {
                         />
                     ))}
                   </Pie>
+                  <ChartLegend
+                    content={<ChartLegendContent nameKey="status" />}
+                  />
                 </PieChart>
                 </ChartContainer>
             </CardContent>
@@ -287,10 +289,6 @@ export default function ReportsDashboard() {
                     <span>Total Vehicles</span>
                     <span>{totalVehicles}</span>
                 </div>
-                 <ChartLegend
-                    content={<ChartLegendContent nameKey="status" />}
-                    data={fleetStatusData}
-                />
             </CardContent>
         </Card>
     </div>

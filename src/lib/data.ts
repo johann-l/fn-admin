@@ -1,3 +1,4 @@
+
 export type Vehicle = {
   id: string;
   name: string;
@@ -58,7 +59,7 @@ export type Expense = {
 
 export type Message = {
   id: string;
-  sender: 'Admin' | string; // driver name
+  sender: 'Admin' | string; // driver name or passenger name
   content: string;
   timestamp: Date;
 };
@@ -66,10 +67,11 @@ export type Message = {
 export type ChatContact = {
   id: string;
   name: string;
-  type: 'Driver' | 'Passenger';
+  type: 'Group' | 'Driver' | 'Passenger';
   avatarUrl: string;
   lastMessage: string;
   lastMessageTime: string;
+  route?: string; // For passengers
 };
 
 export type Payment = {
@@ -134,28 +136,30 @@ export const payments: Payment[] = [
 ];
 
 export const chatContacts: ChatContact[] = [
-    { id: 'd001', name: 'John Doe', type: 'Driver', avatarUrl: 'https://placehold.co/40x40.png', lastMessage: 'Okay, copy that.', lastMessageTime: '10:42 AM' },
-    { id: 'd002', name: 'Jane Smith', type: 'Driver', avatarUrl: 'https://placehold.co/40x40.png', lastMessage: 'Traffic is heavy on 5th Ave.', lastMessageTime: '10:35 AM' },
-    { id: 'pass001', name: 'Alice Williams', type: 'Passenger', avatarUrl: 'https://placehold.co/40x40.png', lastMessage: 'Thank you for the help!', lastMessageTime: 'Yesterday' },
-    { id: 'd005', name: 'Chris Lee', type: 'Driver', avatarUrl: 'https://placehold.co/40x40.png', lastMessage: 'I\'m starting my route now.', lastMessageTime: '9:01 AM' },
+    { id: 'group_drivers', name: 'All Drivers', type: 'Group', avatarUrl: '', lastMessage: 'Remember to complete pre-trip inspections.', lastMessageTime: '8:30 AM' },
+    { id: 'pass001', name: 'Alice Williams', type: 'Passenger', route: 'Downtown Loop', avatarUrl: 'https://placehold.co/40x40.png', lastMessage: 'Thank you for the help!', lastMessageTime: 'Yesterday' },
+    { id: 'pass003', name: 'Charlie Green', type: 'Passenger', route: 'West Suburbs', avatarUrl: 'https://placehold.co/40x40.png', lastMessage: 'Is the bus running on schedule?', lastMessageTime: '9:15 AM' },
+    { id: 'pass004', name: 'Diana Prince', type: 'Passenger', route: 'Downtown Loop', avatarUrl: 'https://placehold.co/40x40.png', lastMessage: 'I left my umbrella on the bus.', lastMessageTime: '10:05 AM' },
 ];
 
 export const messages: Record<string, Message[]> = {
-  'd001': [
-    { id: 'msg1', sender: 'Admin', content: 'John, what is your current ETA for Central Station?', timestamp: new Date(new Date().setHours(10, 40, 0)) },
-    { id: 'msg2', sender: 'John Doe', content: 'Should be there in 15 minutes. Light traffic.', timestamp: new Date(new Date().setHours(10, 41, 0)) },
-    { id: 'msg3', sender: 'Admin', content: 'Great, keep me updated.', timestamp: new Date(new Date().setHours(10, 41, 30)) },
-    { id: 'msg4', sender: 'John Doe', content: 'Okay, copy that.', timestamp: new Date(new Date().setHours(10, 42, 0)) },
-  ],
-  'd002': [
-    { id: 'msg5', sender: 'Jane Smith', content: 'Traffic is heavy on 5th Ave.', timestamp: new Date(new Date().setHours(10, 35, 0)) },
+  'group_drivers': [
+    { id: 'msg_gd_1', sender: 'Admin', content: 'Good morning team. Just a reminder to complete your pre-trip vehicle inspections before heading out.', timestamp: new Date(new Date().setHours(8, 30, 0)) },
+    { id: 'msg_gd_2', sender: 'John Doe', content: 'Morning! Inspection done for City Cruiser 1.', timestamp: new Date(new Date().setHours(8, 32, 0)) },
+    { id: 'msg_gd_3', sender: 'Jane Smith', content: 'All good here on Express 202.', timestamp: new Date(new Date().setHours(8, 35, 0)) },
+    { id: 'msg_gd_4', sender: 'Admin', content: 'Thanks, John and Jane. Drive safe!', timestamp: new Date(new Date().setHours(8, 40, 0)) },
   ],
   'pass001': [
      { id: 'msg6', sender: 'Alice Williams', content: 'I lost my wallet on the bus, has anyone found it?', timestamp: new Date(new Date().setDate(new Date().getDate() - 1)) },
      { id: 'msg7', sender: 'Admin', content: 'Which bus were you on? We can check with the driver.', timestamp: new Date(new Date().setDate(new Date().getDate() - 1)) },
      { id: 'msg8', sender: 'Alice Williams', content: 'Thank you for the help!', timestamp: new Date(new Date().setDate(new Date().getDate() - 1)) },
   ],
-  'd005': [
-     { id: 'msg9', sender: 'Chris Lee', content: "I'm starting my route now.", timestamp: new Date(new Date().setHours(9, 1, 0)) },
-  ]
+  'pass003': [
+    { id: 'msg_cg_1', sender: 'Charlie Green', content: 'Hi, is the West Suburbs bus running on schedule today?', timestamp: new Date(new Date().setHours(9, 15, 0)) },
+    { id: 'msg_cg_2', sender: 'Admin', content: 'Yes, everything is on time so far. You can track the bus live on the main dashboard map.', timestamp: new Date(new Date().setHours(9, 16, 0)) },
+  ],
+  'pass004': [
+    { id: 'msg_dp_1', sender: 'Diana Prince', content: 'I think I left my blue umbrella on the Downtown Loop bus this morning.', timestamp: new Date(new Date().setHours(10, 5, 0)) },
+    { id: 'msg_dp_2', sender: 'Admin', content: 'I will check with the driver and let you know.', timestamp: new Date(new Date().setHours(10, 6, 0)) },
+  ],
 };

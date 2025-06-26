@@ -190,7 +190,7 @@ export default function ChatInterface() {
                     </Avatar>
                     <div className="flex-1">
                         <div className="font-bold">{selectedContact.name}</div>
-                        <div className="text-sm text-muted-foreground">{selectedContact.type === 'Group' ? 'Group Chat' : selectedContact.type}</div>
+                        <div className="text-sm text-muted-foreground">{selectedContact.type === 'Group' ? `Group Chat ・ ${groupMembers.length + 1} members` : selectedContact.type}</div>
                     </div>
                     <div className="flex items-center gap-1">
                        {selectedContact.type === 'Group' && (
@@ -239,12 +239,12 @@ export default function ChatInterface() {
                                         </Avatar>
                                     )}
                                     <div className={cn(
-                                    "max-w-xs lg:max-w-md px-4 py-2.5 rounded-xl",
+                                    "max-w-xs lg:max-w-md px-4 py-2 rounded-xl",
                                     senderIsAdmin 
                                         ? 'bg-primary text-primary-foreground rounded-br-none' 
                                         : 'bg-muted rounded-bl-none'
                                     )}>
-                                    {isGroupChat && !senderIsAdmin && <p className="text-xs font-bold mb-1 text-accent-foreground/80">{senderName}</p>}
+                                    {isGroupChat && !senderIsAdmin && <p className="text-xs font-bold mb-1 text-primary">{senderName}</p>}
                                     <p className="text-sm break-words">{message.content}</p>
                                     <p className="text-xs mt-1.5 text-right opacity-70">{isMounted ? message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '...'}</p>
                                     </div>
@@ -282,51 +282,46 @@ export default function ChatInterface() {
     {selectedContact && (
         <Sheet open={isGroupInfoOpen} onOpenChange={setIsGroupInfoOpen}>
             <SheetContent className="w-full sm:max-w-md flex flex-col p-0">
-                <SheetHeader className="text-left p-6 pb-0">
-                    <div className="flex flex-col items-center gap-4 text-center">
+                <SheetHeader className="p-6 text-center border-b">
+                     <div className="flex flex-col items-center gap-4">
                          <Avatar className="h-24 w-24">
                             <div className="flex h-full w-full items-center justify-center rounded-full bg-muted text-4xl">
                                 <Users className="h-12 w-12" />
                             </div>
                         </Avatar>
-                        <div>
+                        <div className="space-y-1">
                             <SheetTitle className="text-2xl">{selectedContact.name}</SheetTitle>
                             <SheetDescription>
-                                Group &middot; {groupMembers.length + 1} participants
+                                Group Chat &middot; {groupMembers.length + 1} members
                             </SheetDescription>
                         </div>
                     </div>
                 </SheetHeader>
-                <div className="p-6 border-b">
-                    <h4 className="text-sm font-medium text-muted-foreground">{groupMembers.length + 1} participants</h4>
-                </div>
-                <div className="flex-1 overflow-hidden">
-                    <ScrollArea className="h-full">
-                        <div className="space-y-1 p-6 pt-2">
-                            <div className="flex items-center gap-3 p-2 rounded-lg">
+                <div className="flex-1 overflow-y-auto">
+                    <div className="p-6 space-y-5">
+                         <div className="flex items-center gap-4">
+                            <Avatar className="h-10 w-10">
+                                <AvatarImage src="https://placehold.co/100x100.png" alt="Admin" data-ai-hint="person avatar" />
+                                <AvatarFallback>AD</AvatarFallback>
+                            </Avatar>
+                            <div>
+                                <p className="font-semibold">You</p>
+                                <p className="text-sm text-muted-foreground">Admin</p>
+                            </div>
+                        </div>
+                        {groupMembers.map(member => (
+                            <div key={member.id} className="flex items-center gap-4">
                                 <Avatar className="h-10 w-10">
-                                    <AvatarImage src="https://placehold.co/100x100.png" alt="Admin" data-ai-hint="person avatar" />
-                                    <AvatarFallback>AD</AvatarFallback>
+                                    <AvatarImage src={member.avatarUrl} alt={member.name} data-ai-hint="person avatar"/>
+                                    <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
                                 </Avatar>
-                                <div className="flex-1 overflow-hidden">
-                                    <div className="font-semibold truncate">You</div>
-                                    <div className="text-sm text-muted-foreground truncate">Admin</div>
+                                <div>
+                                    <p className="font-semibold">{member.name}</p>
+                                    <p className="text-sm text-muted-foreground">{member.type}</p>
                                 </div>
                             </div>
-                            {groupMembers.map(member => (
-                                <div key={member.id} className="flex items-center gap-3 p-2 rounded-lg">
-                                    <Avatar className="h-10 w-10">
-                                        <AvatarImage src={member.avatarUrl} alt={member.name} data-ai-hint="person avatar"/>
-                                        <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
-                                    </Avatar>
-                                    <div className="flex-1 overflow-hidden">
-                                        <div className="font-semibold truncate">{member.name}</div>
-                                        <div className="text-sm text-muted-foreground truncate">{member.type}</div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </ScrollArea>
+                        ))}
+                    </div>
                 </div>
             </SheetContent>
         </Sheet>

@@ -181,7 +181,7 @@ export default function ExpenseTracker() {
     <TooltipProvider>
       <div className="space-y-6">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
-              <Card>
+              <Card className="group transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20">
                   <CardHeader>
                       <CardTitle>Total Expenses</CardTitle>
                       <CardDescription>This month</CardDescription>
@@ -191,7 +191,7 @@ export default function ExpenseTracker() {
                       <p className="text-xs text-muted-foreground">Across all categories</p>
                   </CardContent>
               </Card>
-              <Card>
+              <Card className="group transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20">
                   <CardHeader>
                       <CardTitle>Expenses by Category</CardTitle>
                       <CardDescription>A visual breakdown of spending for this month.</CardDescription>

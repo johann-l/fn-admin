@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Card } from "@/components/ui/card"
-import { Search, Send, Phone, Video, MoreVertical, ArrowLeft } from "lucide-react"
+import { Search, Send, MoreVertical, ArrowLeft } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useIsMobile } from "@/hooks/use-mobile"
 
@@ -104,8 +104,6 @@ export default function ChatInterface() {
                         <div className="text-sm text-muted-foreground">{selectedContact.type}</div>
                     </div>
                     <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="icon" className="hidden sm:inline-flex"><Phone className="h-5 w-5" /></Button>
-                        <Button variant="ghost" size="icon" className="hidden sm:inline-flex"><Video className="h-5 w-5" /></Button>
                         <Button variant="ghost" size="icon"><MoreVertical className="h-5 w-5" /></Button>
                     </div>
                 </div>

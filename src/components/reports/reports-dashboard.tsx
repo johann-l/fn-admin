@@ -151,7 +151,7 @@ export default function ReportsDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
         >
-            <Card>
+            <Card className="group transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20">
                 <CardHeader className="items-center pb-0">
                     <CardTitle>Expense Breakdown</CardTitle>
                     <CardDescription>Monthly spending by category</CardDescription>
@@ -205,7 +205,7 @@ export default function ReportsDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
         >
-           <Card>
+           <Card className="group transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20">
                <CardHeader>
                     <div className="flex justify-between items-start">
                         <div>
@@ -264,7 +264,7 @@ export default function ReportsDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
         >
-            <Card>
+            <Card className="group transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20">
                 <CardHeader>
                     <CardTitle>Vehicle Occupancy Rate</CardTitle>
                     <CardDescription>Average seat occupancy per vehicle</CardDescription>
@@ -309,7 +309,7 @@ export default function ReportsDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
         >
-            <Card>
+            <Card className="group transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20">
                 <CardHeader className="items-center pb-0">
                     <CardTitle>Fleet Status</CardTitle>
                     <CardDescription>Live distribution of vehicle statuses</CardDescription>

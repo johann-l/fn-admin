@@ -12,7 +12,7 @@ import type { Vehicle } from "@/lib/data"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -21,6 +21,16 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import {
   Form,
   FormControl,
@@ -33,7 +43,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
-import { CalendarIcon, Edit, PlusCircle } from "lucide-react"
+import { CalendarIcon, Edit, PlusCircle, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
@@ -50,9 +60,12 @@ const vehicleFormSchema = z.object({
 type VehicleFormValues = z.infer<typeof vehicleFormSchema>
 
 export default function VehicleManagement() {
-  const { vehicles, drivers, addVehicle, updateVehicle } = useAppData()
+  const { vehicles, drivers, addVehicle, updateVehicle, removeVehicle } = useAppData()
   const [isDialogOpen, setIsDialogOpen] = React.useState(false)
   const [selectedVehicle, setSelectedVehicle] = React.useState<Vehicle | null>(null)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false)
+  const [vehicleToDelete, setVehicleToDelete] = React.useState<Vehicle | null>(null)
+
 
   const form = useForm<VehicleFormValues>({
     resolver: zodResolver(vehicleFormSchema),
@@ -84,6 +97,19 @@ export default function VehicleManagement() {
         lastService: new Date(),
     });
     setIsDialogOpen(true);
+  }
+
+  const handleDeleteClick = (vehicle: Vehicle) => {
+    setVehicleToDelete(vehicle)
+    setIsDeleteDialogOpen(true)
+  }
+
+  const handleConfirmDelete = () => {
+    if (vehicleToDelete) {
+      removeVehicle(vehicleToDelete.id)
+    }
+    setIsDeleteDialogOpen(false)
+    setVehicleToDelete(null)
   }
 
   const onSubmit = (values: VehicleFormValues) => {
@@ -159,6 +185,14 @@ export default function VehicleManagement() {
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent><p>Edit Vehicle</p></TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDeleteClick(vehicle)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent><p>Delete Vehicle</p></TooltipContent>
                       </Tooltip>
                     </TableCell>
                   </TableRow>
@@ -279,6 +313,23 @@ export default function VehicleManagement() {
           </Form>
         </DialogContent>
       </Dialog>
+      
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the vehicle {vehicleToDelete?.name} and unassign its driver.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmDelete} className={buttonVariants({ variant: "destructive" })}>
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }

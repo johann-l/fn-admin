@@ -12,7 +12,7 @@ import type { BusPass } from "@/lib/data"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -21,6 +21,16 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import {
   Form,
   FormControl,
@@ -33,7 +43,7 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
-import { CalendarIcon, Edit, PlusCircle, Eye } from "lucide-react"
+import { CalendarIcon, Edit, PlusCircle, Eye, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import BusPassCard from "./bus-pass-card"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
@@ -49,11 +59,13 @@ const passFormSchema = z.object({
 type PassFormValues = z.infer<typeof passFormSchema>
 
 export default function BusPassAdmin() {
-  const { passes, vehicles, addPass, updatePass } = useAppData()
+  const { passes, vehicles, addPass, updatePass, removePass } = useAppData()
   const [isDialogOpen, setIsDialogOpen] = React.useState(false)
   const [selectedPass, setSelectedPass] = React.useState<BusPass | null>(null)
   const [isViewDialogOpen, setIsViewDialogOpen] = React.useState(false)
   const [selectedPassForView, setSelectedPassForView] = React.useState<BusPass | null>(null)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false)
+  const [passToDelete, setPassToDelete] = React.useState<BusPass | null>(null)
 
   const form = useForm<PassFormValues>({
     resolver: zodResolver(passFormSchema),
@@ -86,6 +98,19 @@ export default function BusPassAdmin() {
   const handleViewClick = (pass: BusPass) => {
     setSelectedPassForView(pass)
     setIsViewDialogOpen(true)
+  }
+
+  const handleDeleteClick = (pass: BusPass) => {
+    setPassToDelete(pass)
+    setIsDeleteDialogOpen(true)
+  }
+
+  const handleConfirmDelete = () => {
+    if (passToDelete) {
+      removePass(passToDelete.id)
+    }
+    setIsDeleteDialogOpen(false)
+    setPassToDelete(null)
   }
 
   const onSubmit = (values: PassFormValues) => {
@@ -165,6 +190,14 @@ export default function BusPassAdmin() {
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent><p>Edit Pass</p></TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDeleteClick(pass)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent><p>Delete Pass</p></TooltipContent>
                       </Tooltip>
                     </TableCell>
                   </TableRow>
@@ -279,6 +312,23 @@ export default function BusPassAdmin() {
           )}
         </DialogContent>
       </Dialog>
+      
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the bus pass for {passToDelete?.passengerName}.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmDelete} className={buttonVariants({ variant: "destructive" })}>
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }

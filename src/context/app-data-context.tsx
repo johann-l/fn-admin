@@ -23,11 +23,13 @@ type AppDataContextType = {
   documents: Document[]
   addVehicle: (vehicle: VehicleFormData) => void
   updateVehicle: (vehicle: Vehicle) => void
+  removeVehicle: (vehicleId: string) => void
   addDriver: (driver: DriverFormData) => void
   updateDriver: (driver: Driver) => void
   removeDriver: (driverId: string) => void
   addPass: (pass: PassFormData) => void
   updatePass: (pass: BusPass) => void
+  removePass: (passId: string) => void
 }
 
 const AppDataContext = React.createContext<AppDataContextType | undefined>(undefined)
@@ -52,6 +54,13 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
   const updateVehicle = (updatedVehicle: Vehicle) => {
     setVehicles(prev => prev.map(v => v.id === updatedVehicle.id ? updatedVehicle : v))
   }
+
+  const removeVehicle = (vehicleId: string) => {
+    setDrivers(prev => prev.map(d => d.assignedVehicleId === vehicleId ? { ...d, assignedVehicleId: null } : d));
+    setPasses(prev => prev.filter(p => p.vehicleId !== vehicleId));
+    setDocuments(prev => prev.filter(doc => doc.vehicleId !== vehicleId));
+    setVehicles(prev => prev.filter(v => v.id !== vehicleId));
+  };
 
   const addDriver = (driver: DriverFormData) => {
     const newDriver: Driver = {
@@ -86,8 +95,12 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
     setPasses(prev => prev.map(p => p.id === updatedPass.id ? updatedPass : p))
   }
 
+  const removePass = (passId: string) => {
+    setPasses(prev => prev.filter(p => p.id !== passId));
+  }
+
   return (
-    <AppDataContext.Provider value={{ vehicles, drivers, passes, documents, addVehicle, updateVehicle, addDriver, updateDriver, removeDriver, addPass, updatePass }}>
+    <AppDataContext.Provider value={{ vehicles, drivers, passes, documents, addVehicle, updateVehicle, removeVehicle, addDriver, updateDriver, removeDriver, addPass, updatePass, removePass }}>
       {children}
     </AppDataContext.Provider>
   )

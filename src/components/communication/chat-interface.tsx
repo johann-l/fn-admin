@@ -12,6 +12,11 @@ import { cn } from "@/lib/utils"
 export default function ChatInterface() {
   const [selectedContactId, setSelectedContactId] = React.useState(chatContacts[0].id)
   const [messages, setMessages] = React.useState<Message[]>(allMessages[chatContacts[0].id] || [])
+  const [isMounted, setIsMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const handleContactSelect = (contactId: string) => {
     setSelectedContactId(contactId)
@@ -80,7 +85,7 @@ export default function ChatInterface() {
                       message.sender === 'Admin' ? 'bg-primary text-primary-foreground' : 'bg-card border'
                     )}>
                       <p className="text-sm">{message.content}</p>
-                      <p className="text-xs mt-1 text-right opacity-70">{message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                      <p className="text-xs mt-1 text-right opacity-70">{isMounted ? message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '...'}</p>
                     </div>
                   </div>
                 ))}

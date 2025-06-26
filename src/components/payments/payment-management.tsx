@@ -23,6 +23,11 @@ export default function PaymentManagement() {
   const [viewMode, setViewMode] = React.useState<'card' | 'list'>('card');
   const [selectedPayment, setSelectedPayment] = React.useState<Payment | null>(null);
   const [isDetailOpen, setIsDetailOpen] = React.useState(false);
+  const [isMounted, setIsMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const totalRevenue = payments
     .filter(p => p.type === 'Incoming' && p.status === 'Paid')
@@ -76,7 +81,7 @@ export default function PaymentManagement() {
           <CardHeader className="flex flex-row items-start justify-between gap-4 pb-4">
             <div className="space-y-1">
               <CardTitle className="text-base font-medium leading-none">{payment.description}</CardTitle>
-              <CardDescription className="text-xs">{format(payment.date, "PPpp")}</CardDescription>
+              <CardDescription className="text-xs">{isMounted ? format(payment.date, "PPpp") : '...'}</CardDescription>
             </div>
             {payment.type === 'Incoming' ? 
               <ArrowUpRight className="h-5 w-5 text-primary shrink-0" /> : 
@@ -124,7 +129,7 @@ export default function PaymentManagement() {
               onClick={() => handlePaymentClick(payment)}
             >
               <TableCell className="font-medium">{payment.description}</TableCell>
-              <TableCell>{format(payment.date, "PP")}</TableCell>
+              <TableCell>{isMounted ? format(payment.date, "PP") : '...'}</TableCell>
               <TableCell>
                 <div className={`font-semibold ${payment.type === 'Incoming' ? 'text-primary' : 'text-destructive'}`}>
                   {payment.type === 'Incoming' ? '+' : '-'}${payment.amount.toFixed(2)}

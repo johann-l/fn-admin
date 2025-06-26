@@ -1,6 +1,7 @@
 
 "use client"
 
+import * as React from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { ArrowUpRight, ArrowDownLeft, Calendar, CreditCard, CheckCircle2, XCircle, Clock } from "lucide-react"
 import type { Payment } from "@/lib/data"
@@ -13,6 +14,11 @@ interface TransactionDetailCardProps {
 }
 
 export default function TransactionDetailCard({ payment }: TransactionDetailCardProps) {
+  const [isMounted, setIsMounted] = React.useState(false)
+
+  React.useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   const getStatusIcon = (status: Payment["status"]) => {
     switch(status) {
@@ -47,7 +53,7 @@ export default function TransactionDetailCard({ payment }: TransactionDetailCard
             <div className="space-y-3 text-sm pt-4">
                 <div className="flex items-center justify-between">
                     <span className="text-muted-foreground flex items-center"><Calendar className="h-4 w-4 mr-2" />Date & Time</span>
-                    <span className="font-semibold">{format(payment.date, "PPpp")}</span>
+                    <span className="font-semibold">{isMounted ? format(payment.date, "PPpp") : '...'}</span>
                 </div>
                 <div className="flex items-center justify-between">
                     <span className="text-muted-foreground flex items-center">{getStatusIcon(payment.status)}<span className="ml-2">Status</span></span>

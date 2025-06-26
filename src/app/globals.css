@@ -84,3 +84,12 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .map-grid {
+    background-image:
+      linear-gradient(hsla(var(--border), 0.5) 1px, transparent 1px),
+      linear-gradient(to right, hsla(var(--border), 0.5) 1px, transparent 1px);
+    background-size: 2rem 2rem;
+  }
+}

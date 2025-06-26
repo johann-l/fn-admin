@@ -81,7 +81,7 @@ export default function MapPlaceholder() {
   return (
     <Card className="h-[400px] lg:h-[calc(100vh-250px)]">
       <CardContent className="p-0 h-full">
-        <div ref={mapRef} className="h-full w-full bg-muted rounded-lg flex items-center justify-center relative overflow-hidden">
+        <div ref={mapRef} className="h-full w-full bg-muted rounded-lg flex items-center justify-center relative overflow-hidden map-grid">
           {activeVehicles.length === 0 ? (
             <div className="text-center text-muted-foreground z-0">
               <MapPin className="h-12 w-12 mx-auto" />

@@ -137,9 +137,8 @@ export const payments: Payment[] = [
 
 export const chatContacts: ChatContact[] = [
     { id: 'group_drivers', name: 'All Drivers', type: 'Group', avatarUrl: '', lastMessage: 'Remember to complete pre-trip inspections.', lastMessageTime: '8:30 AM' },
-    { id: 'pass001', name: 'Alice Williams', type: 'Passenger', route: '101', avatarUrl: 'https://placehold.co/40x40.png', lastMessage: 'Thank you for the help!', lastMessageTime: 'Yesterday' },
-    { id: 'pass003', name: 'Charlie Green', type: 'Passenger', route: '303', avatarUrl: 'https://placehold.co/40x40.png', lastMessage: 'Is the bus running on schedule?', lastMessageTime: '9:15 AM' },
-    { id: 'pass004', name: 'Diana Prince', type: 'Passenger', route: '101', avatarUrl: 'https://placehold.co/40x40.png', lastMessage: 'I left my umbrella on the bus.', lastMessageTime: '10:05 AM' },
+    { id: 'group_route_101', name: 'Route 101 Passengers', type: 'Group', avatarUrl: '', lastMessage: 'I left my umbrella on the bus.', lastMessageTime: '10:05 AM', route: '101' },
+    { id: 'group_route_303', name: 'Route 303 Passengers', type: 'Group', avatarUrl: '', lastMessage: 'Is the bus running on schedule?', lastMessageTime: '9:15 AM', route: '303' },
 ];
 
 export const messages: Record<string, Message[]> = {
@@ -149,17 +148,14 @@ export const messages: Record<string, Message[]> = {
     { id: 'msg_gd_3', sender: 'Jane Smith', content: 'All good here on Express 202.', timestamp: new Date(new Date().setHours(8, 35, 0)) },
     { id: 'msg_gd_4', sender: 'Admin', content: 'Thanks, John and Jane. Drive safe!', timestamp: new Date(new Date().setHours(8, 40, 0)) },
   ],
-  'pass001': [
-     { id: 'msg6', sender: 'Alice Williams', content: 'I lost my wallet on the bus, has anyone found it?', timestamp: new Date(new Date().setDate(new Date().getDate() - 1)) },
-     { id: 'msg7', sender: 'Admin', content: 'Which bus were you on? We can check with the driver.', timestamp: new Date(new Date().setDate(new Date().getDate() - 1)) },
-     { id: 'msg8', sender: 'Alice Williams', content: 'Thank you for the help!', timestamp: new Date(new Date().setDate(new Date().getDate() - 1)) },
+  'group_route_101': [
+     { id: 'msg_r101_1', sender: 'Alice Williams', content: 'I lost my wallet on the bus, has anyone found it?', timestamp: new Date(new Date().setDate(new Date().getDate() - 1)) },
+     { id: 'msg_r101_2', sender: 'Admin', content: 'Which bus were you on, Alice? We can check with the driver.', timestamp: new Date(new Date().setDate(new Date().getDate() - 1)) },
+     { id: 'msg_r101_3', sender: 'Diana Prince', content: 'I think I left my blue umbrella on the bus this morning.', timestamp: new Date(new Date().setHours(10, 5, 0)) },
+     { id: 'msg_r101_4', sender: 'Admin', content: 'I will check with the driver, Diana.', timestamp: new Date(new Date().setHours(10, 6, 0)) },
   ],
-  'pass003': [
-    { id: 'msg_cg_1', sender: 'Charlie Green', content: 'Hi, is the West Suburbs bus running on schedule today?', timestamp: new Date(new Date().setHours(9, 15, 0)) },
-    { id: 'msg_cg_2', sender: 'Admin', content: 'Yes, everything is on time so far. You can track the bus live on the main dashboard map.', timestamp: new Date(new Date().setHours(9, 16, 0)) },
-  ],
-  'pass004': [
-    { id: 'msg_dp_1', sender: 'Diana Prince', content: 'I think I left my blue umbrella on the Downtown Loop bus this morning.', timestamp: new Date(new Date().setHours(10, 5, 0)) },
-    { id: 'msg_dp_2', sender: 'Admin', content: 'I will check with the driver and let you know.', timestamp: new Date(new Date().setHours(10, 6, 0)) },
+  'group_route_303': [
+    { id: 'msg_r303_1', sender: 'Charlie Green', content: 'Hi, is the bus running on schedule today?', timestamp: new Date(new Date().setHours(9, 15, 0)) },
+    { id: 'msg_r303_2', sender: 'Admin', content: 'Yes, everything is on time so far. You can track the bus live on the main dashboard map.', timestamp: new Date(new Date().setHours(9, 16, 0)) },
   ],
 };

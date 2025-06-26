@@ -9,14 +9,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Card } from "@/components/ui/card"
-import { Search, Send, MoreVertical, ArrowLeft, Users } from "lucide-react"
+import { Send, MoreVertical, ArrowLeft, Users } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
 import { cn } from "@/lib/utils"
 import { useIsMobile } from "@/hooks/use-mobile"
 
@@ -30,15 +24,8 @@ export default function ChatInterface() {
   const isMobile = useIsMobile()
   const [mobileView, setMobileView] = React.useState<'list' | 'chat'>('list');
 
-  const driverContact = chatContacts.find(c => c.type === 'Group')
-  const passengerContacts = chatContacts.filter(c => c.type === 'Passenger')
-  
-  const routes = Array.from(new Set(passengerContacts.map(c => c.route).filter(Boolean))) as string[];
-
-  const passengersByRoute = routes.reduce((acc, route) => {
-      acc[route] = passengerContacts.filter(c => c.route === route);
-      return acc;
-  }, {} as Record<string, typeof passengerContacts>);
+  const driverContact = chatContacts.find(c => c.id === 'group_drivers');
+  const passengerGroupChats = chatContacts.filter(c => c.type === 'Group' && c.route);
 
 
   React.useEffect(() => {
@@ -63,7 +50,6 @@ export default function ChatInterface() {
   }
   
   const selectedContact = chatContacts.find(c => c.id === selectedContactId)
-  const isGroupChat = selectedContact?.type === 'Group';
 
   const ContactButton = ({ contact }: { contact: typeof chatContacts[0] }) => (
     <button
@@ -119,22 +105,11 @@ export default function ChatInterface() {
 
                 <TabsContent value="passengers" className="flex-1 overflow-auto">
                     <ScrollArea className="h-full">
-                        <Accordion type="single" collapsible defaultValue={routes[0]} className="p-2">
-                            {routes.map(route => (
-                                <AccordionItem value={route} key={route}>
-                                    <AccordionTrigger className="px-2 py-2 text-sm font-semibold hover:no-underline rounded-md hover:bg-accent">
-                                        {`Route ${route}`}
-                                    </AccordionTrigger>
-                                    <AccordionContent className="pt-1">
-                                        <div className="space-y-1">
-                                            {passengersByRoute[route].map(contact => (
-                                                <ContactButton key={contact.id} contact={contact} />
-                                            ))}
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
+                        <div className="p-2 space-y-1">
+                            {passengerGroupChats.map(contact => (
+                                <ContactButton key={contact.id} contact={contact} />
                             ))}
-                        </Accordion>
+                        </div>
                     </ScrollArea>
                 </TabsContent>
             </Tabs>
@@ -178,14 +153,27 @@ export default function ChatInterface() {
                     <ScrollArea className="h-full p-4 sm:p-6" ref={scrollAreaRef}>
                         <div className="space-y-4">
                             {messages.map(message => {
-                                const senderDriver = isGroupChat ? drivers.find(d => d.name === message.sender) : null;
-                                const senderAvatarUrl = senderDriver ? senderDriver.avatarUrl : selectedContact.avatarUrl;
-                                const senderName = senderDriver ? senderDriver.name : selectedContact.name;
-                                const fallback = (isGroupChat ? message.sender : selectedContact.name).charAt(0);
+                                const isGroupChat = selectedContact?.type === 'Group';
+                                const senderIsAdmin = message.sender === 'Admin';
+                                let senderName = selectedContact.name;
+                                let senderAvatarUrl = selectedContact.avatarUrl;
+                                let fallback = senderName.charAt(0);
+
+                                if (isGroupChat && !senderIsAdmin) {
+                                  senderName = message.sender;
+                                  fallback = senderName.charAt(0);
+                                  const senderDriver = drivers.find(d => d.name === message.sender);
+                                  if (senderDriver) {
+                                    senderAvatarUrl = senderDriver.avatarUrl;
+                                  } else {
+                                    // It's a passenger
+                                    senderAvatarUrl = `https://placehold.co/100x100.png?text=${fallback}`;
+                                  }
+                                }
 
                                 return (
-                                <div key={message.id} className={cn("flex items-end gap-3 w-full", message.sender === 'Admin' ? 'justify-end' : 'justify-start')}>
-                                    {message.sender !== 'Admin' && (
+                                <div key={message.id} className={cn("flex items-end gap-3 w-full", senderIsAdmin ? 'justify-end' : 'justify-start')}>
+                                    {!senderIsAdmin && (
                                         <Avatar className="h-8 w-8 self-end">
                                             <AvatarImage src={`${senderAvatarUrl}?m=${message.id}`} alt={senderName} data-ai-hint="person avatar"/>
                                             <AvatarFallback>{fallback}</AvatarFallback>
@@ -193,11 +181,11 @@ export default function ChatInterface() {
                                     )}
                                     <div className={cn(
                                     "max-w-xs lg:max-w-md px-4 py-2.5 rounded-xl",
-                                    message.sender === 'Admin' 
+                                    senderIsAdmin 
                                         ? 'bg-primary text-primary-foreground rounded-br-none' 
                                         : 'bg-muted rounded-bl-none'
                                     )}>
-                                    {isGroupChat && message.sender !== 'Admin' && <p className="text-xs font-bold mb-1 text-accent-foreground/80">{message.sender}</p>}
+                                    {isGroupChat && !senderIsAdmin && <p className="text-xs font-bold mb-1 text-accent-foreground/80">{senderName}</p>}
                                     <p className="text-sm break-words">{message.content}</p>
                                     <p className="text-xs mt-1.5 text-right opacity-70">{isMounted ? message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '...'}</p>
                                     </div>

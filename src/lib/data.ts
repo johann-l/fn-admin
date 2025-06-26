@@ -48,6 +48,7 @@ export type Expense = {
   description: string;
   amount: number;
   date: Date;
+  status: 'Paid' | 'Unpaid';
 };
 
 export type Message = {
@@ -107,12 +108,12 @@ export const documents: Document[] = [
 ];
 
 export const expenses: Expense[] = [
-  { id: 'exp001', busId: 'b001', type: 'Fuel', description: 'Refuel for City Cruiser 1', amount: 150.75, date: new Date('2024-07-15') },
-  { id: 'exp002', busId: 'b002', type: 'Maintenance', description: 'Brake pad replacement', amount: 350.00, date: new Date('2024-07-14') },
-  { id: 'exp003', busId: 'b003', type: 'Insurance', description: 'Monthly premium', amount: 500.00, date: new Date('2024-07-01') },
-  { id: 'exp004', busId: 'b004', type: 'Fuel', description: 'Refuel for Metro Link', amount: 180.50, date: new Date('2024-07-16') },
-  { id: 'exp005', busId: 'b001', type: 'Other', description: 'Tire cleaning supplies', amount: 45.25, date: new Date('2024-07-12') },
-  { id: 'exp006', busId: 'b005', type: 'Maintenance', description: 'Oil change and filter', amount: 120.00, date: new Date('2024-07-10') },
+  { id: 'exp001', busId: 'b001', type: 'Fuel', description: 'Refuel for City Cruiser 1', amount: 150.75, date: new Date('2024-07-15'), status: 'Paid' },
+  { id: 'exp002', busId: 'b002', type: 'Maintenance', description: 'Brake pad replacement', amount: 350.00, date: new Date('2024-07-14'), status: 'Unpaid' },
+  { id: 'exp003', busId: 'b003', type: 'Insurance', description: 'Monthly premium', amount: 500.00, date: new Date('2024-07-01'), status: 'Paid' },
+  { id: 'exp004', busId: 'b004', type: 'Fuel', description: 'Refuel for Metro Link', amount: 180.50, date: new Date('2024-07-16'), status: 'Unpaid' },
+  { id: 'exp005', busId: 'b001', type: 'Other', description: 'Tire cleaning supplies', amount: 45.25, date: new Date('2024-07-12'), status: 'Paid' },
+  { id: 'exp006', busId: 'b005', type: 'Maintenance', description: 'Oil change and filter', amount: 120.00, date: new Date('2024-07-10'), status: 'Unpaid' },
 ];
 
 export const payments: Payment[] = [
@@ -145,7 +146,7 @@ export const messages: Record<string, Message[]> = {
   'pass001': [
      { id: 'msg6', sender: 'Alice Williams', content: 'I lost my wallet on the bus, has anyone found it?', timestamp: new Date(new Date().setDate(new Date().getDate() - 1)) },
      { id: 'msg7', sender: 'Admin', content: 'Which bus were you on? We can check with the driver.', timestamp: new Date(new Date().setDate(new Date().getDate() - 1)) },
-     { id: 'msg8', sender: 'Alice Williams', content: 'The Downtown Loop one. Thank you for the help!', timestamp: new Date(new Date().setDate(new Date().getDate() - 1)) },
+     { id: 'msg8', sender: 'Alice Williams', content: 'Thank you for the help!', timestamp: new Date(new Date().setDate(new Date().getDate() - 1)) },
   ],
   'd005': [
      { id: 'msg9', sender: 'Chris Lee', content: "I'm starting my route now.", timestamp: new Date(new Date().setHours(9, 1, 0)) },

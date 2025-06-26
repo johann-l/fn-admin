@@ -32,9 +32,17 @@ const chartConfig = {
       label: "Insurance",
       color: "hsl(var(--chart-3))",
   },
+  Tolls: {
+    label: "Tolls",
+    color: "hsl(var(--chart-4))",
+  },
   Other: {
       label: "Other",
       color: "hsl(var(--chart-5))",
+  },
+  Misc: {
+    label: "Misc",
+    color: "hsl(var(--chart-6))",
   },
 } satisfies ChartConfig;
 
@@ -93,6 +101,8 @@ export default function ExpenseTracker() {
       case 'Fuel': return "default";
       case 'Maintenance': return "destructive";
       case 'Insurance': return "secondary";
+      case 'Tolls': return "outline";
+      case 'Misc': return "outline";
       case 'Other': return "outline";
       default: return "default";
     }
@@ -177,7 +187,7 @@ export default function ExpenseTracker() {
                             <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
                             <Bar dataKey="total" radius={4}>
                                {chartData.map((entry) => (
-                                   <Cell key={`cell-${entry.name}`} fill={chartConfig[entry.name as keyof typeof chartConfig]?.color} />
+                                   <Cell key={`cell-${entry.name}`} fill={(chartConfig[entry.name as keyof typeof chartConfig] as any)?.color} />
                                ))}
                             </Bar>
                         </BarChart>

@@ -49,7 +49,7 @@ export type Document = {
 export type Expense = {
   id: string;
   vehicleId: string;
-  type: 'Fuel' | 'Maintenance' | 'Insurance' | 'Other';
+  type: 'Fuel' | 'Maintenance' | 'Insurance' | 'Other' | 'Tolls' | 'Misc';
   description: string;
   amount: number;
   date: Date;
@@ -119,16 +119,18 @@ export const expenses: Expense[] = [
   { id: 'exp004', vehicleId: 'v004', type: 'Fuel', description: 'Refuel for Metro Link', amount: 180.50, date: new Date('2024-07-16'), status: 'Unpaid' },
   { id: 'exp005', vehicleId: 'v001', type: 'Other', description: 'Tire cleaning supplies', amount: 45.25, date: new Date('2024-07-12'), status: 'Paid' },
   { id: 'exp006', vehicleId: 'v005', type: 'Maintenance', description: 'Oil change and filter', amount: 120.00, date: new Date('2024-07-10'), status: 'Unpaid' },
+  { id: 'exp007', vehicleId: 'v002', type: 'Tolls', description: 'Downtown Bridge Toll', amount: 12.50, date: new Date('2024-07-18'), status: 'Paid' },
+  { id: 'exp008', vehicleId: 'v004', type: 'Misc', description: 'Driver meal allowance', amount: 25.00, date: new Date('2024-07-19'), status: 'Paid' },
 ];
 
 export const payments: Payment[] = [
-  { id: 'pay001', description: 'Monthly Bus Pass - A. Williams', amount: 55.00, date: new Date('2024-07-01'), status: 'Paid', type: 'Incoming', method: 'Credit Card' },
-  { id: 'pay002', description: 'Fuel Supplier Invoice #FS-1024', amount: 1250.50, date: new Date('2024-07-05'), status: 'Paid', type: 'Outgoing', method: 'Bank Transfer' },
-  { id: 'pay003', description: 'Downtown Shuttle Service', amount: 300.00, date: new Date('2024-07-10'), status: 'Pending', type: 'Incoming', method: 'Credit Card' },
-  { id: 'pay004', description: 'Tire Replacement - Bus 202', amount: 800.00, date: new Date('2024-07-12'), status: 'Paid', type: 'Outgoing', method: 'Credit Card' },
-  { id: 'pay005', description: 'Ad Revenue - Route 5 Billboards', amount: 750.00, date: new Date('2024-07-15'), status: 'Paid', type: 'Incoming', method: 'Bank Transfer' },
-  { id: 'pay006', description: 'Office Cleaning Services', amount: 150.00, date: new Date('2024-07-18'), status: 'Pending', type: 'Outgoing', method: 'Bank Transfer' },
-  { id: 'pay007', description: 'Special Event Charter', amount: 1200.00, date: new Date('2024-07-20'), status: 'Failed', type: 'Incoming', method: 'Credit Card' },
+  { id: 'pay001', description: 'Monthly Bus Pass - A. Williams', amount: 55.00, date: new Date('2024-07-01T10:00:00Z'), status: 'Paid', type: 'Incoming', method: 'Credit Card' },
+  { id: 'pay002', description: 'Fuel Supplier Invoice #FS-1024', amount: 1250.50, date: new Date('2024-07-05T11:30:00Z'), status: 'Paid', type: 'Outgoing', method: 'Bank Transfer' },
+  { id: 'pay003', description: 'Downtown Shuttle Service', amount: 300.00, date: new Date('2024-07-10T14:00:00Z'), status: 'Pending', type: 'Incoming', method: 'Credit Card' },
+  { id: 'pay004', description: 'Tire Replacement - Bus 202', amount: 800.00, date: new Date('2024-07-12T09:45:00Z'), status: 'Paid', type: 'Outgoing', method: 'Credit Card' },
+  { id: 'pay005', description: 'Ad Revenue - Route 5 Billboards', amount: 750.00, date: new Date('2024-07-15T16:20:00Z'), status: 'Paid', type: 'Incoming', method: 'Bank Transfer' },
+  { id: 'pay006', description: 'Office Cleaning Services', amount: 150.00, date: new Date('2024-07-18T18:00:00Z'), status: 'Pending', type: 'Outgoing', method: 'Bank Transfer' },
+  { id: 'pay007', description: 'Special Event Charter', amount: 1200.00, date: new Date('2024-07-20T10:30:00Z'), status: 'Failed', type: 'Incoming', method: 'Credit Card' },
 ];
 
 export const chatContacts: ChatContact[] = [

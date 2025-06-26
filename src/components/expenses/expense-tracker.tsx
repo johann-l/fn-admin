@@ -8,7 +8,7 @@ import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Cell } from "recharts"
 import { useFormStatus } from "react-dom"
 import { Loader2, Eye } from "lucide-react"
 
-import { expenses as initialExpenses, Expense } from "@/lib/data"
+import type { Expense } from "@/lib/data"
 import { useAppData } from "@/context/app-data-context"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -70,8 +70,7 @@ const expenseTypes: Expense['type'][] = ['Fuel', 'Maintenance', 'Insurance', 'To
 type ExpenseFilter = 'all' | Expense['type'];
 
 export default function ExpenseTracker() {
-  const { vehicles } = useAppData()
-  const [expenses, setExpenses] = React.useState<Expense[]>(initialExpenses)
+  const { vehicles, expenses, updateExpense } = useAppData()
   const searchParams = useSearchParams()
   const { toast } = useToast()
 
@@ -83,11 +82,7 @@ export default function ExpenseTracker() {
         description: "Thank you for your payment.",
       })
       if (expenseId) {
-        setExpenses(prevExpenses => 
-          prevExpenses.map(exp => 
-            exp.id === expenseId ? { ...exp, status: 'Paid' } : exp
-          )
-        )
+        updateExpense(expenseId, { status: 'Paid' })
       }
     }
 
@@ -98,8 +93,7 @@ export default function ExpenseTracker() {
         variant: "destructive",
       })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams]);
+  }, [searchParams, toast, updateExpense]);
 
   const totalExpenses = expenses.reduce((acc, expense) => acc + expense.amount, 0)
 

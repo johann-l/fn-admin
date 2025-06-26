@@ -7,10 +7,12 @@ import {
   drivers as initialDrivers,
   passes as initialPasses,
   documents as initialDocuments,
+  expenses as initialExpenses,
   Vehicle,
   Driver,
   BusPass,
-  Document
+  Document,
+  Expense
 } from "@/lib/data"
 
 type VehicleFormData = Omit<Vehicle, 'id' | 'route' | 'availability' | 'location'>;
@@ -22,6 +24,7 @@ type AppDataContextType = {
   drivers: Driver[]
   passes: BusPass[]
   documents: Document[]
+  expenses: Expense[]
   addVehicle: (vehicle: VehicleFormData) => void
   updateVehicle: (vehicle: Vehicle) => void
   removeVehicle: (vehicleId: string) => void
@@ -32,6 +35,7 @@ type AppDataContextType = {
   updatePass: (pass: BusPass) => void
   removePass: (passId: string) => void
   removeDocument: (documentId: string) => void
+  updateExpense: (expenseId: string, updates: Partial<Expense>) => void
 }
 
 const AppDataContext = React.createContext<AppDataContextType | undefined>(undefined)
@@ -41,6 +45,7 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
   const [drivers, setDrivers] = React.useState<Driver[]>(initialDrivers)
   const [passes, setPasses] = React.useState<BusPass[]>(initialPasses)
   const [documents, setDocuments] = React.useState<Document[]>(initialDocuments)
+  const [expenses, setExpenses] = React.useState<Expense[]>(initialExpenses)
 
   const addVehicle = (vehicle: VehicleFormData) => {
     const newVehicle: Vehicle = {
@@ -104,9 +109,34 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
   const removeDocument = (documentId: string) => {
     setDocuments(prev => prev.filter(doc => doc.id !== documentId));
   };
+  
+  const updateExpense = (expenseId: string, updates: Partial<Expense>) => {
+    setExpenses(prev =>
+      prev.map(expense =>
+        expense.id === expenseId ? { ...expense, ...updates } : expense
+      )
+    );
+  };
 
   return (
-    <AppDataContext.Provider value={{ vehicles, drivers, passes, documents, addVehicle, updateVehicle, removeVehicle, addDriver, updateDriver, removeDriver, addPass, updatePass, removePass, removeDocument }}>
+    <AppDataContext.Provider value={{ 
+        vehicles, 
+        drivers, 
+        passes, 
+        documents, 
+        expenses,
+        addVehicle, 
+        updateVehicle, 
+        removeVehicle, 
+        addDriver, 
+        updateDriver, 
+        removeDriver, 
+        addPass, 
+        updatePass, 
+        removePass, 
+        removeDocument,
+        updateExpense
+    }}>
       {children}
     </AppDataContext.Provider>
   )

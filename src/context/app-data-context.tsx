@@ -9,6 +9,7 @@ import {
   passes as initialPasses,
   documents as initialDocuments,
   routes as initialRoutes,
+  alerts as initialAlerts,
   Vehicle,
   Driver,
   BusPass,
@@ -16,6 +17,7 @@ import {
   Expense,
   Payment,
   Route,
+  Alert,
   generateHistoricalExpenses,
   generateHistoricalPayments
 } from "@/lib/data"
@@ -35,6 +37,7 @@ type AppDataContextType = {
   expenses: Expense[]
   payments: Payment[]
   routes: Route[]
+  alerts: Alert[]
   addVehicle: (vehicle: VehicleFormData) => void
   updateVehicle: (vehicle: Vehicle) => void
   removeVehicle: (vehicleId: string) => void
@@ -62,6 +65,7 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
   const [expenses, setExpenses] = React.useState<Expense[] | null>(null)
   const [payments, setPayments] = React.useState<Payment[] | null>(null)
   const [routes, setRoutes] = React.useState<Route[]>(initialRoutes)
+  const [alerts, setAlerts] = React.useState<Alert[]>(initialAlerts)
 
   React.useEffect(() => {
     // Generate data on the client-side to avoid hydration errors
@@ -173,6 +177,7 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
         expenses: expenses || [],
         payments: payments || [],
         routes,
+        alerts,
         addVehicle, 
         updateVehicle, 
         removeVehicle, 

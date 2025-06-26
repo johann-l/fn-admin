@@ -94,6 +94,17 @@ export type Payment = {
   method: 'Credit Card' | 'Bank Transfer' | 'Cash';
 };
 
+export type Alert = {
+  id: string;
+  title: string;
+  description: string;
+  details: string;
+  type: 'Delay' | 'Maintenance Request' | 'System';
+  vehicleId: string | null;
+  timestamp: Date;
+  isRead: boolean;
+};
+
 export const routes: Route[] = [
   { id: 'r101', name: 'Route 101', stops: ['Main St & 1st Ave', 'Oak Street & 5th Ave', 'Pine Lane', 'University Main Gate'] },
   { id: 'r202', name: 'Route 202', stops: ['City Library', 'Downtown Square', 'West End Terminal', 'University Main Gate'] },
@@ -249,3 +260,36 @@ export const messages: Record<string, Message[]> = {
     { id: 'msg_r303_2', sender: 'Admin', content: 'Yes, everything is on time so far. You can track the bus live on the main dashboard map.', timestamp: new Date(new Date().setHours(9, 16, 0)) },
   ],
 };
+
+export const alerts: Alert[] = [
+  {
+    id: 'alert001',
+    title: 'Bus 2 Delayed',
+    description: 'Significant traffic on Route 202.',
+    details: 'Bus 2 is experiencing significant delays on Route 202 due to unexpected road closures near the Downtown Square stop. The estimated delay is 25 minutes. All passengers have been notified.',
+    type: 'Delay',
+    vehicleId: 'v002',
+    timestamp: new Date(new Date().setHours(new Date().getHours() - 1)),
+    isRead: false,
+  },
+  {
+    id: 'alert002',
+    title: 'Maintenance: Bus 5',
+    description: 'Engine issue reported by driver.',
+    details: 'The driver of Bus 5 has reported a critical engine warning light. The vehicle has been taken out of service and is en route to the depot for immediate inspection. Route 505 will be covered by a standby vehicle.',
+    type: 'Maintenance Request',
+    vehicleId: 'v005',
+    timestamp: new Date(new Date().setHours(new Date().getHours() - 2)),
+    isRead: false,
+  },
+  {
+    id: 'alert003',
+    title: 'Maintenance: Bus 3',
+    description: 'Brake fluid level is low.',
+    details: 'Routine check on Bus 3 indicates that the brake fluid is below the recommended level. Requesting a maintenance check and top-up before its next scheduled run.',
+    type: 'Maintenance Request',
+    vehicleId: 'v003',
+    timestamp: new Date(new Date().setHours(new Date().getHours() - 4)),
+    isRead: false,
+  },
+];

@@ -8,11 +8,13 @@ import {
   passes as initialPasses,
   documents as initialDocuments,
   expenses as initialExpenses,
+  payments as initialPayments,
   Vehicle,
   Driver,
   BusPass,
   Document,
-  Expense
+  Expense,
+  Payment
 } from "@/lib/data"
 
 type VehicleFormData = Omit<Vehicle, 'id' | 'route' | 'availability' | 'location'>;
@@ -25,6 +27,7 @@ type AppDataContextType = {
   passes: BusPass[]
   documents: Document[]
   expenses: Expense[]
+  payments: Payment[]
   addVehicle: (vehicle: VehicleFormData) => void
   updateVehicle: (vehicle: Vehicle) => void
   removeVehicle: (vehicleId: string) => void
@@ -46,6 +49,7 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
   const [passes, setPasses] = React.useState<BusPass[]>(initialPasses)
   const [documents, setDocuments] = React.useState<Document[]>(initialDocuments)
   const [expenses, setExpenses] = React.useState<Expense[]>(initialExpenses)
+  const [payments, setPayments] = React.useState<Payment[]>(initialPayments)
 
   const addVehicle = (vehicle: VehicleFormData) => {
     const newVehicle: Vehicle = {
@@ -125,6 +129,7 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
         passes, 
         documents, 
         expenses,
+        payments,
         addVehicle, 
         updateVehicle, 
         removeVehicle, 

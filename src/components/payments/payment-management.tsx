@@ -1,9 +1,11 @@
+
 "use client"
 
 import * as React from "react"
 import { format } from "date-fns"
 
-import { payments, Payment } from "@/lib/data"
+import { useAppData } from "@/context/app-data-context"
+import type { Payment } from "@/lib/data"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -20,6 +22,7 @@ import { Banknote as BanknoteIcon } from "lucide-react"
 
 
 export default function PaymentManagement() {
+  const { payments } = useAppData()
   const [viewMode, setViewMode] = React.useState<'card' | 'list'>('card');
   const [selectedPayment, setSelectedPayment] = React.useState<Payment | null>(null);
   const [isDetailOpen, setIsDetailOpen] = React.useState(false);

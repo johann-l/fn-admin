@@ -1,4 +1,5 @@
 
+
 "use client"
 
 import * as React from "react"
@@ -7,14 +8,14 @@ import {
   drivers as initialDrivers,
   passes as initialPasses,
   documents as initialDocuments,
-  expenses as initialExpenses,
-  payments as initialPayments,
   Vehicle,
   Driver,
   BusPass,
   Document,
   Expense,
-  Payment
+  Payment,
+  generateHistoricalExpenses,
+  generateHistoricalPayments
 } from "@/lib/data"
 
 type VehicleFormData = Omit<Vehicle, 'id' | 'route' | 'availability' | 'location'>;
@@ -48,8 +49,13 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
   const [drivers, setDrivers] = React.useState<Driver[]>(initialDrivers)
   const [passes, setPasses] = React.useState<BusPass[]>(initialPasses)
   const [documents, setDocuments] = React.useState<Document[]>(initialDocuments)
-  const [expenses, setExpenses] = React.useState<Expense[]>(initialExpenses)
-  const [payments, setPayments] = React.useState<Payment[]>(initialPayments)
+  const [expenses, setExpenses] = React.useState<Expense[]>([])
+  const [payments, setPayments] = React.useState<Payment[]>([])
+
+  React.useEffect(() => {
+    setExpenses(generateHistoricalExpenses());
+    setPayments(generateHistoricalPayments());
+  }, [])
 
   const addVehicle = (vehicle: VehicleFormData) => {
     const newVehicle: Vehicle = {

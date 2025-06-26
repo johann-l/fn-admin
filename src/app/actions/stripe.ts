@@ -1,19 +1,24 @@
+
 'use server';
 
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import Stripe from 'stripe';
-import { expenses } from '@/lib/data';
 
 export async function createCheckoutSession(formData: FormData) {
   const expenseId = formData.get('expenseId') as string;
-  if (!expenseId) {
-    throw new Error('Expense ID is required');
+  const expenseDescription = formData.get('expenseDescription') as string;
+  const expenseAmount = formData.get('expenseAmount') as string;
+  const expenseVehicleId = formData.get('expenseVehicleId') as string;
+  const expenseType = formData.get('expenseType') as string;
+
+  if (!expenseId || !expenseDescription || !expenseAmount || !expenseVehicleId || !expenseType) {
+    throw new Error('Incomplete expense data provided.');
   }
-  
-  const expense = expenses.find((e) => e.id === expenseId);
-  if (!expense) {
-    throw new Error('Expense not found');
+
+  const amountInCents = Math.round(parseFloat(expenseAmount) * 100);
+  if (isNaN(amountInCents)) {
+    throw new Error('Invalid expense amount.');
   }
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
@@ -29,13 +34,13 @@ export async function createCheckoutSession(formData: FormData) {
         price_data: {
           currency: 'usd',
           product_data: {
-            name: expense.description,
+            name: expenseDescription,
             metadata: {
-              vehicleId: expense.vehicleId,
-              expenseType: expense.type,
+              vehicleId: expenseVehicleId,
+              expenseType: expenseType,
             },
           },
-          unit_amount: Math.round(expense.amount * 100), // amount in cents
+          unit_amount: amountInCents,
         },
         quantity: 1,
       },

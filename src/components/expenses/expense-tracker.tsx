@@ -1,4 +1,5 @@
 
+
 "use client"
 
 import * as React from "react"
@@ -180,6 +181,10 @@ export default function ExpenseTracker() {
                 {expense.status === 'Unpaid' && (
                   <form action={createCheckoutSession}>
                     <input type="hidden" name="expenseId" value={expense.id} />
+                    <input type="hidden" name="expenseDescription" value={expense.description} />
+                    <input type="hidden" name="expenseAmount" value={expense.amount.toString()} />
+                    <input type="hidden" name="expenseVehicleId" value={expense.vehicleId} />
+                    <input type="hidden" name="expenseType" value={expense.type} />
                     <PayButton />
                   </form>
                 )}

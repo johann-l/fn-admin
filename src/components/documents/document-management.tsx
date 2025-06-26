@@ -1,0 +1,69 @@
+"use client"
+
+import * as React from "react"
+import { format } from "date-fns"
+
+import { documents, Document, buses } from "@/lib/data"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Upload, Download, Trash2 } from "lucide-react"
+
+export default function DocumentManagement() {
+  const getStatusVariant = (status: Document["status"]): "default" | "secondary" | "destructive" => {
+    switch (status) {
+      case 'Valid': return "default";
+      case 'Expiring Soon': return "secondary";
+      case 'Expired': return "destructive";
+    }
+  }
+  
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+          <CardTitle>Bus Documents</CardTitle>
+          <CardDescription>Upload and manage bus-related documents.</CardDescription>
+        </div>
+        <Button>
+          <Upload className="mr-2 h-4 w-4" />
+          Upload Document
+        </Button>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Document Name</TableHead>
+              <TableHead>Bus</TableHead>
+              <TableHead>Expiry Date</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {documents.map((doc) => (
+              <TableRow key={doc.id}>
+                <TableCell className="font-medium">{doc.name}</TableCell>
+                <TableCell>{buses.find(b => b.id === doc.busId)?.name}</TableCell>
+                <TableCell>{format(doc.expiryDate, "LLL dd, y")}</TableCell>
+                <TableCell>
+                  <Badge variant={getStatusVariant(doc.status)}>{doc.status}</Badge>
+                </TableCell>
+                <TableCell className="text-right space-x-2">
+                    <Button variant="ghost" size="icon">
+                        <Download className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
+                        <Trash2 className="h-4 w-4" />
+                    </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  )
+}

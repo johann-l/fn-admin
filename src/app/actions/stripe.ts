@@ -1,6 +1,7 @@
 'use server';
 
 import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
 import Stripe from 'stripe';
 import { expenses } from '@/lib/data';
 
@@ -17,7 +18,9 @@ export async function createCheckoutSession(formData: FormData) {
 
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:9002';
+  const host = headers().get('host') || 'localhost:9002';
+  const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
+  const appUrl = `${protocol}://${host}`;
 
   const checkoutSession = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],

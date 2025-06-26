@@ -6,7 +6,7 @@ import { useSearchParams } from 'next/navigation'
 import { format } from "date-fns"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Cell } from "recharts"
 import { useFormStatus } from "react-dom"
-import { Loader2 } from "lucide-react"
+import { Loader2, Eye } from "lucide-react"
 
 import { expenses as initialExpenses, Expense } from "@/lib/data"
 import { useAppData } from "@/context/app-data-context"
@@ -141,6 +141,12 @@ export default function ExpenseTracker() {
     return expenses.filter(e => e.type === filter);
   }
 
+  const handlePreviewClick = (expense: Expense) => {
+    if (expense.billUrl) {
+      window.open(expense.billUrl, "_blank");
+    }
+  };
+
   const ExpenseTable = ({ filter }: { filter: ExpenseFilter }) => (
     <Table>
       <TableHeader>
@@ -151,7 +157,7 @@ export default function ExpenseTracker() {
           <TableHead>Date</TableHead>
           <TableHead>Status</TableHead>
           <TableHead className="text-right">Amount</TableHead>
-          <TableHead className="text-right">Action</TableHead>
+          <TableHead className="text-right">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -164,12 +170,26 @@ export default function ExpenseTracker() {
             <TableCell><Badge variant={getStatusVariant(expense.status)}>{expense.status}</Badge></TableCell>
             <TableCell className="text-right">${expense.amount.toFixed(2)}</TableCell>
             <TableCell className="text-right">
-              {expense.status === 'Unpaid' && (
-                <form action={createCheckoutSession}>
-                  <input type="hidden" name="expenseId" value={expense.id} />
-                  <PayButton />
-                </form>
-              )}
+              <div className="flex items-center justify-end space-x-1">
+                {expense.billUrl && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" onClick={() => handlePreviewClick(expense)}>
+                          <Eye className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Preview Bill</p>
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+                {expense.status === 'Unpaid' && (
+                  <form action={createCheckoutSession}>
+                    <input type="hidden" name="expenseId" value={expense.id} />
+                    <PayButton />
+                  </form>
+                )}
+              </div>
             </TableCell>
           </TableRow>
         ))}

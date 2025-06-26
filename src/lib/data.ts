@@ -57,6 +57,7 @@ export type Expense = {
   amount: number;
   date: Date;
   status: 'Paid' | 'Unpaid';
+  billUrl?: string;
 };
 
 export type Message = {
@@ -117,26 +118,26 @@ export const documents: Document[] = [
 ];
 
 export const expenses: Expense[] = [
-  { id: 'exp001', vehicleId: 'v001', type: 'Fuel', description: 'Refuel for Bus 1', amount: 150.75, date: new Date('2024-07-15'), status: 'Paid' },
-  { id: 'exp002', vehicleId: 'v002', type: 'Maintenance', description: 'Brake pad replacement', amount: 350.00, date: new Date('2024-07-14'), status: 'Unpaid' },
-  { id: 'exp003', vehicleId: 'v003', type: 'Insurance', description: 'Monthly premium', amount: 500.00, date: new Date('2024-07-01'), status: 'Paid' },
-  { id: 'exp004', vehicleId: 'v004', type: 'Fuel', description: 'Refuel for Bus 4', amount: 180.50, date: new Date('2024-07-16'), status: 'Unpaid' },
+  { id: 'exp001', vehicleId: 'v001', type: 'Fuel', description: 'Refuel for Bus 1', amount: 150.75, date: new Date('2024-07-15'), status: 'Paid', billUrl: 'https://placehold.co/850x1100.png' },
+  { id: 'exp002', vehicleId: 'v002', type: 'Maintenance', description: 'Brake pad replacement', amount: 350.00, date: new Date('2024-07-14'), status: 'Unpaid', billUrl: 'https://placehold.co/850x1100.png' },
+  { id: 'exp003', vehicleId: 'v003', type: 'Insurance', description: 'Monthly premium', amount: 500.00, date: new Date('2024-07-01'), status: 'Paid', billUrl: 'https://placehold.co/850x1100.png' },
+  { id: 'exp004', vehicleId: 'v004', type: 'Fuel', description: 'Refuel for Bus 4', amount: 180.50, date: new Date('2024-07-16'), status: 'Unpaid', billUrl: 'https://placehold.co/850x1100.png' },
   { id: 'exp005', vehicleId: 'v001', type: 'Other', description: 'Cleaning supplies', amount: 45.25, date: new Date('2024-07-12'), status: 'Paid' },
-  { id: 'exp006', vehicleId: 'v005', type: 'Maintenance', description: 'Oil change and filter', amount: 120.00, date: new Date('2024-07-10'), status: 'Unpaid' },
+  { id: 'exp006', vehicleId: 'v005', type: 'Maintenance', description: 'Oil change and filter', amount: 120.00, date: new Date('2024-07-10'), status: 'Unpaid', billUrl: 'https://placehold.co/850x1100.png' },
   { id: 'exp007', vehicleId: 'v002', type: 'Tolls', description: 'Toll for university trip', amount: 12.50, date: new Date('2024-07-18'), status: 'Paid' },
   { id: 'exp008', vehicleId: 'v004', type: 'Misc', description: 'Driver meal for field trip', amount: 25.00, date: new Date('2024-07-19'), status: 'Paid' },
 ];
 
 export const payments: Payment[] = [
-  { id: 'pay001', description: 'Bus Pass Fee - L. Miller', amount: 250.00, date: new Date('2024-07-01T10:00:00Z'), status: 'Paid', type: 'Incoming', method: 'Credit Card' },
+  { id: 'pay001', description: 'Fall Semester Bus Pass - L. Miller', amount: 250.00, date: new Date('2024-07-01T10:00:00Z'), status: 'Paid', type: 'Incoming', method: 'Credit Card' },
   { id: 'pay002', description: 'Fuel Supplier Invoice #FS-1024', amount: 1250.50, date: new Date('2024-07-05T11:30:00Z'), status: 'Paid', type: 'Outgoing', method: 'Bank Transfer' },
-  { id: 'pay003', description: 'Faculty Transport Fee - Dr. Garcia', amount: 100.00, date: new Date('2024-07-10T14:00:00Z'), status: 'Paid', type: 'Incoming', method: 'Credit Card' },
+  { id: 'pay003', description: 'Faculty Pass - Dr. Garcia', amount: 100.00, date: new Date('2024-07-10T14:00:00Z'), status: 'Paid', type: 'Incoming', method: 'Credit Card' },
   { id: 'pay004', description: 'Tire Replacement - Bus 2', amount: 800.00, date: new Date('2024-07-12T09:45:00Z'), status: 'Paid', type: 'Outgoing', method: 'Credit Card' },
   { id: 'pay005', description: 'Field Trip Charter - History Dept.', amount: 750.00, date: new Date('2024-07-15T16:20:00Z'), status: 'Paid', type: 'Incoming', method: 'Bank Transfer' },
   { id: 'pay006', description: 'Office Cleaning Services', amount: 150.00, date: new Date('2024-07-18T18:00:00Z'), status: 'Pending', type: 'Outgoing', method: 'Bank Transfer' },
   { id: 'pay007', description: 'Late Bus Pass Fee - E. Rodriguez', amount: 275.00, date: new Date('2024-07-20T10:30:00Z'), status: 'Failed', type: 'Incoming', method: 'Credit Card' },
-  { id: 'pay008', description: 'Sports Team Transport', amount: 300.00, date: new Date('2024-07-21T09:15:00Z'), status: 'Paid', type: 'Incoming', method: 'Bank Transfer' },
-  { id: 'pay009', description: 'Department Trip Deposit', amount: 500.00, date: new Date('2024-07-22T14:00:00Z'), status: 'Pending', type: 'Incoming', method: 'Bank Transfer' },
+  { id: 'pay008', description: 'On-board Ticket Sales - Route 101', amount: 75.50, date: new Date('2024-07-21T09:15:00Z'), status: 'Paid', type: 'Incoming', method: 'Cash' },
+  { id: 'pay009', description: 'Sports Team Transport Deposit', amount: 500.00, date: new Date('2024-07-22T14:00:00Z'), status: 'Pending', type: 'Incoming', method: 'Bank Transfer' },
   { id: 'pay010', description: 'Bus Pass Renewal - N. Martinez', amount: 250.00, date: new Date('2024-07-23T11:20:00Z'), status: 'Paid', type: 'Incoming', method: 'Credit Card' },
 ];
 

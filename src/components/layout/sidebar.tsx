@@ -32,11 +32,13 @@ import {
   CreditCard,
   Sun,
   Moon,
+  Truck,
 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 const links = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/vehicles", label: "Vehicles", icon: Truck },
   { href: "/drivers", label: "Drivers", icon: Users },
   { href: "/passes", label: "Bus Passes", icon: Ticket },
   { href: "/documents", label: "Documents", icon: FileText },

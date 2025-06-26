@@ -5,7 +5,7 @@ import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 
-import { drivers, Driver, buses } from "@/lib/data"
+import { drivers, Driver, vehicles } from "@/lib/data"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
@@ -37,7 +37,7 @@ const driverFormSchema = z.object({
   email: z.string().email("Invalid email address"),
   phone: z.string().min(1, "Phone number is required"),
   status: z.enum(["Active", "Suspended", "Inactive"]),
-  assignedBusId: z.string().nullable(),
+  assignedVehicleId: z.string().nullable(),
 })
 
 type DriverFormValues = z.infer<typeof driverFormSchema>
@@ -55,7 +55,7 @@ export default function DriverManagement() {
       email: "",
       phone: "",
       status: "Inactive",
-      assignedBusId: null,
+      assignedVehicleId: null,
     },
   })
 
@@ -66,7 +66,7 @@ export default function DriverManagement() {
       email: driver.email,
       phone: driver.phone,
       status: driver.status,
-      assignedBusId: driver.assignedBusId,
+      assignedVehicleId: driver.assignedVehicleId,
     })
     setIsEditDialogOpen(true)
   }
@@ -103,7 +103,7 @@ export default function DriverManagement() {
               <TableRow>
                 <TableHead>Driver</TableHead>
                 <TableHead>Contact</TableHead>
-                <TableHead>Assigned Bus</TableHead>
+                <TableHead>Assigned Vehicle</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -124,7 +124,7 @@ export default function DriverManagement() {
                     <div className="text-sm">{driver.email}</div>
                     <div className="text-xs text-muted-foreground">{driver.phone}</div>
                   </TableCell>
-                  <TableCell>{buses.find(b => b.id === driver.assignedBusId)?.name || 'N/A'}</TableCell>
+                  <TableCell>{vehicles.find(b => b.id === driver.assignedVehicleId)?.name || 'N/A'}</TableCell>
                   <TableCell>
                     <Badge variant={getStatusVariant(driver.status)}>{driver.status}</Badge>
                   </TableCell>
@@ -217,20 +217,20 @@ export default function DriverManagement() {
                 />
                 <FormField
                   control={form.control}
-                  name="assignedBusId"
+                  name="assignedVehicleId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Assigned Bus</FormLabel>
+                      <FormLabel>Assigned Vehicle</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value || ""}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select a bus" />
+                            <SelectValue placeholder="Select a vehicle" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="">None</SelectItem>
-                          {buses.map(bus => (
-                            <SelectItem key={bus.id} value={bus.id}>{bus.name}</SelectItem>
+                          {vehicles.map(vehicle => (
+                            <SelectItem key={vehicle.id} value={vehicle.id}>{vehicle.name}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>

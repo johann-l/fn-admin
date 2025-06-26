@@ -3,7 +3,7 @@
 import * as React from "react"
 import { format } from "date-fns"
 
-import { documents, Document, buses } from "@/lib/data"
+import { documents, Document, vehicles } from "@/lib/data"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
@@ -23,8 +23,8 @@ export default function DocumentManagement() {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
-          <CardTitle>Bus Documents</CardTitle>
-          <CardDescription>Upload and manage bus-related documents.</CardDescription>
+          <CardTitle>Vehicle Documents</CardTitle>
+          <CardDescription>Upload and manage vehicle-related documents.</CardDescription>
         </div>
         <Button>
           <Upload className="mr-2 h-4 w-4" />
@@ -36,7 +36,7 @@ export default function DocumentManagement() {
           <TableHeader>
             <TableRow>
               <TableHead>Document Name</TableHead>
-              <TableHead>Bus</TableHead>
+              <TableHead>Vehicle</TableHead>
               <TableHead>Expiry Date</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -46,7 +46,7 @@ export default function DocumentManagement() {
             {documents.map((doc) => (
               <TableRow key={doc.id}>
                 <TableCell className="font-medium">{doc.name}</TableCell>
-                <TableCell>{buses.find(b => b.id === doc.busId)?.name}</TableCell>
+                <TableCell>{vehicles.find(v => v.id === doc.vehicleId)?.name}</TableCell>
                 <TableCell>{format(doc.expiryDate, "LLL dd, y")}</TableCell>
                 <TableCell>
                   <Badge variant={getStatusVariant(doc.status)}>{doc.status}</Badge>

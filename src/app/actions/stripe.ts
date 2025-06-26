@@ -28,7 +28,7 @@ export async function createCheckoutSession(formData: FormData) {
           product_data: {
             name: expense.description,
             metadata: {
-              busId: expense.busId,
+              vehicleId: expense.vehicleId,
               expenseType: expense.type,
             },
           },

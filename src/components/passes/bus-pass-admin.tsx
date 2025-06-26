@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { format } from "date-fns"
 
-import { passes, BusPass, buses } from "@/lib/data"
+import { passes, BusPass, vehicles } from "@/lib/data"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
@@ -37,7 +37,7 @@ import BusPassCard from "./bus-pass-card"
 
 const passFormSchema = z.object({
   passengerName: z.string().min(1, "Passenger name is required"),
-  busId: z.string().min(1, "Bus selection is required"),
+  vehicleId: z.string().min(1, "Vehicle selection is required"),
   seat: z.string().min(1, "Seat is required"),
   validFrom: z.date({ required_error: "A start date is required." }),
   validUntil: z.date({ required_error: "An end date is required." }),
@@ -59,7 +59,7 @@ export default function BusPassAdmin() {
     setSelectedPass(pass)
     form.reset({
       passengerName: pass.passengerName,
-      busId: pass.busId,
+      vehicleId: pass.vehicleId,
       seat: pass.seat,
       validFrom: pass.validFrom,
       validUntil: pass.validUntil,
@@ -71,7 +71,7 @@ export default function BusPassAdmin() {
     setSelectedPass(null);
     form.reset({
       passengerName: "",
-      busId: "",
+      vehicleId: "",
       seat: "",
       validFrom: undefined,
       validUntil: undefined
@@ -130,7 +130,7 @@ export default function BusPassAdmin() {
                 <TableRow key={pass.id}>
                   <TableCell className="font-medium">{pass.passengerName}</TableCell>
                   <TableCell>
-                    <div>{buses.find(b => b.id === pass.busId)?.name}</div>
+                    <div>{vehicles.find(v => v.id === pass.vehicleId)?.name}</div>
                     <div className="text-sm text-muted-foreground">Seat {pass.seat}</div>
                   </TableCell>
                   <TableCell>
@@ -174,13 +174,13 @@ export default function BusPassAdmin() {
               <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
-                  name="busId"
+                  name="vehicleId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Bus</FormLabel>
+                      <FormLabel>Vehicle</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl><SelectTrigger><SelectValue placeholder="Select a bus" /></SelectTrigger></FormControl>
-                        <SelectContent>{buses.map(bus => (<SelectItem key={bus.id} value={bus.id}>{bus.name}</SelectItem>))}</SelectContent>
+                        <FormControl><SelectTrigger><SelectValue placeholder="Select a vehicle" /></SelectTrigger></FormControl>
+                        <SelectContent>{vehicles.map(vehicle => (<SelectItem key={vehicle.id} value={vehicle.id}>{vehicle.name}</SelectItem>))}</SelectContent>
                       </Select>
                       <FormMessage />
                     </FormItem>

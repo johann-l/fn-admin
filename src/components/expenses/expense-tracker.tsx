@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import { format } from "date-fns"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Cell } from "recharts"
 
-import { expenses as initialExpenses, buses, Expense } from "@/lib/data"
+import { expenses as initialExpenses, vehicles, Expense } from "@/lib/data"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
@@ -82,8 +82,8 @@ export default function ExpenseTracker() {
 
   const chartData = Object.entries(expensesByType).map(([name, total]) => ({ name, total: Math.floor(total) }))
   
-  const getBusName = (busId: string) => {
-    return buses.find(b => b.id === busId)?.name || 'N/A'
+  const getVehicleName = (vehicleId: string) => {
+    return vehicles.find(v => v.id === vehicleId)?.name || 'N/A'
   }
   
   const getTypeVariant = (type: Expense['type']): "default" | "secondary" | "destructive" | "outline" => {
@@ -117,7 +117,7 @@ export default function ExpenseTracker() {
       <TableHeader>
         <TableRow>
           <TableHead>Description</TableHead>
-          <TableHead>Bus</TableHead>
+          <TableHead>Vehicle</TableHead>
           <TableHead>Type</TableHead>
           <TableHead>Date</TableHead>
           <TableHead>Status</TableHead>
@@ -129,7 +129,7 @@ export default function ExpenseTracker() {
         {[...filteredExpenses(filter)].sort((a, b) => b.date.getTime() - a.date.getTime()).map((expense) => (
           <TableRow key={expense.id}>
             <TableCell className="font-medium">{expense.description}</TableCell>
-            <TableCell>{getBusName(expense.busId)}</TableCell>
+            <TableCell>{getVehicleName(expense.vehicleId)}</TableCell>
             <TableCell><Badge variant={getTypeVariant(expense.type)}>{expense.type}</Badge></TableCell>
             <TableCell>{format(expense.date, "LLL dd, y")}</TableCell>
             <TableCell><Badge variant={getStatusVariant(expense.status)}>{expense.status}</Badge></TableCell>

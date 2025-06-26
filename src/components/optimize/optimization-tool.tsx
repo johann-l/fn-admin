@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { useFormState, useFormStatus } from "react-dom"
+import { useActionState } from "react"
+import { useFormStatus } from "react-dom"
 import { summarizeFleetActivity, SummarizeFleetActivityOutput } from "@/ai/flows/summarize-fleet-activity"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -80,7 +81,7 @@ function ResultsDisplay({ state }: { state: State }) {
 }
 
 export default function OptimizationTool() {
-  const [state, formAction] = useFormState(async (prevState: State, formData: FormData): Promise<State> => {
+  const [state, formAction] = useActionState(async (prevState: State, formData: FormData): Promise<State> => {
     try {
       const dailyEvents = formData.get("dailyEvents") as string
       if (!dailyEvents) {

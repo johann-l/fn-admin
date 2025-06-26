@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -138,7 +139,7 @@ export default function ExpenseTracker() {
         <TableRow>
           <TableHead>Description</TableHead>
           <TableHead>Vehicle</TableHead>
-          <TableHead>Type</TableHead>
+          {filter === 'all' && <TableHead>Type</TableHead>}
           <TableHead>Date</TableHead>
           <TableHead>Status</TableHead>
           <TableHead className="text-right">Amount</TableHead>
@@ -150,7 +151,7 @@ export default function ExpenseTracker() {
           <TableRow key={expense.id}>
             <TableCell className="font-medium">{expense.description}</TableCell>
             <TableCell>{getVehicleName(expense.vehicleId)}</TableCell>
-            <TableCell><Badge variant={getTypeVariant(expense.type)}>{expense.type}</Badge></TableCell>
+            {filter === 'all' && <TableCell><Badge variant={getTypeVariant(expense.type)}>{expense.type}</Badge></TableCell>}
             <TableCell>{format(expense.date, "LLL dd, y")}</TableCell>
             <TableCell><Badge variant={getStatusVariant(expense.status)}>{expense.status}</Badge></TableCell>
             <TableCell className="text-right">${expense.amount.toFixed(2)}</TableCell>

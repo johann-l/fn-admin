@@ -87,6 +87,7 @@ body {
 
 @layer components {
   .map-grid {
+    background-color: hsl(var(--muted));
     background-image:
       linear-gradient(hsla(var(--border), 0.5) 1px, transparent 1px),
       linear-gradient(to right, hsla(var(--border), 0.5) 1px, transparent 1px);

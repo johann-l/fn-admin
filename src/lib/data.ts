@@ -118,82 +118,84 @@ export const documents: Document[] = [
   { id: 'doc004', name: 'Permit-Bus-4.pdf', vehicleId: 'v004', uploadDate: new Date('2024-03-10'), expiryDate: new Date('2026-03-09'), status: 'Valid', url: 'https://placehold.co/850x1100.png' },
 ];
 
-const generateHistoricalExpenses = (): Expense[] => {
-    const expenses: Expense[] = [];
-    const now = new Date();
-    const vehicleIds = ['v001', 'v002', 'v003', 'v004', 'v005'];
-    const expenseTypes: Expense['type'][] = ['Fuel', 'Maintenance', 'Insurance', 'Tolls', 'Misc', 'Other'];
+export const expenses: Expense[] = [
+  { "id": "exp_11_0", "vehicleId": "v001", "type": "Tolls", "description": "Tolls for vehicle", "amount": 268, "date": new Date("2023-08-25T18:30:00.000Z"), "status": "Paid", "billUrl": "https://placehold.co/850x1100.png" },
+  { "id": "exp_11_1", "vehicleId": "v001", "type": "Misc", "description": "Misc for vehicle", "amount": 105, "date": new Date("2023-08-02T18:30:00.000Z"), "status": "Paid", "billUrl": "https://placehold.co/850x1100.png" },
+  { "id": "exp_10_0", "vehicleId": "v003", "type": "Maintenance", "description": "Maintenance for vehicle", "amount": 233, "date": new Date("2023-09-08T18:30:00.000Z"), "status": "Paid", "billUrl": "https://placehold.co/850x1100.png" },
+  { "id": "exp_10_1", "vehicleId": "v005", "type": "Insurance", "description": "Insurance for vehicle", "amount": 313, "date": new Date("2023-09-20T18:30:00.000Z"), "status": "Paid", "billUrl": "https://placehold.co/850x1100.png" },
+  { "id": "exp_9_0", "vehicleId": "v005", "type": "Tolls", "description": "Tolls for vehicle", "amount": 204, "date": new Date("2023-10-23T18:30:00.000Z"), "status": "Paid", "billUrl": "https://placehold.co/850x1100.png" },
+  { "id": "exp_9_1", "vehicleId": "v005", "type": "Fuel", "description": "Fuel for vehicle", "amount": 248, "date": new Date("2023-10-01T18:30:00.000Z"), "status": "Unpaid", "billUrl": "https://placehold.co/850x1100.png" },
+  { "id": "exp_8_0", "vehicleId": "v003", "type": "Fuel", "description": "Fuel for vehicle", "amount": 79, "date": new Date("2023-11-20T18:30:00.000Z"), "status": "Paid", "billUrl": "https://placehold.co/850x1100.png" },
+  { "id": "exp_8_1", "vehicleId": "v004", "type": "Other", "description": "Other for vehicle", "amount": 249, "date": new Date("2023-11-06T18:30:00.000Z"), "status": "Paid", "billUrl": "https://placehold.co/850x1100.png" },
+  { "id": "exp_7_0", "vehicleId": "v005", "type": "Insurance", "description": "Insurance for vehicle", "amount": 257, "date": new Date("2023-12-05T18:30:00.000Z"), "status": "Paid", "billUrl": "https://placehold.co/850x1100.png" },
+  { "id": "exp_7_1", "vehicleId": "v002", "type": "Fuel", "description": "Fuel for vehicle", "amount": 286, "date": new Date("2023-12-25T18:30:00.000Z"), "status": "Paid", "billUrl": "https://placehold.co/850x1100.png" },
+  { "id": "exp_6_0", "vehicleId": "v003", "type": "Misc", "description": "Misc for vehicle", "amount": 232, "date": new Date("2024-01-08T18:30:00.000Z"), "status": "Paid", "billUrl": "https://placehold.co/850x1100.png" },
+  { "id": "exp_6_1", "vehicleId": "v001", "type": "Insurance", "description": "Insurance for vehicle", "amount": 230, "date": new Date("2024-01-13T18:30:00.000Z"), "status": "Paid", "billUrl": "https://placehold.co/850x1100.png" },
+  { "id": "exp_5_0", "vehicleId": "v004", "type": "Tolls", "description": "Tolls for vehicle", "amount": 105, "date": new Date("2024-02-18T18:30:00.000Z"), "status": "Paid", "billUrl": "https://placehold.co/850x1100.png" },
+  { "id": "exp_5_1", "vehicleId": "v003", "type": "Maintenance", "description": "Maintenance for vehicle", "amount": 269, "date": new Date("2024-02-13T18:30:00.000Z"), "status": "Paid", "billUrl": "https://placehold.co/850x1100.png" },
+  { "id": "exp_4_0", "vehicleId": "v003", "type": "Misc", "description": "Misc for vehicle", "amount": 143, "date": new Date("2024-03-12T18:30:00.000Z"), "status": "Paid", "billUrl": "https://placehold.co/850x1100.png" },
+  { "id": "exp_4_1", "vehicleId": "v001", "type": "Insurance", "description": "Insurance for vehicle", "amount": 178, "date": new Date("2024-03-24T18:30:00.000Z"), "status": "Paid", "billUrl": "https://placehold.co/850x1100.png" },
+  { "id": "exp_3_0", "vehicleId": "v005", "type": "Other", "description": "Other for vehicle", "amount": 128, "date": new Date("2024-04-18T18:30:00.000Z"), "status": "Paid", "billUrl": "https://placehold.co/850x1100.png" },
+  { "id": "exp_3_1", "vehicleId": "v003", "type": "Misc", "description": "Misc for vehicle", "amount": 148, "date": new Date("2024-04-09T18:30:00.000Z"), "status": "Paid", "billUrl": "https://placehold.co/850x1100.png" },
+  { "id": "exp_2_0", "vehicleId": "v004", "type": "Other", "description": "Other for vehicle", "amount": 291, "date": new Date("2024-05-23T18:30:00.000Z"), "status": "Unpaid", "billUrl": "https://placehold.co/850x1100.png" },
+  { "id": "exp_2_1", "vehicleId": "v002", "type": "Other", "description": "Other for vehicle", "amount": 222, "date": new Date("2024-05-18T18:30:00.000Z"), "status": "Paid", "billUrl": "https://placehold.co/850x1100.png" },
+  { "id": "exp_1_0", "vehicleId": "v002", "type": "Tolls", "description": "Tolls for vehicle", "amount": 313, "date": new Date("2024-06-25T18:30:00.000Z"), "status": "Paid", "billUrl": "https://placehold.co/850x1100.png" },
+  { "id": "exp_1_1", "vehicleId": "v001", "type": "Tolls", "description": "Tolls for vehicle", "amount": 272, "date": new Date("2024-06-20T18:30:00.000Z"), "status": "Paid", "billUrl": "https://placehold.co/850x1100.png" },
+  { "id": "exp_0_0", "vehicleId": "v005", "type": "Fuel", "description": "Fuel for vehicle", "amount": 169, "date": new Date("2024-07-28T18:30:00.000Z"), "status": "Paid", "billUrl": "https://placehold.co/850x1100.png" },
+  { "id": "exp_0_1", "vehicleId": "v001", "type": "Maintenance", "description": "Maintenance for vehicle", "amount": 249, "date": new Date("2024-07-10T18:30:00.000Z"), "status": "Paid", "billUrl": "https://placehold.co/850x1100.png" }
+];
 
-    for (let i = 11; i >= 0; i--) {
-        const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
+export const payments: Payment[] = [
+  { "id": "pay_in_11_0", "description": "Bus Pass Fee - Student 1", "amount": 194, "date": new Date("2023-08-16T18:30:00.000Z"), "status": "Paid", "type": "Incoming", "method": "Credit Card" },
+  { "id": "pay_in_11_1", "description": "Bus Pass Fee - Student 2", "amount": 198, "date": new Date("2023-08-11T18:30:00.000Z"), "status": "Paid", "type": "Incoming", "method": "Credit Card" },
+  { "id": "pay_out_11_0", "description": "Insurance Premium", "amount": 1826, "date": new Date("2023-08-25T18:30:00.000Z"), "status": "Paid", "type": "Outgoing", "method": "Bank Transfer" },
+  { "id": "pay_out_11_1", "description": "Fuel Supplier Invoice", "amount": 1951, "date": new Date("2023-08-04T18:30:00.000Z"), "status": "Paid", "type": "Outgoing", "method": "Bank Transfer" },
+  { "id": "pay_in_10_0", "description": "Bus Pass Fee - Student 1", "amount": 235, "date": new Date("2023-09-24T18:30:00.000Z"), "status": "Paid", "type": "Incoming", "method": "Credit Card" },
+  { "id": "pay_in_10_1", "description": "Bus Pass Fee - Student 2", "amount": 159, "date": new Date("2023-09-21T18:30:00.000Z"), "status": "Paid", "type": "Incoming", "method": "Credit Card" },
+  { "id": "pay_out_10_0", "description": "Insurance Premium", "amount": 911, "date": new Date("2023-09-15T18:30:00.000Z"), "status": "Paid", "type": "Outgoing", "method": "Bank Transfer" },
+  { "id": "pay_out_10_1", "description": "Cleaning Services", "amount": 718, "date": new Date("2023-09-22T18:30:00.000Z"), "status": "Paid", "type": "Outgoing", "method": "Bank Transfer" },
+  { "id": "pay_in_9_0", "description": "Bus Pass Fee - Student 1", "amount": 204, "date": new Date("2023-10-18T18:30:00.000Z"), "status": "Paid", "type": "Incoming", "method": "Credit Card" },
+  { "id": "pay_in_9_1", "description": "Bus Pass Fee - Student 2", "amount": 242, "date": new Date("2023-10-10T18:30:00.000Z"), "status": "Paid", "type": "Incoming", "method": "Bank Transfer" },
+  { "id": "pay_out_9_0", "description": "Maintenance Parts", "amount": 1782, "date": new Date("2023-10-06T18:30:00.000Z"), "status": "Paid", "type": "Outgoing", "method": "Bank Transfer" },
+  { "id": "pay_out_9_1", "description": "Insurance Premium", "amount": 1656, "date": new Date("2023-10-09T18:30:00.000Z"), "status": "Paid", "type": "Outgoing", "method": "Bank Transfer" },
+  { "id": "pay_in_8_0", "description": "Bus Pass Fee - Student 1", "amount": 204, "date": new Date("2023-11-06T18:30:00.000Z"), "status": "Paid", "type": "Incoming", "method": "Credit Card" },
+  { "id": "pay_in_8_1", "description": "Bus Pass Fee - Student 2", "amount": 218, "date": new Date("2023-11-20T18:30:00.000Z"), "status": "Paid", "type": "Incoming", "method": "Bank Transfer" },
+  { "id": "pay_out_8_0", "description": "Maintenance Parts", "amount": 1698, "date": new Date("2023-11-03T18:30:00.000Z"), "status": "Paid", "type": "Outgoing", "method": "Bank Transfer" },
+  { "id": "pay_out_8_1", "description": "Cleaning Services", "amount": 1058, "date": new Date("2023-11-13T18:30:00.000Z"), "status": "Paid", "type": "Outgoing", "method": "Bank Transfer" },
+  { "id": "pay_in_7_0", "description": "Bus Pass Fee - Student 1", "amount": 146, "date": new Date("2023-12-07T18:30:00.000Z"), "status": "Paid", "type": "Incoming", "method": "Credit Card" },
+  { "id": "pay_in_7_1", "description": "Bus Pass Fee - Student 2", "amount": 196, "date": new Date("2023-12-14T18:30:00.000Z"), "status": "Paid", "type": "Incoming", "method": "Credit Card" },
+  { "id": "pay_out_7_0", "description": "Fuel Supplier Invoice", "amount": 1468, "date": new Date("2023-12-11T18:30:00.000Z"), "status": "Paid", "type": "Outgoing", "method": "Bank Transfer" },
+  { "id": "pay_out_7_1", "description": "Maintenance Parts", "amount": 1131, "date": new Date("2023-12-25T18:30:00.000Z"), "status": "Paid", "type": "Outgoing", "method": "Bank Transfer" },
+  { "id": "pay_in_6_0", "description": "Bus Pass Fee - Student 1", "amount": 154, "date": new Date("2024-01-20T18:30:00.000Z"), "status": "Paid", "type": "Incoming", "method": "Credit Card" },
+  { "id": "pay_in_6_1", "description": "Bus Pass Fee - Student 2", "amount": 153, "date": new Date("2024-01-13T18:30:00.000Z"), "status": "Paid", "type": "Incoming", "method": "Credit Card" },
+  { "id": "pay_out_6_0", "description": "Fuel Supplier Invoice", "amount": 639, "date": new Date("2024-01-15T18:30:00.000Z"), "status": "Paid", "type": "Outgoing", "method": "Bank Transfer" },
+  { "id": "pay_out_6_1", "description": "Insurance Premium", "amount": 1047, "date": new Date("2024-01-25T18:30:00.000Z"), "status": "Paid", "type": "Outgoing", "method": "Bank Transfer" },
+  { "id": "pay_in_5_0", "description": "Bus Pass Fee - Student 1", "amount": 118, "date": new Date("2024-02-04T18:30:00.000Z"), "status": "Paid", "type": "Incoming", "method": "Credit Card" },
+  { "id": "pay_in_5_1", "description": "Bus Pass Fee - Student 2", "amount": 149, "date": new Date("2024-02-18T18:30:00.000Z"), "status": "Paid", "type": "Incoming", "method": "Credit Card" },
+  { "id": "pay_out_5_0", "description": "Maintenance Parts", "amount": 1941, "date": new Date("2024-02-08T18:30:00.000Z"), "status": "Paid", "type": "Outgoing", "method": "Bank Transfer" },
+  { "id": "pay_out_5_1", "description": "Fuel Supplier Invoice", "amount": 597, "date": new Date("2024-02-19T18:30:00.000Z"), "status": "Paid", "type": "Outgoing", "method": "Bank Transfer" },
+  { "id": "pay_in_4_0", "description": "Bus Pass Fee - Student 1", "amount": 192, "date": new Date("2024-03-23T18:30:00.000Z"), "status": "Paid", "type": "Incoming", "method": "Credit Card" },
+  { "id": "pay_in_4_1", "description": "Bus Pass Fee - Student 2", "amount": 178, "date": new Date("2024-03-12T18:30:00.000Z"), "status": "Paid", "type": "Incoming", "method": "Credit Card" },
+  { "id": "pay_out_4_0", "description": "Cleaning Services", "amount": 1056, "date": new Date("2024-03-15T18:30:00.000Z"), "status": "Paid", "type": "Outgoing", "method": "Bank Transfer" },
+  { "id": "pay_out_4_1", "description": "Fuel Supplier Invoice", "amount": 1391, "date": new Date("2024-03-24T18:30:00.000Z"), "status": "Paid", "type": "Outgoing", "method": "Bank Transfer" },
+  { "id": "pay_in_3_0", "description": "Bus Pass Fee - Student 1", "amount": 223, "date": new Date("2024-04-18T18:30:00.000Z"), "status": "Paid", "type": "Incoming", "method": "Credit Card" },
+  { "id": "pay_in_3_1", "description": "Bus Pass Fee - Student 2", "amount": 179, "date": new Date("2024-04-09T18:30:00.000Z"), "status": "Paid", "type": "Incoming", "method": "Bank Transfer" },
+  { "id": "pay_out_3_0", "description": "Cleaning Services", "amount": 1587, "date": new Date("2024-04-22T18:30:00.000Z"), "status": "Paid", "type": "Outgoing", "method": "Bank Transfer" },
+  { "id": "pay_out_3_1", "description": "Maintenance Parts", "amount": 1419, "date": new Date("2024-04-28T18:30:00.000Z"), "status": "Paid", "type": "Outgoing", "method": "Bank Transfer" },
+  { "id": "pay_in_2_0", "description": "Bus Pass Fee - Student 1", "amount": 249, "date": new Date("2024-05-18T18:30:00.000Z"), "status": "Paid", "type": "Incoming", "method": "Credit Card" },
+  { "id": "pay_in_2_1", "description": "Bus Pass Fee - Student 2", "amount": 185, "date": new Date("2024-05-23T18:30:00.000Z"), "status": "Paid", "type": "Incoming", "method": "Credit Card" },
+  { "id": "pay_out_2_0", "description": "Maintenance Parts", "amount": 1056, "date": new Date("2024-05-28T18:30:00.000Z"), "status": "Paid", "type": "Outgoing", "method": "Bank Transfer" },
+  { "id": "pay_out_2_1", "description": "Maintenance Parts", "amount": 1242, "date": new Date("2024-05-09T18:30:00.000Z"), "status": "Paid", "type": "Outgoing", "method": "Bank Transfer" },
+  { "id": "pay_in_1_0", "description": "Bus Pass Fee - Student 1", "amount": 196, "date": new Date("2024-06-25T18:30:00.000Z"), "status": "Paid", "type": "Incoming", "method": "Credit Card" },
+  { "id": "pay_in_1_1", "description": "Bus Pass Fee - Student 2", "amount": 236, "date": new Date("2024-06-11T18:30:00.000Z"), "status": "Paid", "type": "Incoming", "method": "Credit Card" },
+  { "id": "pay_out_1_0", "description": "Fuel Supplier Invoice", "amount": 1421, "date": new Date("2024-06-18T18:30:00.000Z"), "status": "Paid", "type": "Outgoing", "method": "Bank Transfer" },
+  { "id": "pay_out_1_1", "description": "Insurance Premium", "amount": 1698, "date": new Date("2024-06-20T18:30:00.000Z"), "status": "Paid", "type": "Outgoing", "method": "Bank Transfer" },
+  { "id": "pay_in_0_0", "description": "Bus Pass Fee - Student 1", "amount": 178, "date": new Date("2024-07-28T18:30:00.000Z"), "status": "Paid", "type": "Incoming", "method": "Credit Card" },
+  { "id": "pay_in_0_1", "description": "Bus Pass Fee - Student 2", "amount": 166, "date": new Date("2024-07-10T18:30:00.000Z"), "status": "Paid", "type": "Incoming", "method": "Bank Transfer" },
+  { "id": "pay_out_0_0", "description": "Cleaning Services", "amount": 1488, "date": new Date("2024-07-01T18:30:00.000Z"), "status": "Paid", "type": "Outgoing", "method": "Bank Transfer" },
+  { "id": "pay_out_0_1", "description": "Maintenance Parts", "amount": 1342, "date": new Date("2024-07-04T18:30:00.000Z"), "status": "Paid", "type": "Outgoing", "method": "Bank Transfer" }
+];
 
-        const expenseCount = Math.floor(Math.random() * 4) + 2; // 2 to 5 expenses per month
-        for (let j = 0; j < expenseCount; j++) {
-            const day = Math.floor(Math.random() * 28) + 1;
-            const expenseDate = new Date(monthDate.getFullYear(), monthDate.getMonth(), day);
-            const type = expenseTypes[Math.floor(Math.random() * expenseTypes.length)];
-            expenses.push({
-                id: `exp_${i}_${j}`,
-                vehicleId: vehicleIds[Math.floor(Math.random() * vehicleIds.length)],
-                type: type,
-                description: `${type} for vehicle`,
-                amount: Math.floor(Math.random() * 300) + 50, // 50-350
-                date: expenseDate,
-                status: Math.random() > 0.1 ? 'Paid' : 'Unpaid', // Most are paid
-                billUrl: 'https://placehold.co/850x1100.png',
-            });
-        }
-    }
-    return expenses;
-};
-
-export const expenses: Expense[] = generateHistoricalExpenses();
-
-const generateHistoricalPayments = (): Payment[] => {
-  const payments: Payment[] = [];
-  const now = new Date();
-
-  for (let i = 11; i >= 0; i--) {
-    const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
-
-    // Generate incoming payments for the month
-    const incomingCount = Math.floor(Math.random() * 5) + 3; // 3 to 7 incoming
-    for (let j = 0; j < incomingCount; j++) {
-      const day = Math.floor(Math.random() * 28) + 1;
-      const paymentDate = new Date(monthDate.getFullYear(), monthDate.getMonth(), day);
-      payments.push({
-        id: `pay_in_${i}_${j}`,
-        description: `Bus Pass Fee - Student ${j + 1}`,
-        amount: Math.floor(Math.random() * 151) + 100, // 100-250
-        date: paymentDate,
-        status: 'Paid',
-        type: 'Incoming',
-        method: Math.random() > 0.3 ? 'Credit Card' : 'Bank Transfer',
-      });
-    }
-
-    // Generate outgoing payments for the month
-    const outgoingCount = Math.floor(Math.random() * 3) + 2; // 2 to 4 outgoing
-    for (let k = 0; k < outgoingCount; k++) {
-      const day = Math.floor(Math.random() * 28) + 1;
-      const paymentDate = new Date(monthDate.getFullYear(), monthDate.getMonth(), day);
-      const descriptions = ['Fuel Supplier Invoice', 'Maintenance Parts', 'Insurance Premium', 'Cleaning Services'];
-      payments.push({
-        id: `pay_out_${i}_${k}`,
-        description: descriptions[Math.floor(Math.random() * descriptions.length)],
-        amount: Math.floor(Math.random() * 1501) + 500, // 500-2000
-        date: paymentDate,
-        status: 'Paid',
-        type: 'Outgoing',
-        method: 'Bank Transfer',
-      });
-    }
-  }
-  return payments;
-}
-
-
-export const payments: Payment[] = generateHistoricalPayments();
 
 export const chatContacts: ChatContact[] = [
     { id: 'group_drivers', name: 'All Drivers', type: 'Group', avatarUrl: '', lastMessage: 'Remember to complete pre-trip inspections.', lastMessageTime: '8:30 AM' },

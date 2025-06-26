@@ -18,7 +18,6 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-  DialogTrigger,
 } from "@/components/ui/dialog"
 import {
   Form,
@@ -32,8 +31,9 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
-import { CalendarIcon, Edit, PlusCircle } from "lucide-react"
+import { CalendarIcon, Edit, PlusCircle, Eye } from "lucide-react"
 import { cn } from "@/lib/utils"
+import BusPassCard from "./bus-pass-card"
 
 const passFormSchema = z.object({
   passengerName: z.string().min(1, "Passenger name is required"),
@@ -48,6 +48,8 @@ type PassFormValues = z.infer<typeof passFormSchema>
 export default function BusPassAdmin() {
   const [isDialogOpen, setIsDialogOpen] = React.useState(false)
   const [selectedPass, setSelectedPass] = React.useState<BusPass | null>(null)
+  const [isViewDialogOpen, setIsViewDialogOpen] = React.useState(false)
+  const [selectedPassForView, setSelectedPassForView] = React.useState<BusPass | null>(null)
 
   const form = useForm<PassFormValues>({
     resolver: zodResolver(passFormSchema),
@@ -75,6 +77,11 @@ export default function BusPassAdmin() {
       validUntil: undefined
     });
     setIsDialogOpen(true);
+  }
+
+  const handleViewClick = (pass: BusPass) => {
+    setSelectedPassForView(pass)
+    setIsViewDialogOpen(true)
   }
 
   const onSubmit = (values: PassFormValues) => {
@@ -132,7 +139,10 @@ export default function BusPassAdmin() {
                   <TableCell>
                     <Badge variant={getStatusVariant(pass.status)}>{pass.status}</Badge>
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right space-x-1">
+                    <Button variant="ghost" size="icon" onClick={() => handleViewClick(pass)}>
+                      <Eye className="h-4 w-4" />
+                    </Button>
                     <Button variant="ghost" size="icon" onClick={() => handleEditClick(pass)}>
                       <Edit className="h-4 w-4" />
                     </Button>
@@ -230,6 +240,12 @@ export default function BusPassAdmin() {
               </DialogFooter>
             </form>
           </Form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+        <DialogContent className="sm:max-w-sm p-0 bg-transparent border-none shadow-none">
+          {selectedPassForView && <BusPassCard pass={selectedPassForView} />}
         </DialogContent>
       </Dialog>
     </>

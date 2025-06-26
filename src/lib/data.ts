@@ -24,6 +24,7 @@ export type Driver = {
 export type BusPass = {
   id: string;
   passengerName: string;
+  bloodGroup: string;
   busId: string;
   route: string;
   seat: string;
@@ -94,10 +95,10 @@ export const buses: Bus[] = [
 ];
 
 export const passes: BusPass[] = [
-  { id: 'p001', passengerName: 'Alice Williams', busId: 'b001', route: 'Downtown Loop', seat: '12A', validFrom: new Date('2024-07-01'), validUntil: new Date('2024-07-31'), status: 'Active' },
-  { id: 'p002', passengerName: 'Bob Brown', busId: 'b002', route: 'Uptown Express', seat: '5B', validFrom: new Date('2024-06-01'), validUntil: new Date('2024-06-30'), status: 'Expired' },
-  { id: 'p003', passengerName: 'Charlie Green', busId: 'b003', route: 'West Suburbs', seat: '21F', validFrom: new Date('2024-07-10'), validUntil: new Date('2024-08-10'), status: 'Active' },
-  { id: 'p004', passengerName: 'Diana Prince', busId: 'b001', route: 'Downtown Loop', seat: '3C', validFrom: new Date('2024-01-01'), validUntil: new Date('2024-01-01'), status: 'Invalid' },
+  { id: 'p001', passengerName: 'Alice Williams', bloodGroup: 'A+', busId: 'b001', route: 'Downtown Loop', seat: '12A', validFrom: new Date('2024-07-01'), validUntil: new Date('2024-07-31'), status: 'Active' },
+  { id: 'p002', passengerName: 'Bob Brown', bloodGroup: 'O-', busId: 'b002', route: 'Uptown Express', seat: '5B', validFrom: new Date('2024-06-01'), validUntil: new Date('2024-06-30'), status: 'Expired' },
+  { id: 'p003', passengerName: 'Charlie Green', bloodGroup: 'B+', busId: 'b003', route: 'West Suburbs', seat: '21F', validFrom: new Date('2024-07-10'), validUntil: new Date('2024-08-10'), status: 'Active' },
+  { id: 'p004', passengerName: 'Diana Prince', bloodGroup: 'AB+', busId: 'b001', route: 'Downtown Loop', seat: '3C', validFrom: new Date('2024-01-01'), validUntil: new Date('2024-01-01'), status: 'Invalid' },
 ];
 
 export const documents: Document[] = [

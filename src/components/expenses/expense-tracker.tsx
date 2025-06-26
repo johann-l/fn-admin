@@ -57,6 +57,9 @@ function PayButton() {
   )
 }
 
+const expenseTypes: Expense['type'][] = ['Fuel', 'Maintenance', 'Insurance', 'Tolls', 'Misc', 'Other'];
+type ExpenseFilter = 'all' | Expense['type'];
+
 export default function ExpenseTracker() {
   const { vehicles } = useAppData()
   const [expenses, setExpenses] = React.useState<Expense[]>(initialExpenses)
@@ -122,19 +125,14 @@ export default function ExpenseTracker() {
     return status === 'Paid' ? 'default' : 'destructive';
   }
 
-  const filteredExpenses = (filter: 'all' | 'paid' | 'unpaid') => {
-    switch (filter) {
-      case 'paid':
-        return expenses.filter(e => e.status === 'Paid');
-      case 'unpaid':
-        return expenses.filter(e => e.status === 'Unpaid');
-      case 'all':
-      default:
-        return expenses;
+  const filteredExpenses = (filter: ExpenseFilter) => {
+    if (filter === 'all') {
+      return expenses;
     }
+    return expenses.filter(e => e.type === filter);
   }
 
-  const ExpenseTable = ({ filter }: { filter: 'all' | 'paid' | 'unpaid' }) => (
+  const ExpenseTable = ({ filter }: { filter: ExpenseFilter }) => (
     <Table>
       <TableHeader>
         <TableRow>
@@ -213,20 +211,20 @@ export default function ExpenseTracker() {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="all">
-            <TabsList className="grid w-full grid-cols-3 md:w-[400px]">
+            <TabsList className="h-auto flex-wrap justify-start gap-1">
               <TabsTrigger value="all">All Expenses</TabsTrigger>
-              <TabsTrigger value="unpaid">Unpaid</TabsTrigger>
-              <TabsTrigger value="paid">Paid</TabsTrigger>
+              {expenseTypes.map(type => (
+                <TabsTrigger key={type} value={type}>{type}</TabsTrigger>
+              ))}
             </TabsList>
             <TabsContent value="all">
               <ExpenseTable filter="all" />
             </TabsContent>
-            <TabsContent value="unpaid">
-              <ExpenseTable filter="unpaid" />
-            </TabsContent>
-            <TabsContent value="paid">
-              <ExpenseTable filter="paid" />
-            </TabsContent>
+            {expenseTypes.map(type => (
+              <TabsContent key={type} value={type}>
+                <ExpenseTable filter={type} />
+              </TabsContent>
+            ))}
           </Tabs>
         </CardContent>
       </Card>

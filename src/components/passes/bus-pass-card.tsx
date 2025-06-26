@@ -24,6 +24,8 @@ export default function BusPassCard({ pass }: BusPassCardProps) {
     validUntil: pass.validUntil.toISOString(),
   });
 
+  const studentName = pass.studentName || '';
+
   return (
     <>
       <style jsx global>
@@ -64,15 +66,15 @@ export default function BusPassCard({ pass }: BusPassCardProps) {
                 </div>
                 <div className="absolute -bottom-10 right-6">
                     <Avatar className="h-20 w-20 border-4 border-card bg-card">
-                        <AvatarImage src={`https://placehold.co/100x100.png?text=${pass.studentName.charAt(0)}`} alt={pass.studentName} data-ai-hint="person avatar"/>
-                        <AvatarFallback>{pass.studentName.substring(0, 2).toUpperCase()}</AvatarFallback>
+                        <AvatarImage src={`https://placehold.co/100x100.png?text=${studentName.charAt(0)}`} alt={studentName} data-ai-hint="person avatar"/>
+                        <AvatarFallback>{studentName ? studentName.substring(0, 2).toUpperCase() : 'SN'}</AvatarFallback>
                     </Avatar>
                 </div>
             </div>
             <CardContent className="p-6 pt-12 space-y-4">
                 <div className="flex justify-between items-center">
                     <div className="text-left">
-                        <h3 className="text-xl font-semibold">{pass.studentName}</h3>
+                        <h3 className="text-xl font-semibold">{studentName}</h3>
                         <p className="text-sm text-muted-foreground">Student Bus Pass</p>
                     </div>
                     <div className="p-1 bg-white rounded-md">

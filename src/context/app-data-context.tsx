@@ -21,6 +21,7 @@ import {
 type VehicleFormData = Omit<Vehicle, 'id' | 'route' | 'availability' | 'location'>;
 type PassFormData = Omit<BusPass, 'id' | 'status' | 'bloodGroup' | 'route'>;
 type DriverFormData = Omit<Driver, 'id' | 'avatarUrl'>;
+type ExpenseFormData = Omit<Expense, 'id'>;
 
 type AppDataContextType = {
   vehicles: Vehicle[]
@@ -39,6 +40,7 @@ type AppDataContextType = {
   updatePass: (pass: BusPass) => void
   removePass: (passId: string) => void
   removeDocument: (documentId: string) => void
+  addExpense: (expense: ExpenseFormData) => void
   updateExpense: (expenseId: string, updates: Partial<Expense>) => void
 }
 
@@ -49,10 +51,11 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
   const [drivers, setDrivers] = React.useState<Driver[]>(initialDrivers)
   const [passes, setPasses] = React.useState<BusPass[]>(initialPasses)
   const [documents, setDocuments] = React.useState<Document[]>(initialDocuments)
-  const [expenses, setExpenses] = React.useState<Expense[]>([])
-  const [payments, setPayments] = React.useState<Payment[]>([])
+  const [expenses, setExpenses] = React.useState<Expense[] | null>(null)
+  const [payments, setPayments] = React.useState<Payment[] | null>(null)
 
   React.useEffect(() => {
+    // Generate data on the client-side to avoid hydration errors
     setExpenses(generateHistoricalExpenses());
     setPayments(generateHistoricalPayments());
   }, [])
@@ -119,12 +122,20 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
   const removeDocument = (documentId: string) => {
     setDocuments(prev => prev.filter(doc => doc.id !== documentId));
   };
+
+  const addExpense = (expenseData: ExpenseFormData) => {
+    const newExpense: Expense = {
+      ...expenseData,
+      id: `exp-${Date.now()}`,
+    };
+    setExpenses(prev => (prev ? [newExpense, ...prev] : [newExpense]));
+  };
   
   const updateExpense = (expenseId: string, updates: Partial<Expense>) => {
     setExpenses(prev =>
-      prev.map(expense =>
+      prev ? prev.map(expense =>
         expense.id === expenseId ? { ...expense, ...updates } : expense
-      )
+      ) : null
     );
   };
 
@@ -134,8 +145,8 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
         drivers, 
         passes, 
         documents, 
-        expenses,
-        payments,
+        expenses: expenses || [],
+        payments: payments || [],
         addVehicle, 
         updateVehicle, 
         removeVehicle, 
@@ -146,6 +157,7 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
         updatePass, 
         removePass, 
         removeDocument,
+        addExpense,
         updateExpense
     }}>
       {children}

@@ -1,6 +1,7 @@
 
 "use client"
 
+import * as React from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
@@ -46,7 +47,7 @@ export default function FleetStatusTable() {
                 <TableHead>Vehicle</TableHead>
                 <TableHead>Driver</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Route Progress</TableHead>
+                <TableHead className="w-[150px]">Route Progress</TableHead>
                 <TableHead className="text-right">Seats</TableHead>
               </TableRow>
             </TableHeader>
@@ -69,22 +70,33 @@ export default function FleetStatusTable() {
                     <TableCell>
                       {vehicle.status !== 'Out of Service' &&
                       vehicle.status !== 'Maintenance' &&
-                      route &&
+                      route && totalStops > 0 &&
                       currentStopIndex >= 0 ? (
                         <TooltipProvider>
                           <Tooltip delayDuration={100}>
                             <TooltipTrigger asChild>
-                              <div className="flex items-center gap-1.5 cursor-default">
+                              <div className="flex items-center w-full cursor-default">
                                 {Array.from({ length: totalStops }).map((_, index) => (
-                                  <div
-                                    key={index}
-                                    className={cn(
-                                      'h-2 w-2 rounded-full transition-colors',
-                                      index <= currentStopIndex
-                                        ? 'bg-primary'
-                                        : 'bg-muted'
+                                  <React.Fragment key={index}>
+                                    <div
+                                      className={cn(
+                                        'h-2.5 w-2.5 rounded-full transition-colors flex-shrink-0',
+                                        index <= currentStopIndex
+                                          ? 'bg-primary'
+                                          : 'bg-muted'
+                                      )}
+                                    />
+                                    {index < totalStops - 1 && (
+                                      <div
+                                        className={cn(
+                                          'flex-grow h-[2px] mx-1 transition-colors',
+                                          index < currentStopIndex
+                                            ? 'bg-primary'
+                                            : 'bg-muted'
+                                        )}
+                                      />
                                     )}
-                                  />
+                                  </React.Fragment>
                                 ))}
                               </div>
                             </TooltipTrigger>

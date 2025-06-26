@@ -1,5 +1,4 @@
 
-
 export type Vehicle = {
   id: string;
   name: string;
@@ -136,7 +135,7 @@ export const generateHistoricalExpenses = (): Expense[] => {
         id: `exp_${i}_${j}`,
         vehicleId: vehicle.id,
         type: type,
-        description: `${type} for vehicle`,
+        description: `${type} for ${vehicle.name}`,
         amount: Math.floor(Math.random() * (300 - 50 + 1)) + 50,
         date: expenseDate,
         status: Math.random() > 0.2 ? 'Paid' : 'Unpaid',

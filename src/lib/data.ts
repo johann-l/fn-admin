@@ -109,10 +109,10 @@ export const passes: BusPass[] = [
 ];
 
 export const documents: Document[] = [
-  { id: 'doc001', name: 'Registration-CC1.pdf', vehicleId: 'v001', uploadDate: new Date('2024-01-15'), expiryDate: new Date('2025-01-14'), status: 'Valid', url: 'https://placehold.co/850x1100.png' },
-  { id: 'doc002', name: 'Insurance-E202.pdf', vehicleId: 'v002', uploadDate: new Date('2023-08-01'), expiryDate: new Date('2024-07-31'), status: 'Expiring Soon', url: 'https://placehold.co/850x1100.png' },
-  { id: 'doc003', name: 'Maintenance-SC.pdf', vehicleId: 'v003', uploadDate: new Date('2024-05-20'), expiryDate: new Date('2024-06-19'), status: 'Expired', url: 'https://placehold.co/850x1100.png' },
-  { id: 'doc004', name: 'Permit-ML.pdf', vehicleId: 'v004', uploadDate: new Date('2024-03-10'), expiryDate: new Date('2026-03-09'), status: 'Valid', url: 'https://placehold.co/850x1100.png' },
+  { id: 'doc001', name: 'Registration-Bus-1.pdf', vehicleId: 'v001', uploadDate: new Date('2024-01-15'), expiryDate: new Date('2025-01-14'), status: 'Valid', url: 'https://placehold.co/850x1100.png' },
+  { id: 'doc002', name: 'Insurance-Bus-2.pdf', vehicleId: 'v002', uploadDate: new Date('2023-08-01'), expiryDate: new Date('2024-07-31'), status: 'Expiring Soon', url: 'https://placehold.co/850x1100.png' },
+  { id: 'doc003', name: 'Maintenance-Bus-3.pdf', vehicleId: 'v003', uploadDate: new Date('2024-05-20'), expiryDate: new Date('2024-06-19'), status: 'Expired', url: 'https://placehold.co/850x1100.png' },
+  { id: 'doc004', name: 'Permit-Bus-4.pdf', vehicleId: 'v004', uploadDate: new Date('2024-03-10'), expiryDate: new Date('2026-03-09'), status: 'Valid', url: 'https://placehold.co/850x1100.png' },
 ];
 
 export const expenses: Expense[] = [
@@ -127,13 +127,16 @@ export const expenses: Expense[] = [
 ];
 
 export const payments: Payment[] = [
-  { id: 'pay001', description: 'Monthly Bus Pass - A. Williams', amount: 55.00, date: new Date('2024-07-01T10:00:00Z'), status: 'Paid', type: 'Incoming', method: 'Credit Card' },
+  { id: 'pay001', description: 'Bus Pass Fee - A. Williams', amount: 55.00, date: new Date('2024-07-01T10:00:00Z'), status: 'Paid', type: 'Incoming', method: 'Credit Card' },
   { id: 'pay002', description: 'Fuel Supplier Invoice #FS-1024', amount: 1250.50, date: new Date('2024-07-05T11:30:00Z'), status: 'Paid', type: 'Outgoing', method: 'Bank Transfer' },
-  { id: 'pay003', description: 'Downtown Shuttle Service', amount: 300.00, date: new Date('2024-07-10T14:00:00Z'), status: 'Pending', type: 'Incoming', method: 'Credit Card' },
+  { id: 'pay003', description: 'Bus Pass Fee - C. Green', amount: 55.00, date: new Date('2024-07-10T14:00:00Z'), status: 'Paid', type: 'Incoming', method: 'Credit Card' },
   { id: 'pay004', description: 'Tire Replacement - Bus 2', amount: 800.00, date: new Date('2024-07-12T09:45:00Z'), status: 'Paid', type: 'Outgoing', method: 'Credit Card' },
   { id: 'pay005', description: 'Ad Revenue - Route 5 Billboards', amount: 750.00, date: new Date('2024-07-15T16:20:00Z'), status: 'Paid', type: 'Incoming', method: 'Bank Transfer' },
   { id: 'pay006', description: 'Office Cleaning Services', amount: 150.00, date: new Date('2024-07-18T18:00:00Z'), status: 'Pending', type: 'Outgoing', method: 'Bank Transfer' },
   { id: 'pay007', description: 'Special Event Charter', amount: 1200.00, date: new Date('2024-07-20T10:30:00Z'), status: 'Failed', type: 'Incoming', method: 'Credit Card' },
+  { id: 'pay008', description: 'On-board Ticket - Route 202', amount: 2.50, date: new Date('2024-07-21T09:15:00Z'), status: 'Paid', type: 'Incoming', method: 'Cash' },
+  { id: 'pay009', description: 'Charter Service Deposit', amount: 500.00, date: new Date('2024-07-22T14:00:00Z'), status: 'Pending', type: 'Incoming', method: 'Bank Transfer' },
+  { id: 'pay010', description: 'Bus Pass Fee - B. Brown', amount: 55.00, date: new Date('2024-07-23T11:20:00Z'), status: 'Paid', type: 'Incoming', method: 'Credit Card' },
 ];
 
 export const chatContacts: ChatContact[] = [

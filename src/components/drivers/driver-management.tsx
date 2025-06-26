@@ -177,7 +177,7 @@ export default function DriverManagement() {
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
                       exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.3 }}
+                      transition={{ type: "spring", stiffness: 350, damping: 35 }}
                       className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
                     >
                       <TableCell>

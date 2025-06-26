@@ -8,6 +8,7 @@ import { motion } from "framer-motion"
 
 import { useAppData } from "@/context/app-data-context"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   ChartConfig,
@@ -163,6 +164,28 @@ export default function ReportsDashboard() {
       amount: Math.round(amount),
     })).sort((a, b) => b.amount - a.amount);
   }, [expenses, vehicles])
+
+  const incomePayments = React.useMemo(() => {
+    if (!payments) return [];
+    return payments.filter((p) => p.type === 'Incoming' && p.status === 'Paid');
+  }, [payments]);
+
+  const outgoingPayments = React.useMemo(() => {
+    if (!payments) return [];
+    return payments.filter((p) => p.type === 'Outgoing' && p.status === 'Paid');
+  }, [payments]);
+
+  const totalIncome = React.useMemo(() => {
+    return incomePayments.reduce((acc, p) => acc + p.amount, 0);
+  }, [incomePayments]);
+
+  const totalExpensesFromPayments = React.useMemo(() => {
+    return outgoingPayments.reduce((acc, p) => acc + p.amount, 0);
+  }, [outgoingPayments]);
+
+  const netProfit = React.useMemo(() => {
+    return totalIncome - totalExpensesFromPayments;
+  }, [totalIncome, totalExpensesFromPayments]);
 
 
   return (
@@ -414,6 +437,95 @@ export default function ReportsDashboard() {
                     <div className="flex justify-between font-medium">
                         <span>Total Vehicles</span>
                         <span>{totalVehicles}</span>
+                    </div>
+                </CardContent>
+            </Card>
+        </motion.div>
+
+        <motion.div
+            className="lg:col-span-2"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+        >
+            <Card className="group transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20">
+                <CardHeader>
+                    <CardTitle>Financial Summary</CardTitle>
+                    <CardDescription>
+                    Detailed breakdown of income and expenses.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid md:grid-cols-2 gap-x-8 gap-y-6">
+                    <div className="flex flex-col">
+                        <h3 className="text-lg font-semibold mb-4">Income</h3>
+                        <div className="border rounded-lg overflow-hidden flex-1 flex flex-col">
+                          <div className="flex-1 overflow-y-auto max-h-80">
+                            <Table>
+                                <TableHeader className="sticky top-0 bg-card/95 backdrop-blur-sm">
+                                <TableRow>
+                                    <TableHead>Description</TableHead>
+                                    <TableHead className="text-right">Amount</TableHead>
+                                </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                {[...incomePayments].sort((a,b) => b.date.getTime() - a.date.getTime()).map((p) => (
+                                    <TableRow key={p.id}>
+                                    <TableCell>
+                                        <div className="font-medium">{p.description}</div>
+                                        <div className="text-xs text-muted-foreground">{format(p.date, "LLL dd, y")}</div>
+                                    </TableCell>
+                                    <TableCell className="text-right font-medium text-primary">+${p.amount.toFixed(2)}</TableCell>
+                                    </TableRow>
+                                ))}
+                                </TableBody>
+                            </Table>
+                          </div>
+                          <div className="flex justify-between items-center text-lg font-bold p-4 border-t bg-card/95 backdrop-blur-sm">
+                              <span>Total Income</span>
+                              <span className="text-primary">${totalIncome.toFixed(2)}</span>
+                          </div>
+                        </div>
+                    </div>
+                    <div className="flex flex-col">
+                        <h3 className="text-lg font-semibold mb-4">Expenses</h3>
+                        <div className="border rounded-lg overflow-hidden flex-1 flex flex-col">
+                           <div className="flex-1 overflow-y-auto max-h-80">
+                            <Table>
+                                <TableHeader className="sticky top-0 bg-card/95 backdrop-blur-sm">
+                                <TableRow>
+                                    <TableHead>Description</TableHead>
+                                    <TableHead className="text-right">Amount</TableHead>
+                                </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                {[...outgoingPayments].sort((a,b) => b.date.getTime() - a.date.getTime()).map((p) => (
+                                    <TableRow key={p.id}>
+                                    <TableCell>
+                                        <div className="font-medium">{p.description}</div>
+                                        <div className="text-xs text-muted-foreground">{format(p.date, "LLL dd, y")}</div>
+                                    </TableCell>
+                                    <TableCell className="text-right font-medium text-destructive">-${p.amount.toFixed(2)}</TableCell>
+                                    </TableRow>
+                                ))}
+                                </TableBody>
+                            </Table>
+                           </div>
+                           <div className="flex justify-between items-center text-lg font-bold p-4 border-t bg-card/95 backdrop-blur-sm">
+                              <span>Total Expenses</span>
+                              <span className="text-destructive">${totalExpensesFromPayments.toFixed(2)}</span>
+                           </div>
+                        </div>
+                    </div>
+                    </div>
+        
+                    <div className="mt-6 pt-6 border-t">
+                    <div className="flex justify-between items-center text-xl font-bold">
+                        <span>Net Profit</span>
+                        <span className={netProfit >= 0 ? 'text-primary' : 'text-destructive'}>
+                        ${netProfit.toFixed(2)}
+                        </span>
+                    </div>
                     </div>
                 </CardContent>
             </Card>

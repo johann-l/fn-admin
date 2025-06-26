@@ -70,6 +70,7 @@ export default function BusPassAdmin() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false)
   const [passToDelete, setPassToDelete] = React.useState<BusPass | null>(null)
   const [busFilter, setBusFilter] = React.useState<string>('all')
+  const [typeFilter, setTypeFilter] = React.useState<string>('all')
 
   const form = useForm<PassFormValues>({
     resolver: zodResolver(passFormSchema),
@@ -142,10 +143,9 @@ export default function BusPassAdmin() {
   }
 
   const filteredPasses = passes.filter(pass => {
-    if (busFilter === 'all') {
-        return true;
-    }
-    return pass.vehicleId === busFilter;
+    const busMatch = busFilter === 'all' || pass.vehicleId === busFilter;
+    const typeMatch = typeFilter === 'all' || pass.holderType === typeFilter;
+    return busMatch && typeMatch;
   });
 
   return (
@@ -162,21 +162,36 @@ export default function BusPassAdmin() {
             </Button>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center gap-2 py-4">
-            <Label htmlFor="bus-filter">Filter by Bus</Label>
-            <Select value={busFilter} onValueChange={setBusFilter}>
-              <SelectTrigger id="bus-filter" className="w-[200px]">
-                <SelectValue placeholder="Select a bus" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Buses</SelectItem>
-                {vehicles.map(vehicle => (
-                  <SelectItem key={vehicle.id} value={vehicle.id}>
-                    {vehicle.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="flex flex-wrap items-center gap-4 py-4">
+            <div className="flex items-center gap-2">
+              <Label htmlFor="bus-filter">Filter by Bus</Label>
+              <Select value={busFilter} onValueChange={setBusFilter}>
+                <SelectTrigger id="bus-filter" className="w-[200px]">
+                  <SelectValue placeholder="Select a bus" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Buses</SelectItem>
+                  {vehicles.map(vehicle => (
+                    <SelectItem key={vehicle.id} value={vehicle.id}>
+                      {vehicle.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center gap-2">
+              <Label htmlFor="type-filter">Filter by Type</Label>
+              <Select value={typeFilter} onValueChange={setTypeFilter}>
+                <SelectTrigger id="type-filter" className="w-[180px]">
+                  <SelectValue placeholder="Select a type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="Student">Student</SelectItem>
+                  <SelectItem value="Faculty">Faculty</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           <TooltipProvider>
             <Table>

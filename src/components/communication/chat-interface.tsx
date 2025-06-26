@@ -92,7 +92,7 @@ export default function ChatInterface() {
                 <div className="p-4 border-b">
                      <TabsList className="grid w-full grid-cols-2">
                         <TabsTrigger value="drivers">Drivers</TabsTrigger>
-                        <TabsTrigger value="parents">Parents/Students</TabsTrigger>
+                        <TabsTrigger value="passengers">Passengers</TabsTrigger>
                     </TabsList>
                 </div>
 
@@ -104,7 +104,7 @@ export default function ChatInterface() {
                     </ScrollArea>
                 </TabsContent>
 
-                <TabsContent value="parents" className="flex-1 overflow-auto">
+                <TabsContent value="passengers" className="flex-1 overflow-auto">
                     <ScrollArea className="h-full">
                         <div className="p-2 space-y-1">
                             {passengerGroupChats.map(contact => (

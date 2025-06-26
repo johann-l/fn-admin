@@ -19,12 +19,12 @@ export default function BusPassCard({ pass }: BusPassCardProps) {
   const vehicle = vehicles.find(v => v.id === pass.vehicleId);
   const qrValue = JSON.stringify({
     passId: pass.id,
-    studentName: pass.studentName,
+    holderName: pass.holderName,
     vehicleId: pass.vehicleId,
     validUntil: pass.validUntil.toISOString(),
   });
 
-  const studentName = pass.studentName || '';
+  const holderName = pass.holderName || '';
 
   return (
     <>
@@ -66,16 +66,16 @@ export default function BusPassCard({ pass }: BusPassCardProps) {
                 </div>
                 <div className="absolute -bottom-10 right-6">
                     <Avatar className="h-20 w-20 border-4 border-card bg-card">
-                        <AvatarImage src={`https://placehold.co/100x100.png?text=${studentName.charAt(0)}`} alt={studentName} data-ai-hint="person avatar"/>
-                        <AvatarFallback>{studentName ? studentName.substring(0, 2).toUpperCase() : 'SN'}</AvatarFallback>
+                        <AvatarImage src={`https://placehold.co/100x100.png?text=${holderName.charAt(0)}`} alt={holderName} data-ai-hint="person avatar"/>
+                        <AvatarFallback>{holderName ? holderName.substring(0, 2).toUpperCase() : 'PN'}</AvatarFallback>
                     </Avatar>
                 </div>
             </div>
             <CardContent className="p-6 pt-12 space-y-4">
                 <div className="flex justify-between items-center">
                     <div className="text-left">
-                        <h3 className="text-xl font-semibold">{studentName}</h3>
-                        <p className="text-sm text-muted-foreground">Student Bus Pass</p>
+                        <h3 className="text-xl font-semibold">{holderName}</h3>
+                        <p className="text-sm text-muted-foreground">{pass.holderType} Bus Pass</p>
                     </div>
                     <div className="p-1 bg-white rounded-md">
                         <QRCode value={qrValue} size={64} />

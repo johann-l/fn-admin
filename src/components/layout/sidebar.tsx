@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useTheme } from "next-themes"
 import {
   Sidebar,
   SidebarHeader,
@@ -11,6 +12,12 @@ import {
   SidebarMenuButton,
   SidebarFooter,
 } from "@/components/ui/sidebar"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import {
   Bus,
   LayoutDashboard,
@@ -22,6 +29,8 @@ import {
   Settings,
   LogOut,
   Banknote,
+  Sun,
+  Moon,
 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
@@ -37,6 +46,7 @@ const links = [
 
 export default function AppSidebar() {
   const pathname = usePathname()
+  const { setTheme } = useTheme()
 
   // A simple function to check for the root path
   const isActive = (href: string) => {
@@ -73,6 +83,33 @@ export default function AppSidebar() {
       </SidebarContent>
       <SidebarFooter className="space-y-2">
         <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton
+                  className="w-full justify-start"
+                  tooltip="Toggle theme"
+                >
+                  <div className="relative h-4 w-4">
+                    <Sun className="absolute h-full w-full rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                    <Moon className="absolute h-full w-full rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                  </div>
+                  <span>Toggle theme</span>
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="right" align="center">
+                <DropdownMenuItem onClick={() => setTheme("light")}>
+                  Light
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme("dark")}>
+                  Dark
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setTheme("system")}>
+                  System
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton asChild tooltip="Settings">
               <Link href="#">

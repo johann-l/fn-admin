@@ -117,6 +117,15 @@ export const documents: Document[] = [
   { id: 'doc004', name: 'Permit-Bus-4.pdf', vehicleId: 'v004', uploadDate: new Date('2024-03-10'), expiryDate: new Date('2026-03-09'), status: 'Valid', url: 'https://placehold.co/850x1100.png' },
 ];
 
+const expenseDescriptionsByType: Record<Expense['type'], string[]> = {
+  Fuel: ['Fuel top-up', 'Diesel refill', 'Gasoline purchase'],
+  Maintenance: ['Oil change service', 'Brake pad replacement', 'Tire rotation', 'Wiper blade replacement', 'Engine diagnostic'],
+  Insurance: ['Monthly insurance premium', 'Policy renewal fee'],
+  Tolls: ['Highway toll fee', 'Bridge toll charge'],
+  Misc: ['Tire replacement', 'First-aid kit restock', 'Interior detailing'],
+  Other: ["Driver's lunch allowance", 'Parking fees', 'Bus wash service'],
+};
+
 export const generateHistoricalExpenses = (): Expense[] => {
   const expenses: Expense[] = [];
   const expenseTypes: Expense['type'][] = ['Fuel', 'Maintenance', 'Insurance', 'Tolls', 'Misc', 'Other'];
@@ -125,18 +134,31 @@ export const generateHistoricalExpenses = (): Expense[] => {
   for (let i = 11; i >= 0; i--) {
     const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
     
-    for (let j = 0; j < 2; j++) {
+    // Generate more expenses per month for better variety
+    for (let j = 0; j < 5; j++) {
       const vehicle = vehicles[Math.floor(Math.random() * vehicles.length)];
       const type = expenseTypes[Math.floor(Math.random() * expenseTypes.length)];
       const randomDay = Math.floor(Math.random() * 28) + 1;
       const expenseDate = new Date(monthDate.getFullYear(), monthDate.getMonth(), randomDay);
 
+      const descriptionsForType = expenseDescriptionsByType[type];
+      const description = descriptionsForType[Math.floor(Math.random() * descriptionsForType.length)];
+
+      let amount;
+      switch (type) {
+        case 'Fuel': amount = Math.floor(Math.random() * (150 - 80 + 1)) + 80; break;
+        case 'Maintenance': amount = Math.floor(Math.random() * (500 - 100 + 1)) + 100; break;
+        case 'Insurance': amount = Math.floor(Math.random() * (400 - 250 + 1)) + 250; break;
+        case 'Tolls': amount = Math.floor(Math.random() * (50 - 10 + 1)) + 10; break;
+        default: amount = Math.floor(Math.random() * (100 - 20 + 1)) + 20; break;
+      }
+
       expenses.push({
-        id: `exp_${i}_${j}`,
+        id: `exp_${i}_${j}_${Math.random()}`,
         vehicleId: vehicle.id,
         type: type,
-        description: `${type} for ${vehicle.name}`,
-        amount: Math.floor(Math.random() * (300 - 50 + 1)) + 50,
+        description: description,
+        amount: amount,
         date: expenseDate,
         status: Math.random() > 0.2 ? 'Paid' : 'Unpaid',
         billUrl: "https://placehold.co/850x1100.png",
@@ -145,6 +167,7 @@ export const generateHistoricalExpenses = (): Expense[] => {
   }
   return expenses;
 };
+
 
 export const generateHistoricalPayments = (): Payment[] => {
   const payments: Payment[] = [];

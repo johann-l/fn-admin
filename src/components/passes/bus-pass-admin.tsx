@@ -347,7 +347,7 @@ export default function BusPassAdmin() {
                           control={form.control}
                           name="semester"
                           render={({ field }) => (
-                              <FormItem><FormLabel>Semester</FormLabel><FormControl><Input {...field} placeholder="e.g. Fall 2024" /></FormControl><FormMessage /></FormItem>
+                              <FormItem><FormLabel>Semester Number</FormLabel><FormControl><Input type="number" {...field} placeholder="e.g. 8" /></FormControl><FormMessage /></FormItem>
                           )}
                       />
                   </div>

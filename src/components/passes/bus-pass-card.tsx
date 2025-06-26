@@ -104,7 +104,7 @@ export default function BusPassCard({ pass }: BusPassCardProps) {
                             <span className="font-semibold">{pass.course}</span>
                         </div>
                         <div className="flex items-center justify-between">
-                            <span className="text-muted-foreground flex items-center"><Calendar className="h-4 w-4 mr-2" />Semester</span>
+                            <span className="text-muted-foreground flex items-center"><Calendar className="h-4 w-4 mr-2" />Semester Number</span>
                             <span className="font-semibold">{pass.semester}</span>
                         </div>
                       </>

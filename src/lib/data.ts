@@ -135,10 +135,10 @@ export const vehicles: Vehicle[] = [
 ];
 
 export const passes: BusPass[] = [
-  { id: 'p001', holderName: 'Liam Miller', holderType: 'Student', bloodGroup: 'A+', vehicleId: 'v001', seat: '12A', busStop: 'Oak Street & 5th Ave', validFrom: new Date('2024-07-01'), validUntil: new Date('2024-12-31'), status: 'Active', studentId: 'STU12345', semester: 'Fall 2024', course: 'Computer Science', department: 'School of Engineering' },
+  { id: 'p001', holderName: 'Liam Miller', holderType: 'Student', bloodGroup: 'A+', vehicleId: 'v001', seat: '12A', busStop: 'Oak Street & 5th Ave', validFrom: new Date('2024-07-01'), validUntil: new Date('2024-12-31'), status: 'Active', studentId: 'STU12345', semester: '8', course: 'Computer Science', department: 'School of Engineering' },
   { id: 'p002', holderName: 'Dr. Olivia Garcia', holderType: 'Faculty', bloodGroup: 'O-', vehicleId: 'v002', seat: '5B', busStop: 'University Main Gate', validFrom: new Date('2024-01-01'), validUntil: new Date('2024-06-30'), status: 'Expired', facultyId: 'FAC67890', department: 'Physics Department' },
-  { id: 'p003', holderName: 'Noah Martinez', holderType: 'Student', bloodGroup: 'B+', vehicleId: 'v003', seat: '21F', busStop: 'Elm Street Plaza', validFrom: new Date('2024-07-10'), validUntil: new Date('2024-12-31'), status: 'Active', studentId: 'STU54321', semester: 'Fall 2024', course: 'Mechanical Engineering', department: 'School of Engineering' },
-  { id: 'p004', holderName: 'Emma Rodriguez', holderType: 'Student', bloodGroup: 'AB+', vehicleId: 'v001', seat: '3C', busStop: 'Maple & 12th', validFrom: new Date('2024-01-01'), validUntil: new Date('2024-01-01'), status: 'Invalid', studentId: 'STU98765', semester: 'Spring 2024', course: 'Fine Arts', department: 'School of Arts' },
+  { id: 'p003', holderName: 'Noah Martinez', holderType: 'Student', bloodGroup: 'B+', vehicleId: 'v003', seat: '21F', busStop: 'Elm Street Plaza', validFrom: new Date('2024-07-10'), validUntil: new Date('2024-12-31'), status: 'Active', studentId: 'STU54321', semester: '8', course: 'Mechanical Engineering', department: 'School of Engineering' },
+  { id: 'p004', holderName: 'Emma Rodriguez', holderType: 'Student', bloodGroup: 'AB+', vehicleId: 'v001', seat: '3C', busStop: 'Maple & 12th', validFrom: new Date('2024-01-01'), validUntil: new Date('2024-01-01'), status: 'Invalid', studentId: 'STU98765', semester: '1', course: 'Fine Arts', department: 'School of Arts' },
 ];
 
 export const documents: Document[] = [

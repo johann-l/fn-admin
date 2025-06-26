@@ -18,6 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig } from "@/components/ui/chart"
 import { useToast } from "@/hooks/use-toast"
 import { createCheckoutSession } from "@/app/actions/stripe"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 const chartConfig = {
   total: {
@@ -52,9 +53,16 @@ const chartConfig = {
 function PayButton() {
   const { pending } = useFormStatus()
   return (
-    <Button type="submit" size="sm" disabled={pending} className="w-[82px]">
-      {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Pay Now"}
-    </Button>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button type="submit" size="sm" disabled={pending} className="w-[82px]">
+          {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Pay Now"}
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>Pay with Stripe</p>
+      </TooltipContent>
+    </Tooltip>
   )
 }
 
@@ -170,65 +178,67 @@ export default function ExpenseTracker() {
   );
 
   return (
-    <div className="space-y-6">
-       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
-            <Card>
-                <CardHeader>
-                    <CardTitle>Total Expenses</CardTitle>
-                    <CardDescription>This month</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <p className="text-3xl font-bold">${totalExpenses.toFixed(2)}</p>
-                    <p className="text-xs text-muted-foreground">Across all categories</p>
-                </CardContent>
-            </Card>
-            <Card>
-                <CardHeader>
-                    <CardTitle>Expenses by Category</CardTitle>
-                    <CardDescription>A visual breakdown of spending for this month.</CardDescription>
-                </CardHeader>
-                <CardContent className="pl-2">
-                    <ChartContainer config={chartConfig} className="h-[200px] w-full">
-                        <BarChart accessibilityLayer data={chartData} margin={{ top: 20, right: 20, left: 0, bottom: 5 }}>
-                            <CartesianGrid vertical={false} />
-                            <XAxis dataKey="name" tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value} />
-                            <YAxis domain={[0, 'dataMax + 100']} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value}`} />
-                            <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
-                            <Bar dataKey="total" radius={4}>
-                               {chartData.map((entry) => (
-                                   <Cell key={`cell-${entry.name}`} fill={(chartConfig[entry.name as keyof typeof chartConfig] as any)?.color} />
-                               ))}
-                            </Bar>
-                        </BarChart>
-                    </ChartContainer>
-                </CardContent>
-            </Card>
-       </div>
+    <TooltipProvider>
+      <div className="space-y-6">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
+              <Card>
+                  <CardHeader>
+                      <CardTitle>Total Expenses</CardTitle>
+                      <CardDescription>This month</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                      <p className="text-3xl font-bold">${totalExpenses.toFixed(2)}</p>
+                      <p className="text-xs text-muted-foreground">Across all categories</p>
+                  </CardContent>
+              </Card>
+              <Card>
+                  <CardHeader>
+                      <CardTitle>Expenses by Category</CardTitle>
+                      <CardDescription>A visual breakdown of spending for this month.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="pl-2">
+                      <ChartContainer config={chartConfig} className="h-[200px] w-full">
+                          <BarChart accessibilityLayer data={chartData} margin={{ top: 20, right: 20, left: 0, bottom: 5 }}>
+                              <CartesianGrid vertical={false} />
+                              <XAxis dataKey="name" tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value} />
+                              <YAxis domain={[0, 'dataMax + 100']} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value}`} />
+                              <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
+                              <Bar dataKey="total" radius={4}>
+                                {chartData.map((entry) => (
+                                    <Cell key={`cell-${entry.name}`} fill={(chartConfig[entry.name as keyof typeof chartConfig] as any)?.color} />
+                                ))}
+                              </Bar>
+                          </BarChart>
+                      </ChartContainer>
+                  </CardContent>
+              </Card>
+        </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Expense History</CardTitle>
-          <CardDescription>View and pay for fleet expenses.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="all">
-            <TabsList className="h-auto flex-wrap justify-start gap-1">
-              <TabsTrigger value="all">All Expenses</TabsTrigger>
-              {expenseTypes.map(type => (
-                <TabsTrigger key={type} value={type}>{type}</TabsTrigger>
-              ))}
-            </TabsList>
-            <TabsContent value="all">
-              <ExpenseTable filter="all" />
-            </TabsContent>
-            {expenseTypes.map(type => (
-              <TabsContent key={type} value={type}>
-                <ExpenseTable filter={type} />
+        <Card>
+          <CardHeader>
+            <CardTitle>Expense History</CardTitle>
+            <CardDescription>View and pay for fleet expenses.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="all">
+              <TabsList className="h-auto flex-wrap justify-start gap-1">
+                <TabsTrigger value="all">All Expenses</TabsTrigger>
+                {expenseTypes.map(type => (
+                  <TabsTrigger key={type} value={type}>{type}</TabsTrigger>
+                ))}
+              </TabsList>
+              <TabsContent value="all">
+                <ExpenseTable filter="all" />
               </TabsContent>
-            ))}
-          </Tabs>
-        </CardContent>
-      </Card>
-    </div>
+              {expenseTypes.map(type => (
+                <TabsContent key={type} value={type}>
+                  <ExpenseTable filter={type} />
+                </TabsContent>
+              ))}
+            </Tabs>
+          </CardContent>
+        </Card>
+      </div>
+    </TooltipProvider>
   )
 }

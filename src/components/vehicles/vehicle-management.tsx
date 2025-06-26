@@ -35,6 +35,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar"
 import { CalendarIcon, Edit, PlusCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 const vehicleFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -123,41 +124,48 @@ export default function VehicleManagement() {
             </Button>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Vehicle</TableHead>
-                <TableHead>License Plate</TableHead>
-                <TableHead>Driver</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Last Service</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {vehicles.map((vehicle) => (
-                <TableRow key={vehicle.id}>
-                  <TableCell>
-                    <div className="font-medium">{vehicle.name}</div>
-                    <div className="text-sm text-muted-foreground">{vehicle.model} ({vehicle.year})</div>
-                  </TableCell>
-                  <TableCell className="font-mono">{vehicle.licensePlate}</TableCell>
-                  <TableCell>{drivers.find(d => d.id === vehicle.driverId)?.name || 'N/A'}</TableCell>
-                  <TableCell>
-                    <Badge variant={getStatusVariant(vehicle.status)}>{vehicle.status}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    {format(vehicle.lastService, "LLL dd, y")}
-                  </TableCell>
-                  <TableCell className="text-right space-x-1">
-                    <Button variant="ghost" size="icon" onClick={() => handleEditClick(vehicle)}>
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
+          <TooltipProvider>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Vehicle</TableHead>
+                  <TableHead>License Plate</TableHead>
+                  <TableHead>Driver</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Last Service</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {vehicles.map((vehicle) => (
+                  <TableRow key={vehicle.id}>
+                    <TableCell>
+                      <div className="font-medium">{vehicle.name}</div>
+                      <div className="text-sm text-muted-foreground">{vehicle.model} ({vehicle.year})</div>
+                    </TableCell>
+                    <TableCell className="font-mono">{vehicle.licensePlate}</TableCell>
+                    <TableCell>{drivers.find(d => d.id === vehicle.driverId)?.name || 'N/A'}</TableCell>
+                    <TableCell>
+                      <Badge variant={getStatusVariant(vehicle.status)}>{vehicle.status}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      {format(vehicle.lastService, "LLL dd, y")}
+                    </TableCell>
+                    <TableCell className="text-right space-x-1">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="ghost" size="icon" onClick={() => handleEditClick(vehicle)}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent><p>Edit Vehicle</p></TooltipContent>
+                      </Tooltip>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TooltipProvider>
         </CardContent>
       </Card>
 

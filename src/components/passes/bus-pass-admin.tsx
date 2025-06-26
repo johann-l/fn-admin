@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -35,6 +36,7 @@ import { Calendar } from "@/components/ui/calendar"
 import { CalendarIcon, Edit, PlusCircle, Eye } from "lucide-react"
 import { cn } from "@/lib/utils"
 import BusPassCard from "./bus-pass-card"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 const passFormSchema = z.object({
   passengerName: z.string().min(1, "Passenger name is required"),
@@ -122,42 +124,54 @@ export default function BusPassAdmin() {
             </Button>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Passenger</TableHead>
-                <TableHead>Assignment</TableHead>
-                <TableHead>Validity</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {passes.map((pass) => (
-                <TableRow key={pass.id}>
-                  <TableCell className="font-medium">{pass.passengerName}</TableCell>
-                  <TableCell>
-                    <div>{vehicles.find(v => v.id === pass.vehicleId)?.name}</div>
-                    <div className="text-sm text-muted-foreground">Seat {pass.seat}</div>
-                  </TableCell>
-                  <TableCell>
-                    {format(pass.validFrom, "LLL dd, y")} - {format(pass.validUntil, "LLL dd, y")}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={getStatusVariant(pass.status)}>{pass.status}</Badge>
-                  </TableCell>
-                  <TableCell className="text-right space-x-1">
-                    <Button variant="ghost" size="icon" onClick={() => handleViewClick(pass)}>
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" onClick={() => handleEditClick(pass)}>
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
+          <TooltipProvider>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Passenger</TableHead>
+                  <TableHead>Assignment</TableHead>
+                  <TableHead>Validity</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {passes.map((pass) => (
+                  <TableRow key={pass.id}>
+                    <TableCell className="font-medium">{pass.passengerName}</TableCell>
+                    <TableCell>
+                      <div>{vehicles.find(v => v.id === pass.vehicleId)?.name}</div>
+                      <div className="text-sm text-muted-foreground">Seat {pass.seat}</div>
+                    </TableCell>
+                    <TableCell>
+                      {format(pass.validFrom, "LLL dd, y")} - {format(pass.validUntil, "LLL dd, y")}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={getStatusVariant(pass.status)}>{pass.status}</Badge>
+                    </TableCell>
+                    <TableCell className="text-right space-x-1">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="ghost" size="icon" onClick={() => handleViewClick(pass)}>
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent><p>View Pass</p></TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="ghost" size="icon" onClick={() => handleEditClick(pass)}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent><p>Edit Pass</p></TooltipContent>
+                      </Tooltip>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TooltipProvider>
         </CardContent>
       </Card>
 

@@ -13,6 +13,7 @@ import { Send, MoreVertical, ArrowLeft, Users } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 export default function ChatInterface() {
   const { drivers } = useAppData()
@@ -120,6 +121,7 @@ export default function ChatInterface() {
             "w-full md:w-2/3 flex-col h-full",
             isMobile && mobileView === 'list' ? 'hidden' : 'flex'
         )}>
+          <TooltipProvider>
             {selectedContact ? (
             <>
                 <div className="p-3 border-b flex items-center gap-2">
@@ -145,7 +147,14 @@ export default function ChatInterface() {
                         <div className="text-sm text-muted-foreground">{selectedContact.type === 'Group' ? 'Group Chat' : selectedContact.type}</div>
                     </div>
                     <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="icon"><MoreVertical className="h-5 w-5" /></Button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon"><MoreVertical className="h-5 w-5" /></Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>More Options</p>
+                          </TooltipContent>
+                        </Tooltip>
                     </div>
                 </div>
 
@@ -198,9 +207,16 @@ export default function ChatInterface() {
                 <div className="p-4 border-t bg-background">
                     <form className="relative" onSubmit={(e) => e.preventDefault()}>
                         <Input placeholder="Type a message..." className="pr-12 h-10" />
-                        <Button size="icon" type="submit" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full">
-                            <Send className="h-4 w-4" />
-                        </Button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button size="icon" type="submit" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full">
+                                <Send className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Send Message</p>
+                          </TooltipContent>
+                        </Tooltip>
                     </form>
                 </div>
             </>
@@ -209,6 +225,7 @@ export default function ChatInterface() {
                 Select a conversation to start messaging
             </div>
             )}
+            </TooltipProvider>
         </div>
     </Card>
   )

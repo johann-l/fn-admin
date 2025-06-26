@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -10,7 +11,9 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { PlusCircle, ArrowUpRight, ArrowDownLeft, CreditCard, CheckCircle2, XCircle, Clock, LayoutGrid, List } from "lucide-react"
+import TransactionDetailCard from "./transaction-detail-card"
 
 // Renaming Banknote import to avoid conflict with Banknote component from data
 import { Banknote as BanknoteIcon } from "lucide-react"
@@ -18,6 +21,8 @@ import { Banknote as BanknoteIcon } from "lucide-react"
 
 export default function PaymentManagement() {
   const [viewMode, setViewMode] = React.useState<'card' | 'list'>('card');
+  const [selectedPayment, setSelectedPayment] = React.useState<Payment | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = React.useState(false);
 
   const totalRevenue = payments
     .filter(p => p.type === 'Incoming' && p.status === 'Paid')
@@ -26,6 +31,11 @@ export default function PaymentManagement() {
   const totalExpenses = payments
     .filter(p => p.type === 'Outgoing' && p.status === 'Paid')
     .reduce((acc, p) => acc + p.amount, 0);
+    
+  const handlePaymentClick = (payment: Payment) => {
+    setSelectedPayment(payment);
+    setIsDetailOpen(true);
+  };
 
   const getStatusVariant = (status: Payment["status"]): "default" | "secondary" | "destructive" => {
     switch (status) {
@@ -58,7 +68,11 @@ export default function PaymentManagement() {
   const PaymentCards = ({ filter }: { filter: 'all' | 'incoming' | 'outgoing' }) => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pt-4">
       {[...filteredPayments(filter)].sort((a, b) => b.date.getTime() - a.date.getTime()).map((payment) => (
-        <Card key={payment.id} className="flex flex-col">
+        <Card 
+          key={payment.id} 
+          className="flex flex-col cursor-pointer transition-all hover:shadow-lg hover:-translate-y-1"
+          onClick={() => handlePaymentClick(payment)}
+        >
           <CardHeader className="flex flex-row items-start justify-between gap-4 pb-4">
             <div className="space-y-1">
               <CardTitle className="text-base font-medium leading-none">{payment.description}</CardTitle>
@@ -104,7 +118,11 @@ export default function PaymentManagement() {
         </TableHeader>
         <TableBody>
           {[...filteredPayments(filter)].sort((a, b) => b.date.getTime() - a.date.getTime()).map((payment) => (
-            <TableRow key={payment.id}>
+            <TableRow 
+              key={payment.id} 
+              className="cursor-pointer" 
+              onClick={() => handlePaymentClick(payment)}
+            >
               <TableCell className="font-medium">{payment.description}</TableCell>
               <TableCell>{format(payment.date, "PP")}</TableCell>
               <TableCell>
@@ -141,86 +159,104 @@ export default function PaymentManagement() {
   );
 
   return (
-    <div className="space-y-6">
-       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-                    <ArrowUpRight className="h-4 w-4 text-primary" />
-                </CardHeader>
-                <CardContent>
-                    <p className="text-3xl font-bold">${totalRevenue.toFixed(2)}</p>
-                    <p className="text-xs text-muted-foreground">This month's paid income</p>
-                </CardContent>
-            </Card>
-            <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">Total Spending</CardTitle>
-                    <ArrowDownLeft className="h-4 w-4 text-destructive" />
-                </CardHeader>
-                <CardContent>
-                    <p className="text-3xl font-bold">${totalExpenses.toFixed(2)}</p>
-                    <p className="text-xs text-muted-foreground">This month's paid expenses</p>
-                </CardContent>
-            </Card>
-       </div>
+    <>
+      <div className="space-y-6">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
+              <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+                      <ArrowUpRight className="h-4 w-4 text-primary" />
+                  </CardHeader>
+                  <CardContent>
+                      <p className="text-3xl font-bold">${totalRevenue.toFixed(2)}</p>
+                      <p className="text-xs text-muted-foreground">This month's paid income</p>
+                  </CardContent>
+              </Card>
+              <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Total Spending</CardTitle>
+                      <ArrowDownLeft className="h-4 w-4 text-destructive" />
+                  </CardHeader>
+                  <CardContent>
+                      <p className="text-3xl font-bold">${totalExpenses.toFixed(2)}</p>
+                      <p className="text-xs text-muted-foreground">This month's paid expenses</p>
+                  </CardContent>
+              </Card>
+        </div>
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-                <CardTitle>Transaction History</CardTitle>
-                <CardDescription>View and filter all incoming and outgoing payments.</CardDescription>
-            </div>
-            <div className="flex items-center gap-2">
-                <div className="hidden md:flex items-center gap-1 p-1 rounded-lg bg-muted">
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button variant={viewMode === 'list' ? 'secondary' : 'ghost'} size="icon" className="h-8 w-8" onClick={() => setViewMode('list')}>
-                                    <List className="h-4 w-4" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>List View</p>
-                            </TooltipContent>
-                        </Tooltip>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                 <Button variant={viewMode === 'card' ? 'secondary' : 'ghost'} size="icon" className="h-8 w-8" onClick={() => setViewMode('card')}>
-                                    <LayoutGrid className="h-4 w-4" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                <p>Card View</p>
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
-                </div>
-                <Button>
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    New Payment
-                </Button>
-            </div>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="all">
-            <TabsList className="grid w-full grid-cols-3 md:w-[400px]">
-              <TabsTrigger value="all">All Transactions</TabsTrigger>
-              <TabsTrigger value="incoming">Incoming</TabsTrigger>
-              <TabsTrigger value="outgoing">Outgoing</TabsTrigger>
-            </TabsList>
-            <TabsContent value="all">
-              {viewMode === 'card' ? <PaymentCards filter="all" /> : <PaymentTable filter="all" />}
-            </TabsContent>
-            <TabsContent value="incoming">
-              {viewMode === 'card' ? <PaymentCards filter="incoming" /> : <PaymentTable filter="incoming" />}
-            </TabsContent>
-            <TabsContent value="outgoing">
-              {viewMode === 'card' ? <PaymentCards filter="outgoing" /> : <PaymentTable filter="outgoing" />}
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
-    </div>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                  <CardTitle>Transaction History</CardTitle>
+                  <CardDescription>View and filter all incoming and outgoing payments.</CardDescription>
+              </div>
+              <div className="flex items-center gap-2">
+                  <div className="hidden md:flex items-center gap-1 p-1 rounded-lg bg-muted">
+                      <TooltipProvider>
+                          <Tooltip>
+                              <TooltipTrigger asChild>
+                                  <Button variant={viewMode === 'list' ? 'secondary' : 'ghost'} size="icon" className="h-8 w-8" onClick={() => setViewMode('list')}>
+                                      <List className="h-4 w-4" />
+                                  </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                  <p>List View</p>
+                              </TooltipContent>
+                          </Tooltip>
+                          <Tooltip>
+                              <TooltipTrigger asChild>
+                                  <Button variant={viewMode === 'card' ? 'secondary' : 'ghost'} size="icon" className="h-8 w-8" onClick={() => setViewMode('card')}>
+                                      <LayoutGrid className="h-4 w-4" />
+                                  </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                  <p>Card View</p>
+                              </TooltipContent>
+                          </Tooltip>
+                      </TooltipProvider>
+                  </div>
+                  <Button>
+                      <PlusCircle className="mr-2 h-4 w-4" />
+                      New Payment
+                  </Button>
+              </div>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="all">
+              <TabsList className="grid w-full grid-cols-3 md:w-[400px]">
+                <TabsTrigger value="all">All Transactions</TabsTrigger>
+                <TabsTrigger value="incoming">Incoming</TabsTrigger>
+                <TabsTrigger value="outgoing">Outgoing</TabsTrigger>
+              </TabsList>
+              <TabsContent value="all">
+                {viewMode === 'card' ? <PaymentCards filter="all" /> : <PaymentTable filter="all" />}
+              </TabsContent>
+              <TabsContent value="incoming">
+                {viewMode === 'card' ? <PaymentCards filter="incoming" /> : <PaymentTable filter="incoming" />}
+              </TabsContent>
+              <TabsContent value="outgoing">
+                {viewMode === 'card' ? <PaymentCards filter="outgoing" /> : <PaymentTable filter="outgoing" />}
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
+        <DialogContent className="sm:max-w-sm p-0 bg-transparent border-none shadow-none">
+          {selectedPayment && (
+            <>
+              <DialogHeader className="sr-only">
+                <DialogTitle>Transaction Details: {selectedPayment.id}</DialogTitle>
+                <DialogDescription>
+                  Detailed view of transaction {selectedPayment.description}.
+                </DialogDescription>
+              </DialogHeader>
+              <TransactionDetailCard payment={selectedPayment} />
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }

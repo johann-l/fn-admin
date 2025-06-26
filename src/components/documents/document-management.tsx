@@ -26,7 +26,7 @@ export default function DocumentManagement() {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
-          <CardTitle>Vehicle Documents</CardTitle>
+          <CardTitle>Fleet Documents</CardTitle>
           <CardDescription>Upload and manage vehicle-related documents.</CardDescription>
         </div>
         <Button>

@@ -113,7 +113,7 @@ export default function VehicleManagement() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
             <div>
-                <CardTitle>Fleet Vehicles</CardTitle>
+                <CardTitle>Fleet Overview</CardTitle>
                 <CardDescription>Manage and monitor all vehicles in the fleet.</CardDescription>
             </div>
             <Button onClick={handleCreateClick}>

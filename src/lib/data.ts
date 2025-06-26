@@ -34,6 +34,7 @@ export type BusPass = {
   vehicleId: string;
   route: string;
   seat: string;
+  busStop: string;
   validFrom: Date;
   validUntil: Date;
   status: 'Active' | 'Expired' | 'Invalid';
@@ -104,10 +105,10 @@ export const vehicles: Vehicle[] = [
 ];
 
 export const passes: BusPass[] = [
-  { id: 'p001', holderName: 'Liam Miller', holderType: 'Student', bloodGroup: 'A+', vehicleId: 'v001', route: '101', seat: '12A', validFrom: new Date('2024-07-01'), validUntil: new Date('2024-12-31'), status: 'Active' },
-  { id: 'p002', holderName: 'Dr. Olivia Garcia', holderType: 'Faculty', bloodGroup: 'O-', vehicleId: 'v002', route: '202', seat: '5B', validFrom: new Date('2024-01-01'), validUntil: new Date('2024-06-30'), status: 'Expired' },
-  { id: 'p003', holderName: 'Noah Martinez', holderType: 'Student', bloodGroup: 'B+', vehicleId: 'v003', route: '303', seat: '21F', validFrom: new Date('2024-07-10'), validUntil: new Date('2024-12-31'), status: 'Active' },
-  { id: 'p004', holderName: 'Emma Rodriguez', holderType: 'Student', bloodGroup: 'AB+', vehicleId: 'v001', route: '101', seat: '3C', validFrom: new Date('2024-01-01'), validUntil: new Date('2024-01-01'), status: 'Invalid' },
+  { id: 'p001', holderName: 'Liam Miller', holderType: 'Student', bloodGroup: 'A+', vehicleId: 'v001', route: '101', seat: '12A', busStop: 'Oak Street & 5th Ave', validFrom: new Date('2024-07-01'), validUntil: new Date('2024-12-31'), status: 'Active' },
+  { id: 'p002', holderName: 'Dr. Olivia Garcia', holderType: 'Faculty', bloodGroup: 'O-', vehicleId: 'v002', route: '202', seat: '5B', busStop: 'University Main Gate', validFrom: new Date('2024-01-01'), validUntil: new Date('2024-06-30'), status: 'Expired' },
+  { id: 'p003', holderName: 'Noah Martinez', holderType: 'Student', bloodGroup: 'B+', vehicleId: 'v003', route: '303', seat: '21F', busStop: 'Elm Street Plaza', validFrom: new Date('2024-07-10'), validUntil: new Date('2024-12-31'), status: 'Active' },
+  { id: 'p004', holderName: 'Emma Rodriguez', holderType: 'Student', bloodGroup: 'AB+', vehicleId: 'v001', route: '101', seat: '3C', busStop: 'Maple & 12th', validFrom: new Date('2024-01-01'), validUntil: new Date('2024-01-01'), status: 'Invalid' },
 ];
 
 export const documents: Document[] = [

@@ -3,7 +3,7 @@
 
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Bus, MapPin, Calendar, Droplets, Ticket, Printer } from "lucide-react"
+import { Bus, MapPin, Calendar, Droplets, Ticket, Printer, Signpost } from "lucide-react"
 import type { BusPass } from "@/lib/data"
 import { useAppData } from "@/context/app-data-context"
 import { format } from "date-fns"
@@ -98,6 +98,10 @@ export default function BusPassCard({ pass }: BusPassCardProps) {
                     <div className="flex items-center justify-between">
                         <span className="text-muted-foreground flex items-center"><MapPin className="h-4 w-4 mr-2" />Route</span>
                         <span className="font-semibold">{pass.route !== 'N/A' ? `Route ${pass.route}` : 'N/A'}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground flex items-center"><Signpost className="h-4 w-4 mr-2" />Bus Stop</span>
+                        <span className="font-semibold">{pass.busStop}</span>
                     </div>
                 </div>
 

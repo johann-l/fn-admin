@@ -54,6 +54,7 @@ const passFormSchema = z.object({
   holderType: z.enum(['Student', 'Faculty']),
   vehicleId: z.string().min(1, "Vehicle selection is required"),
   seat: z.string().min(1, "Seat is required"),
+  busStop: z.string().min(1, "Bus stop is required"),
   validFrom: z.date({ required_error: "A start date is required." }),
   validUntil: z.date({ required_error: "An end date is required." }),
 })
@@ -82,6 +83,7 @@ export default function BusPassAdmin() {
       holderType: pass.holderType,
       vehicleId: pass.vehicleId,
       seat: pass.seat,
+      busStop: pass.busStop,
       validFrom: pass.validFrom,
       validUntil: pass.validUntil,
     })
@@ -95,6 +97,7 @@ export default function BusPassAdmin() {
       holderType: "Student",
       vehicleId: "",
       seat: "",
+      busStop: "",
       validFrom: undefined,
       validUntil: undefined
     });
@@ -216,6 +219,7 @@ export default function BusPassAdmin() {
                       <TableCell>
                         <div>{vehicles.find(v => v.id === pass.vehicleId)?.name}</div>
                         <div className="text-sm text-muted-foreground">Seat {pass.seat}</div>
+                        <div className="text-sm text-muted-foreground">{pass.busStop}</div>
                       </TableCell>
                       <TableCell>
                         {format(pass.validFrom, "LLL dd, y")} - {format(pass.validUntil, "LLL dd, y")}
@@ -294,8 +298,7 @@ export default function BusPassAdmin() {
                   )}
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
+              <FormField
                   control={form.control}
                   name="vehicleId"
                   render={({ field }) => (
@@ -309,11 +312,19 @@ export default function BusPassAdmin() {
                     </FormItem>
                   )}
                 />
+              <div className="grid grid-cols-2 gap-4">
                  <FormField
                     control={form.control}
                     name="seat"
                     render={({ field }) => (
                         <FormItem><FormLabel>Seat</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                    )}
+                    />
+                 <FormField
+                    control={form.control}
+                    name="busStop"
+                    render={({ field }) => (
+                        <FormItem><FormLabel>Bus Stop</FormLabel><FormControl><Input {...field} placeholder="e.g. Main St & 1st Ave" /></FormControl><FormMessage /></FormItem>
                     )}
                     />
               </div>

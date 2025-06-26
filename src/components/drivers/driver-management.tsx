@@ -10,7 +10,7 @@ import type { Driver } from "@/lib/data"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -19,6 +19,16 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import {
   Form,
   FormControl,
@@ -30,7 +40,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Edit, Eye } from "lucide-react"
+import { Edit, Eye, PlusCircle, Trash2 } from "lucide-react"
 import DriverIdCard from "./driver-id-card"
 
 const driverFormSchema = z.object({
@@ -42,13 +52,17 @@ const driverFormSchema = z.object({
 })
 
 type DriverFormValues = z.infer<typeof driverFormSchema>
+type DriverFormData = Omit<Driver, 'id' | 'avatarUrl'>;
+
 
 export default function DriverManagement() {
-  const { drivers, vehicles, updateDriver } = useAppData()
-  const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false)
-  const [selectedDriverForEdit, setSelectedDriverForEdit] = React.useState<Driver | null>(null)
+  const { drivers, vehicles, addDriver, updateDriver, removeDriver } = useAppData()
+  const [isFormOpen, setIsFormOpen] = React.useState(false)
+  const [editingDriver, setEditingDriver] = React.useState<Driver | null>(null)
   const [isViewDialogOpen, setIsViewDialogOpen] = React.useState(false)
   const [selectedDriverForView, setSelectedDriverForView] = React.useState<Driver | null>(null)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false)
+  const [driverToDelete, setDriverToDelete] = React.useState<Driver | null>(null)
 
   const form = useForm<DriverFormValues>({
     resolver: zodResolver(driverFormSchema),
@@ -61,8 +75,20 @@ export default function DriverManagement() {
     },
   })
 
+  const handleCreateClick = () => {
+    setEditingDriver(null);
+    form.reset({
+      name: "",
+      email: "",
+      phone: "",
+      status: "Inactive",
+      assignedVehicleId: null,
+    });
+    setIsFormOpen(true);
+  }
+
   const handleEditClick = (driver: Driver) => {
-    setSelectedDriverForEdit(driver)
+    setEditingDriver(driver)
     form.reset({
       name: driver.name,
       email: driver.email,
@@ -70,7 +96,7 @@ export default function DriverManagement() {
       status: driver.status,
       assignedVehicleId: driver.assignedVehicleId,
     })
-    setIsEditDialogOpen(true)
+    setIsFormOpen(true)
   }
 
   const handleViewClick = (driver: Driver) => {
@@ -78,16 +104,32 @@ export default function DriverManagement() {
     setIsViewDialogOpen(true)
   }
 
-  const onSubmit = (values: DriverFormValues) => {
-    if (selectedDriverForEdit) {
-      const finalValues = {
-        ...values,
-        assignedVehicleId:
-          values.assignedVehicleId === "none" ? null : values.assignedVehicleId,
-      };
-      updateDriver({ ...selectedDriverForEdit, ...finalValues });
+  const handleDeleteClick = (driver: Driver) => {
+    setDriverToDelete(driver)
+    setIsDeleteDialogOpen(true)
+  }
+
+  const handleConfirmDelete = () => {
+    if (driverToDelete) {
+      removeDriver(driverToDelete.id)
     }
-    setIsEditDialogOpen(false);
+    setIsDeleteDialogOpen(false)
+    setDriverToDelete(null)
+  }
+
+  const onSubmit = (values: DriverFormValues) => {
+    const finalValues = {
+      ...values,
+      assignedVehicleId:
+        values.assignedVehicleId === "none" ? null : values.assignedVehicleId,
+    };
+
+    if (editingDriver) {
+      updateDriver({ ...editingDriver, ...finalValues });
+    } else {
+      addDriver(finalValues as DriverFormData)
+    }
+    setIsFormOpen(false);
   }
 
   const getStatusVariant = (status: Driver["status"]): "default" | "secondary" | "destructive" => {
@@ -101,9 +143,15 @@ export default function DriverManagement() {
   return (
     <>
       <Card>
-        <CardHeader>
-          <CardTitle>All Drivers</CardTitle>
-          <CardDescription>View and manage all driver profiles in the fleet.</CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>All Drivers</CardTitle>
+            <CardDescription>View and manage all driver profiles in the fleet.</CardDescription>
+          </div>
+          <Button onClick={handleCreateClick}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Add Driver
+          </Button>
         </CardHeader>
         <CardContent>
           <Table>
@@ -143,6 +191,9 @@ export default function DriverManagement() {
                     <Button variant="ghost" size="icon" onClick={() => handleEditClick(driver)}>
                       <Edit className="h-4 w-4" />
                     </Button>
+                    <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDeleteClick(driver)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -151,12 +202,12 @@ export default function DriverManagement() {
         </CardContent>
       </Card>
 
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Edit Driver Profile</DialogTitle>
+            <DialogTitle>{editingDriver ? "Edit Driver Profile" : "Add New Driver"}</DialogTitle>
             <DialogDescription>
-              Make changes to {selectedDriverForEdit?.name}'s profile here. Click save when you're done.
+              {editingDriver ? `Make changes to ${editingDriver.name}'s profile here. Click save when you're done.` : "Enter the details for the new driver."}
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>
@@ -248,7 +299,7 @@ export default function DriverManagement() {
                 />
               </div>
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancel</Button>
+                <Button type="button" variant="outline" onClick={() => setIsFormOpen(false)}>Cancel</Button>
                 <Button type="submit">Save changes</Button>
               </DialogFooter>
             </form>
@@ -271,6 +322,23 @@ export default function DriverManagement() {
           )}
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the profile for {driverToDelete?.name} and unassign them from any vehicles.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmDelete} className={buttonVariants({ variant: "destructive" })}>
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }

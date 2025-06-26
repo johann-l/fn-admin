@@ -14,6 +14,7 @@ import {
 
 type VehicleFormData = Omit<Vehicle, 'id' | 'route' | 'availability' | 'location'>;
 type PassFormData = Omit<BusPass, 'id' | 'status' | 'bloodGroup' | 'route'>;
+type DriverFormData = Omit<Driver, 'id' | 'avatarUrl'>;
 
 type AppDataContextType = {
   vehicles: Vehicle[]
@@ -22,7 +23,9 @@ type AppDataContextType = {
   documents: Document[]
   addVehicle: (vehicle: VehicleFormData) => void
   updateVehicle: (vehicle: Vehicle) => void
+  addDriver: (driver: DriverFormData) => void
   updateDriver: (driver: Driver) => void
+  removeDriver: (driverId: string) => void
   addPass: (pass: PassFormData) => void
   updatePass: (pass: BusPass) => void
 }
@@ -50,9 +53,23 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
     setVehicles(prev => prev.map(v => v.id === updatedVehicle.id ? updatedVehicle : v))
   }
 
+  const addDriver = (driver: DriverFormData) => {
+    const newDriver: Driver = {
+      ...driver,
+      id: `d${Date.now()}`,
+      avatarUrl: 'https://placehold.co/100x100.png',
+    };
+    setDrivers(prev => [...prev, newDriver]);
+  };
+
   const updateDriver = (updatedDriver: Driver) => {
     setDrivers(prev => prev.map(d => d.id === updatedDriver.id ? updatedDriver : d))
   }
+
+  const removeDriver = (driverId: string) => {
+    setVehicles(prev => prev.map(v => v.driverId === driverId ? { ...v, driverId: null } : v));
+    setDrivers(prev => prev.filter(d => d.id !== driverId));
+  };
   
   const addPass = (pass: PassFormData) => {
     const newPass: BusPass = {
@@ -70,7 +87,7 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AppDataContext.Provider value={{ vehicles, drivers, passes, documents, addVehicle, updateVehicle, updateDriver, addPass, updatePass }}>
+    <AppDataContext.Provider value={{ vehicles, drivers, passes, documents, addVehicle, updateVehicle, addDriver, updateDriver, removeDriver, addPass, updatePass }}>
       {children}
     </AppDataContext.Provider>
   )

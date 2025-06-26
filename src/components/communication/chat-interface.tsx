@@ -14,9 +14,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 
 export default function ChatInterface() {
-  const { drivers } = useAppData()
+  const { drivers, passes } = useAppData()
   
   const [selectedContactId, setSelectedContactId] = React.useState(chatContacts[0].id)
   const [messages, setMessages] = React.useState<Message[]>(allMessages[chatContacts[0].id] || [])
@@ -24,9 +25,41 @@ export default function ChatInterface() {
   const scrollAreaRef = React.useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile()
   const [mobileView, setMobileView] = React.useState<'list' | 'chat'>('list');
+  const [isGroupInfoOpen, setIsGroupInfoOpen] = React.useState(false)
 
   const driverContact = chatContacts.find(c => c.id === 'group_drivers');
   const passengerGroupChats = chatContacts.filter(c => c.type === 'Group' && c.route);
+  
+  const selectedContact = chatContacts.find(c => c.id === selectedContactId)
+
+  const groupMembers = React.useMemo(() => {
+    if (!selectedContact || selectedContact.type !== 'Group') {
+        return [];
+    }
+    if (selectedContact.id === 'group_drivers') {
+        return drivers.map(driver => ({
+            id: driver.id,
+            name: driver.name,
+            avatarUrl: `${driver.avatarUrl}?m=${driver.id}`,
+            type: 'Driver'
+        }));
+    }
+    if (selectedContact.route) {
+        const passHolders = passes
+            .filter(pass => pass.route === selectedContact.route)
+            .map(pass => ({
+                id: pass.id,
+                name: pass.holderName,
+                avatarUrl: `https://placehold.co/100x100.png?text=${pass.holderName.charAt(0)}`,
+                type: pass.holderType
+            }));
+        
+        // Use name for uniqueness as ID is random and can cause issues on hot-reload
+        const uniqueMembers = Array.from(new Map(passHolders.map(item => [item.name, item])).values());
+        return uniqueMembers;
+    }
+    return [];
+  }, [selectedContact, drivers, passes]);
 
 
   React.useEffect(() => {
@@ -49,8 +82,6 @@ export default function ChatInterface() {
       setMobileView('chat');
     }
   }
-  
-  const selectedContact = chatContacts.find(c => c.id === selectedContactId)
 
   const ContactButton = ({ contact }: { contact: typeof chatContacts[0] }) => (
     <button
@@ -82,6 +113,7 @@ export default function ChatInterface() {
   )
 
   return (
+    <>
     <Card className="h-full flex overflow-hidden">
         {/* Contact List */}
         <div className={cn(
@@ -147,14 +179,18 @@ export default function ChatInterface() {
                         <div className="text-sm text-muted-foreground">{selectedContact.type === 'Group' ? 'Group Chat' : selectedContact.type}</div>
                     </div>
                     <div className="flex items-center gap-1">
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon"><MoreVertical className="h-5 w-5" /></Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>More Options</p>
-                          </TooltipContent>
-                        </Tooltip>
+                       {selectedContact.type === 'Group' && (
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button variant="ghost" size="icon" onClick={() => setIsGroupInfoOpen(true)}>
+                                <MoreVertical className="h-5 w-5" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Group Info</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
                     </div>
                 </div>
 
@@ -228,5 +264,59 @@ export default function ChatInterface() {
             </TooltipProvider>
         </div>
     </Card>
+
+    {selectedContact && (
+        <Sheet open={isGroupInfoOpen} onOpenChange={setIsGroupInfoOpen}>
+            <SheetContent className="w-full sm:max-w-md flex flex-col p-0">
+                <SheetHeader className="text-left p-6 pb-0">
+                    <div className="flex flex-col items-center gap-4 text-center">
+                         <Avatar className="h-24 w-24">
+                            <div className="flex h-full w-full items-center justify-center rounded-full bg-muted text-4xl">
+                                <Users className="h-12 w-12" />
+                            </div>
+                        </Avatar>
+                        <div>
+                            <SheetTitle className="text-2xl">{selectedContact.name}</SheetTitle>
+                            <SheetDescription>
+                                Group &middot; {groupMembers.length + 1} participants
+                            </SheetDescription>
+                        </div>
+                    </div>
+                </SheetHeader>
+                <div className="p-6 border-b">
+                    <h4 className="text-sm font-medium text-muted-foreground">{groupMembers.length + 1} participants</h4>
+                </div>
+                <div className="flex-1 overflow-hidden">
+                    <ScrollArea className="h-full">
+                        <div className="space-y-1 p-6 pt-2">
+                            <div className="flex items-center gap-3 p-2 rounded-lg">
+                                <Avatar className="h-10 w-10">
+                                    <AvatarImage src="https://placehold.co/100x100.png" alt="Admin" data-ai-hint="person avatar" />
+                                    <AvatarFallback>AD</AvatarFallback>
+                                </Avatar>
+                                <div className="flex-1 overflow-hidden">
+                                    <div className="font-semibold truncate">You</div>
+                                    <div className="text-sm text-muted-foreground truncate">Admin</div>
+                                </div>
+                            </div>
+                            {groupMembers.map(member => (
+                                <div key={member.id} className="flex items-center gap-3 p-2 rounded-lg">
+                                    <Avatar className="h-10 w-10">
+                                        <AvatarImage src={member.avatarUrl} alt={member.name} data-ai-hint="person avatar"/>
+                                        <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
+                                    </Avatar>
+                                    <div className="flex-1 overflow-hidden">
+                                        <div className="font-semibold truncate">{member.name}</div>
+                                        <div className="text-sm text-muted-foreground truncate">{member.type}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </ScrollArea>
+                </div>
+            </SheetContent>
+        </Sheet>
+    )}
+    </>
   )
 }

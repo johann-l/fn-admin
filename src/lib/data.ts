@@ -45,6 +45,7 @@ export type Document = {
   uploadDate: Date;
   expiryDate: Date;
   status: 'Valid' | 'Expiring Soon' | 'Expired';
+  url: string;
 };
 
 export type Expense = {
@@ -108,10 +109,10 @@ export const passes: BusPass[] = [
 ];
 
 export const documents: Document[] = [
-  { id: 'doc001', name: 'Registration-CC1.pdf', vehicleId: 'v001', uploadDate: new Date('2024-01-15'), expiryDate: new Date('2025-01-14'), status: 'Valid' },
-  { id: 'doc002', name: 'Insurance-E202.pdf', vehicleId: 'v002', uploadDate: new Date('2023-08-01'), expiryDate: new Date('2024-07-31'), status: 'Expiring Soon' },
-  { id: 'doc003', name: 'Maintenance-SC.pdf', vehicleId: 'v003', uploadDate: new Date('2024-05-20'), expiryDate: new Date('2024-06-19'), status: 'Expired' },
-  { id: 'doc004', name: 'Permit-ML.pdf', vehicleId: 'v004', uploadDate: new Date('2024-03-10'), expiryDate: new Date('2026-03-09'), status: 'Valid' },
+  { id: 'doc001', name: 'Registration-CC1.pdf', vehicleId: 'v001', uploadDate: new Date('2024-01-15'), expiryDate: new Date('2025-01-14'), status: 'Valid', url: 'https://placehold.co/850x1100.png' },
+  { id: 'doc002', name: 'Insurance-E202.pdf', vehicleId: 'v002', uploadDate: new Date('2023-08-01'), expiryDate: new Date('2024-07-31'), status: 'Expiring Soon', url: 'https://placehold.co/850x1100.png' },
+  { id: 'doc003', name: 'Maintenance-SC.pdf', vehicleId: 'v003', uploadDate: new Date('2024-05-20'), expiryDate: new Date('2024-06-19'), status: 'Expired', url: 'https://placehold.co/850x1100.png' },
+  { id: 'doc004', name: 'Permit-ML.pdf', vehicleId: 'v004', uploadDate: new Date('2024-03-10'), expiryDate: new Date('2026-03-09'), status: 'Valid', url: 'https://placehold.co/850x1100.png' },
 ];
 
 export const expenses: Expense[] = [

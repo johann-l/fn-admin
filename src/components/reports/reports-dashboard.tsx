@@ -3,9 +3,11 @@
 
 import * as React from "react"
 import { Bar, BarChart, Line, LineChart, Pie, PieChart, Cell, CartesianGrid, XAxis, YAxis } from "recharts"
+import { subMonths, format } from "date-fns"
 
 import { useAppData } from "@/context/app-data-context"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   ChartConfig,
   ChartContainer,
@@ -27,22 +29,13 @@ const expenseChartConfig = {
   Misc: { label: "Misc", color: "hsl(var(--chart-6))" },
 } satisfies ChartConfig
 
-const onTimePerformanceData = [
-  { month: "January", onTime: 92.1, goal: 95 },
-  { month: "February", onTime: 93.5, goal: 95 },
-  { month: "March", onTime: 91.8, goal: 95 },
-  { month: "April", onTime: 94.2, goal: 95 },
-  { month: "May", onTime: 95.6, goal: 95 },
-  { month: "June", onTime: 96.1, goal: 95 },
-]
-
-const performanceChartConfig = {
-  onTime: {
-    label: "On-Time %",
+const revenueExpenseChartConfig = {
+  revenue: {
+    label: "Revenue",
     color: "hsl(var(--chart-1))",
   },
-  goal: {
-    label: "Goal %",
+  expenses: {
+    label: "Expenses",
     color: "hsl(var(--chart-3))",
   },
 } satisfies ChartConfig
@@ -63,9 +56,10 @@ const fleetStatusChartConfig = {
 } satisfies ChartConfig
 
 export default function ReportsDashboard() {
-  const { expenses, vehicles } = useAppData()
+  const { expenses, vehicles, payments } = useAppData()
   const [activeExpense, setActiveExpense] = React.useState(0);
   const [activeStatus, setActiveStatus] = React.useState(0);
+  const [timeFrame, setTimeFrame] = React.useState<"3m" | "6m" | "1y">("6m");
 
   const expenseData = React.useMemo(() => {
     const byType = expenses.reduce((acc, expense) => {
@@ -83,6 +77,42 @@ export default function ReportsDashboard() {
   const totalExpenses = React.useMemo(() => {
     return expenseData.reduce((acc, curr) => acc + curr.amount, 0)
   }, [expenseData])
+
+  const revenueExpenseData = React.useMemo(() => {
+    const months = timeFrame === "3m" ? 3 : timeFrame === "6m" ? 6 : 12
+    const now = new Date()
+
+    const monthlyRecords: { [key: string]: { revenue: number; expenses: number } } = {}
+
+    // Initialize last 'months' months
+    for (let i = 0; i < months; i++) {
+      const monthKey = format(subMonths(now, i), "yyyy-MM")
+      monthlyRecords[monthKey] = { revenue: 0, expenses: 0 }
+    }
+
+    const startDate = subMonths(now, months)
+
+    payments.forEach((payment) => {
+      if (payment.date >= startDate && payment.status === "Paid") {
+        const monthKey = format(payment.date, "yyyy-MM")
+        if (monthlyRecords[monthKey]) {
+          if (payment.type === "Incoming") {
+            monthlyRecords[monthKey].revenue += payment.amount
+          } else {
+            monthlyRecords[monthKey].expenses += payment.amount
+          }
+        }
+      }
+    })
+
+    return Object.keys(monthlyRecords)
+      .sort()
+      .map((monthKey) => ({
+        month: format(new Date(monthKey + "-02"), "MMM"), // Adding -02 to avoid timezone issues with -01
+        revenue: Math.round(monthlyRecords[monthKey].revenue),
+        expenses: Math.round(monthlyRecords[monthKey].expenses),
+      }))
+  }, [payments, timeFrame])
 
 
   const vehicleOccupancyData = React.useMemo(() => {
@@ -145,6 +175,7 @@ export default function ReportsDashboard() {
                   </Pie>
                   <ChartLegend
                     content={<ChartLegendContent nameKey="type" />}
+                    className="-mt-4"
                   />
                 </PieChart>
                 </ChartContainer>
@@ -158,52 +189,53 @@ export default function ReportsDashboard() {
         </Card>
 
         <Card className="xl:col-span-2">
-            <CardHeader>
-                <CardTitle>On-Time Performance</CardTitle>
-                <CardDescription>Performance trend over the last 6 months</CardDescription>
+           <CardHeader>
+                <div className="flex justify-between items-start">
+                    <div>
+                        <CardTitle>Revenue vs. Expenses</CardTitle>
+                        <CardDescription>Financial overview for the selected period.</CardDescription>
+                    </div>
+                    <Tabs value={timeFrame} onValueChange={(value) => setTimeFrame(value as any)} className="w-auto">
+                        <TabsList className="h-8">
+                            <TabsTrigger value="3m" className="h-6 px-2 text-xs">3M</TabsTrigger>
+                            <TabsTrigger value="6m" className="h-6 px-2 text-xs">6M</TabsTrigger>
+                            <TabsTrigger value="1y" className="h-6 px-2 text-xs">1Y</TabsTrigger>
+                        </TabsList>
+                    </Tabs>
+                </div>
             </CardHeader>
             <CardContent>
-                <ChartContainer config={performanceChartConfig} className="h-[300px] w-full">
-                <LineChart
-                    data={onTimePerformanceData}
-                    margin={{
-                    left: 12,
-                    right: 12,
-                    }}
-                >
-                    <CartesianGrid vertical={false} />
-                    <XAxis
-                    dataKey="month"
-                    tickLine={false}
-                    axisLine={false}
-                    tickMargin={8}
-                    />
-                    <YAxis
-                        tickLine={false}
-                        axisLine={false}
-                        tickMargin={8}
-                        tickFormatter={(value) => `${value}%`}
-                    />
-                    <ChartTooltip
-                        cursor={false}
-                        content={<ChartTooltipContent indicator="dot" />}
-                    />
-                    <Line
-                        dataKey="onTime"
-                        type="monotone"
-                        stroke="var(--color-onTime)"
-                        strokeWidth={2}
-                        dot={false}
-                    />
-                    <Line
-                        dataKey="goal"
-                        type="monotone"
-                        stroke="var(--color-goal)"
-                        strokeWidth={2}
-                        strokeDasharray="3 3"
-                        dot={false}
-                    />
-                </LineChart>
+                <ChartContainer config={revenueExpenseChartConfig} className="h-[300px] w-full">
+                    <BarChart data={revenueExpenseData} margin={{ left: -20, right: 12 }}>
+                        <CartesianGrid vertical={false} />
+                        <XAxis
+                            dataKey="month"
+                            tickLine={false}
+                            axisLine={false}
+                            tickMargin={8}
+                        />
+                        <YAxis
+                            tickLine={false}
+                            axisLine={false}
+                            tickMargin={8}
+                            tickFormatter={(value) => `$${value / 1000}k`}
+                        />
+                        <ChartTooltip
+                            cursor={false}
+                            content={<ChartTooltipContent indicator="dot" />}
+                        />
+                        <ChartLegend content={<ChartLegendContent />} />
+                        <Bar
+                            dataKey="revenue"
+                            fill="var(--color-revenue)"
+                            radius={[4, 4, 0, 0]}
+                        />
+                        <Bar
+                            dataKey="expenses"
+                            fill="var(--color-expenses)"
+                            radius={[4, 4, 0, 0]}
+                        />
+                    </BarChart>
                 </ChartContainer>
             </CardContent>
         </Card>
@@ -280,6 +312,7 @@ export default function ReportsDashboard() {
                   </Pie>
                   <ChartLegend
                     content={<ChartLegendContent nameKey="status" />}
+                    className="-mt-4"
                   />
                 </PieChart>
                 </ChartContainer>

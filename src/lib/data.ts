@@ -128,18 +128,51 @@ export const expenses: Expense[] = [
   { id: 'exp008', vehicleId: 'v004', type: 'Misc', description: 'Driver meal for field trip', amount: 25.00, date: new Date('2024-07-19'), status: 'Paid', billUrl: 'https://placehold.co/850x1100.png' },
 ];
 
-export const payments: Payment[] = [
-  { id: 'pay001', description: 'Fall Semester Bus Pass - L. Miller', amount: 250.00, date: new Date('2024-07-01T10:00:00Z'), status: 'Paid', type: 'Incoming', method: 'Credit Card' },
-  { id: 'pay002', description: 'Fuel Supplier Invoice #FS-1024', amount: 1250.50, date: new Date('2024-07-05T11:30:00Z'), status: 'Paid', type: 'Outgoing', method: 'Bank Transfer' },
-  { id: 'pay003', description: 'Faculty Pass - Dr. Garcia', amount: 100.00, date: new Date('2024-07-10T14:00:00Z'), status: 'Paid', type: 'Incoming', method: 'Credit Card' },
-  { id: 'pay004', description: 'Tire Replacement - Bus 2', amount: 800.00, date: new Date('2024-07-12T09:45:00Z'), status: 'Paid', type: 'Outgoing', method: 'Credit Card' },
-  { id: 'pay005', description: 'Field Trip Charter - History Dept.', amount: 750.00, date: new Date('2024-07-15T16:20:00Z'), status: 'Paid', type: 'Incoming', method: 'Bank Transfer' },
-  { id: 'pay006', description: 'Office Cleaning Services', amount: 150.00, date: new Date('2024-07-18T18:00:00Z'), status: 'Pending', type: 'Outgoing', method: 'Bank Transfer' },
-  { id: 'pay007', description: 'Late Bus Pass Fee - E. Rodriguez', amount: 275.00, date: new Date('2024-07-20T10:30:00Z'), status: 'Failed', type: 'Incoming', method: 'Credit Card' },
-  { id: 'pay008', description: 'On-board Ticket Sales - Route 101', amount: 75.50, date: new Date('2024-07-21T09:15:00Z'), status: 'Paid', type: 'Incoming', method: 'Cash' },
-  { id: 'pay009', description: 'Sports Team Transport Deposit', amount: 500.00, date: new Date('2024-07-22T14:00:00Z'), status: 'Pending', type: 'Incoming', method: 'Bank Transfer' },
-  { id: 'pay010', description: 'Bus Pass Renewal - N. Martinez', amount: 250.00, date: new Date('2024-07-23T11:20:00Z'), status: 'Paid', type: 'Incoming', method: 'Credit Card' },
-];
+const generateHistoricalPayments = (): Payment[] => {
+  const payments: Payment[] = [];
+  const now = new Date();
+
+  for (let i = 11; i >= 0; i--) {
+    const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
+
+    // Generate incoming payments for the month
+    const incomingCount = Math.floor(Math.random() * 5) + 3; // 3 to 7 incoming
+    for (let j = 0; j < incomingCount; j++) {
+      const day = Math.floor(Math.random() * 28) + 1;
+      const paymentDate = new Date(monthDate.getFullYear(), monthDate.getMonth(), day);
+      payments.push({
+        id: `pay_in_${i}_${j}`,
+        description: `Bus Pass Fee - Student ${j + 1}`,
+        amount: Math.floor(Math.random() * 151) + 100, // 100-250
+        date: paymentDate,
+        status: 'Paid',
+        type: 'Incoming',
+        method: Math.random() > 0.3 ? 'Credit Card' : 'Bank Transfer',
+      });
+    }
+
+    // Generate outgoing payments for the month
+    const outgoingCount = Math.floor(Math.random() * 3) + 2; // 2 to 4 outgoing
+    for (let k = 0; k < outgoingCount; k++) {
+      const day = Math.floor(Math.random() * 28) + 1;
+      const paymentDate = new Date(monthDate.getFullYear(), monthDate.getMonth(), day);
+      const descriptions = ['Fuel Supplier Invoice', 'Maintenance Parts', 'Insurance Premium', 'Cleaning Services'];
+      payments.push({
+        id: `pay_out_${i}_${k}`,
+        description: descriptions[Math.floor(Math.random() * descriptions.length)],
+        amount: Math.floor(Math.random() * 1501) + 500, // 500-2000
+        date: paymentDate,
+        status: 'Paid',
+        type: 'Outgoing',
+        method: 'Bank Transfer',
+      });
+    }
+  }
+  return payments;
+}
+
+
+export const payments: Payment[] = generateHistoricalPayments();
 
 export const chatContacts: ChatContact[] = [
     { id: 'group_drivers', name: 'All Drivers', type: 'Group', avatarUrl: '', lastMessage: 'Remember to complete pre-trip inspections.', lastMessageTime: '8:30 AM' },

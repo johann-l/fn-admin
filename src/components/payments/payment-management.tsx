@@ -14,6 +14,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { PlusCircle, ArrowUpRight, ArrowDownLeft, CreditCard, CheckCircle2, XCircle, Clock, LayoutGrid, List } from "lucide-react"
 import TransactionDetailCard from "./transaction-detail-card"
+import { cn } from "@/lib/utils"
 
 // Renaming Banknote import to avoid conflict with Banknote component from data
 import { Banknote as BanknoteIcon } from "lucide-react"
@@ -75,7 +76,10 @@ export default function PaymentManagement() {
       {[...filteredPayments(filter)].sort((a, b) => b.date.getTime() - a.date.getTime()).map((payment) => (
         <Card 
           key={payment.id} 
-          className="flex flex-col cursor-pointer transition-all hover:shadow-lg hover:-translate-y-1"
+          className={cn(
+            "group flex flex-col cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-xl",
+            payment.type === 'Incoming' ? "hover:shadow-primary/10" : "hover:shadow-destructive/10"
+          )}
           onClick={() => handlePaymentClick(payment)}
         >
           <CardHeader className="flex flex-row items-start justify-between gap-4 pb-4">
@@ -84,8 +88,8 @@ export default function PaymentManagement() {
               <CardDescription className="text-xs">{isMounted ? format(payment.date, "PPpp") : '...'}</CardDescription>
             </div>
             {payment.type === 'Incoming' ? 
-              <ArrowUpRight className="h-5 w-5 text-primary shrink-0" /> : 
-              <ArrowDownLeft className="h-5 w-5 text-destructive shrink-0" />
+              <ArrowUpRight className="h-5 w-5 text-primary shrink-0 transition-all duration-300 group-hover:translate-x-1" /> : 
+              <ArrowDownLeft className="h-5 w-5 text-destructive shrink-0 transition-all duration-300 group-hover:translate-x-1 group-hover:text-primary" />
             }
           </CardHeader>
           <CardContent className="flex-1 space-y-4">

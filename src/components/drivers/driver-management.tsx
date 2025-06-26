@@ -250,7 +250,17 @@ export default function DriverManagement() {
       
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
         <DialogContent className="sm:max-w-sm p-0 bg-transparent border-none shadow-none">
-          {selectedDriverForView && <DriverIdCard driver={selectedDriverForView} />}
+          {selectedDriverForView && (
+            <>
+              <DialogHeader className="sr-only">
+                <DialogTitle>Driver ID Card: {selectedDriverForView.name}</DialogTitle>
+                <DialogDescription>
+                  View and print the driver&apos;s ID card.
+                </DialogDescription>
+              </DialogHeader>
+              <DriverIdCard driver={selectedDriverForView} />
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </>

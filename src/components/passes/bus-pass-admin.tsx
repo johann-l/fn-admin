@@ -245,7 +245,17 @@ export default function BusPassAdmin() {
 
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
         <DialogContent className="sm:max-w-sm p-0 bg-transparent border-none shadow-none">
-          {selectedPassForView && <BusPassCard pass={selectedPassForView} />}
+          {selectedPassForView && (
+            <>
+              <DialogHeader className="sr-only">
+                <DialogTitle>Bus Pass: {selectedPassForView.passengerName}</DialogTitle>
+                <DialogDescription>
+                  View and print the passenger&apos;s bus pass.
+                </DialogDescription>
+              </DialogHeader>
+              <BusPassCard pass={selectedPassForView} />
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </>

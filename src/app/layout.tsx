@@ -6,7 +6,7 @@ import AppSidebar from '@/components/layout/sidebar';
 import { ThemeProvider } from "next-themes";
 
 export const metadata: Metadata = {
-  title: 'FleetDeck',
+  title: 'FleetNow',
   description: 'AI-Powered Fleet Management',
 };
 

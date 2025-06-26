@@ -62,7 +62,7 @@ export default function AppSidebar() {
           <div className="bg-primary text-primary-foreground p-2 rounded-lg">
             <Bus className="h-6 w-6" />
           </div>
-          <h1 className="text-xl font-semibold font-headline">FleetDeck</h1>
+          <h1 className="text-xl font-semibold font-headline">FleetNow</h1>
         </div>
       </SidebarHeader>
       <SidebarContent>
@@ -128,7 +128,7 @@ export default function AppSidebar() {
             </Avatar>
             <div className="flex flex-col group-data-[collapsible=icon]:hidden">
               <span className="font-semibold text-sm text-sidebar-foreground">Admin User</span>
-              <span className="text-xs text-sidebar-foreground/70">admin@fleetdeck.com</span>
+              <span className="text-xs text-sidebar-foreground/70">admin@fleetnow.com</span>
             </div>
             <LogOut className="ml-auto h-5 w-5 cursor-pointer text-sidebar-foreground/70 hover:text-sidebar-foreground group-data-[collapsible=icon]:hidden" />
         </div>

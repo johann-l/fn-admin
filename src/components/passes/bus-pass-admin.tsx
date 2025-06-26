@@ -62,7 +62,7 @@ const passFormSchema = z.object({
 type PassFormValues = z.infer<typeof passFormSchema>
 
 export default function BusPassAdmin() {
-  const { passes, vehicles, addPass, updatePass, removePass } = useAppData()
+  const { passes, vehicles, routes, addPass, updatePass, removePass } = useAppData()
   const [isDialogOpen, setIsDialogOpen] = React.useState(false)
   const [selectedPass, setSelectedPass] = React.useState<BusPass | null>(null)
   const [isViewDialogOpen, setIsViewDialogOpen] = React.useState(false)
@@ -124,11 +124,9 @@ export default function BusPassAdmin() {
 
   const onSubmit = (values: PassFormValues) => {
     if(selectedPass) {
-      const vehicle = vehicles.find(v => v.id === values.vehicleId)
       updatePass({
         ...selectedPass,
         ...values,
-        route: vehicle?.route || selectedPass.route,
       });
     } else {
       addPass(values)
@@ -149,6 +147,13 @@ export default function BusPassAdmin() {
     const typeMatch = typeFilter === 'all' || pass.holderType === typeFilter;
     return busMatch && typeMatch;
   });
+  
+  const getRouteNameForPass = (pass: BusPass) => {
+    const vehicle = vehicles.find(v => v.id === pass.vehicleId);
+    if (!vehicle || !vehicle.routeId) return 'N/A';
+    const route = routes.find(r => r.id === vehicle.routeId);
+    return route?.name || 'N/A';
+  }
 
   return (
     <>
@@ -217,7 +222,7 @@ export default function BusPassAdmin() {
                         <div className="text-sm text-muted-foreground">{pass.holderType}</div>
                       </TableCell>
                       <TableCell>
-                        <div>{vehicles.find(v => v.id === pass.vehicleId)?.name}</div>
+                        <div>{vehicles.find(v => v.id === pass.vehicleId)?.name} ({getRouteNameForPass(pass)})</div>
                         <div className="text-sm text-muted-foreground">Seat {pass.seat}</div>
                         <div className="text-sm text-muted-foreground">{pass.busStop}</div>
                       </TableCell>

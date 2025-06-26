@@ -28,7 +28,7 @@ export default function ChatInterface() {
   const [isGroupInfoOpen, setIsGroupInfoOpen] = React.useState(false)
 
   const driverContact = chatContacts.find(c => c.id === 'group_drivers');
-  const passengerGroupChats = chatContacts.filter(c => c.type === 'Group' && c.route);
+  const passengerGroupChats = chatContacts.filter(c => c.type === 'Group' && c.routeId);
   
   const selectedContact = chatContacts.find(c => c.id === selectedContactId)
 
@@ -44,19 +44,22 @@ export default function ChatInterface() {
             type: 'Driver'
         }));
     }
-    if (selectedContact.route) {
-        const passHolders = passes
-            .filter(pass => pass.route === selectedContact.route)
-            .map(pass => ({
-                id: pass.id,
-                name: pass.holderName,
-                avatarUrl: `https://placehold.co/100x100.png?text=${pass.holderName.charAt(0)}`,
-                type: pass.holderType
-            }));
+    if (selectedContact.routeId) {
+        const passesForRoute = passes.filter(pass => {
+            const vehicle = vehicles.find(v => v.id === pass.vehicleId);
+            return vehicle?.routeId === selectedContact.routeId;
+        });
+
+        const passHolders = passesForRoute.map(pass => ({
+            id: pass.id,
+            name: pass.holderName,
+            avatarUrl: `https://placehold.co/100x100.png?text=${pass.holderName.charAt(0)}`,
+            type: pass.holderType
+        }));
         
         const uniquePassHolders = Array.from(new Map(passHolders.map(item => [item.name, item])).values());
         
-        const vehicleForRoute = vehicles.find(v => v.route === selectedContact.route);
+        const vehicleForRoute = vehicles.find(v => v.routeId === selectedContact.routeId);
         const driverForRoute = drivers.find(d => d.id === vehicleForRoute?.driverId);
         
         const allMembers = [...uniquePassHolders];

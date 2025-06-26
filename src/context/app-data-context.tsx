@@ -8,20 +8,24 @@ import {
   drivers as initialDrivers,
   passes as initialPasses,
   documents as initialDocuments,
+  routes as initialRoutes,
   Vehicle,
   Driver,
   BusPass,
   Document,
   Expense,
   Payment,
+  Route,
   generateHistoricalExpenses,
   generateHistoricalPayments
 } from "@/lib/data"
 
-type VehicleFormData = Omit<Vehicle, 'id' | 'route' | 'availability' | 'location'>;
-type PassFormData = Omit<BusPass, 'id' | 'status' | 'bloodGroup' | 'route'>;
+type VehicleFormData = Omit<Vehicle, 'id' | 'availability' | 'location'>;
+type PassFormData = Omit<BusPass, 'id' | 'status' | 'bloodGroup'>;
 type DriverFormData = Omit<Driver, 'id' | 'avatarUrl'>;
 type ExpenseFormData = Omit<Expense, 'id'>;
+type RouteFormData = Omit<Route, 'id'>;
+
 
 type AppDataContextType = {
   vehicles: Vehicle[]
@@ -30,6 +34,7 @@ type AppDataContextType = {
   documents: Document[]
   expenses: Expense[]
   payments: Payment[]
+  routes: Route[]
   addVehicle: (vehicle: VehicleFormData) => void
   updateVehicle: (vehicle: Vehicle) => void
   removeVehicle: (vehicleId: string) => void
@@ -42,6 +47,9 @@ type AppDataContextType = {
   removeDocument: (documentId: string) => void
   addExpense: (expense: ExpenseFormData) => void
   updateExpense: (expenseId: string, updates: Partial<Expense>) => void
+  addRoute: (route: RouteFormData) => void
+  updateRoute: (route: Route) => void
+  removeRoute: (routeId: string) => void
 }
 
 const AppDataContext = React.createContext<AppDataContextType | undefined>(undefined)
@@ -53,6 +61,7 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
   const [documents, setDocuments] = React.useState<Document[]>(initialDocuments)
   const [expenses, setExpenses] = React.useState<Expense[] | null>(null)
   const [payments, setPayments] = React.useState<Payment[] | null>(null)
+  const [routes, setRoutes] = React.useState<Route[]>(initialRoutes)
 
   React.useEffect(() => {
     // Generate data on the client-side to avoid hydration errors
@@ -64,7 +73,6 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
     const newVehicle: Vehicle = {
       ...vehicle,
       id: `v${Date.now()}`,
-      route: 'Unassigned',
       availability: { total: 40, occupied: 0 },
       location: { lat: 34.0522, lng: -118.2437 }, // Default to LA
     }
@@ -106,7 +114,6 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
         id: `p${Date.now()}`,
         status: 'Active',
         bloodGroup: 'N/A',
-        route: vehicles.find(v => v.id === pass.vehicleId)?.route || 'N/A'
     }
     setPasses(prev => [...prev, newPass])
   }
@@ -139,6 +146,23 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
+  const addRoute = (route: RouteFormData) => {
+    const newRoute: Route = {
+      ...route,
+      id: `r${Date.now()}`,
+    }
+    setRoutes(prev => [...prev, newRoute])
+  };
+
+  const updateRoute = (updatedRoute: Route) => {
+    setRoutes(prev => prev.map(r => r.id === updatedRoute.id ? updatedRoute : r));
+  };
+
+  const removeRoute = (routeId: string) => {
+    setVehicles(prev => prev.map(v => v.routeId === routeId ? { ...v, routeId: null } : v));
+    setRoutes(prev => prev.filter(r => r.id !== routeId));
+  };
+
   return (
     <AppDataContext.Provider value={{ 
         vehicles, 
@@ -147,6 +171,7 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
         documents, 
         expenses: expenses || [],
         payments: payments || [],
+        routes,
         addVehicle, 
         updateVehicle, 
         removeVehicle, 
@@ -158,7 +183,10 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
         removePass, 
         removeDocument,
         addExpense,
-        updateExpense
+        updateExpense,
+        addRoute,
+        updateRoute,
+        removeRoute
     }}>
       {children}
     </AppDataContext.Provider>

@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -10,7 +11,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { cn } from "@/lib/utils"
 
 export default function MapPlaceholder() {
-  const { vehicles } = useAppData()
+  const { vehicles, routes } = useAppData()
   const mapRef = React.useRef<HTMLDivElement>(null)
   
   const [positions, setPositions] = React.useState<Map<string, { x: number; y: number }>>(new Map())
@@ -78,6 +79,11 @@ export default function MapPlaceholder() {
   
   const activeVehicles = vehicles.filter(v => v.status !== 'Out of Service' && v.status !== 'Maintenance');
 
+  const getRouteName = (routeId: string | null) => {
+    if (!routeId) return 'Unassigned';
+    return routes.find(r => r.id === routeId)?.name || 'Unassigned';
+  }
+
   return (
     <Card className="h-[400px] lg:h-[calc(100vh-250px)]">
       <CardContent className="p-0 h-full">
@@ -118,7 +124,7 @@ export default function MapPlaceholder() {
                     </TooltipTrigger>
                     <TooltipContent>
                       <p className="font-semibold">{vehicle.name}</p>
-                      <p className="text-sm text-muted-foreground">{vehicle.route ? `Route ${vehicle.route}` : 'Unassigned'}</p>
+                      <p className="text-sm text-muted-foreground">{getRouteName(vehicle.routeId)}</p>
                       <p className="text-sm flex items-center gap-2">
                           <span className={cn("h-2 w-2 rounded-full inline-block", getStatusColor(vehicle.status))}></span>
                           {vehicle.status}

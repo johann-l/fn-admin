@@ -6,7 +6,7 @@ export type Vehicle = {
   year: number;
   licensePlate: string;
   driverId: string | null;
-  route: string;
+  routeId: string | null;
   status: 'On Time' | 'Delayed' | 'Early' | 'Maintenance' | 'Out of Service';
   lastService: Date;
   availability: {
@@ -26,13 +26,18 @@ export type Driver = {
   avatarUrl: string;
 };
 
+export type Route = {
+  id: string;
+  name: string;
+  stops: string[];
+}
+
 export type BusPass = {
   id:string;
   holderName: string;
   holderType: 'Student' | 'Faculty';
   bloodGroup: string;
   vehicleId: string;
-  route: string;
   seat: string;
   busStop: string;
   validFrom: Date;
@@ -75,7 +80,7 @@ export type ChatContact = {
   avatarUrl: string;
   lastMessage: string;
   lastMessageTime: string;
-  route?: string; // For passengers
+  routeId?: string; // For passengers
 };
 
 export type Payment = {
@@ -88,6 +93,14 @@ export type Payment = {
   method: 'Credit Card' | 'Bank Transfer' | 'Cash';
 };
 
+export const routes: Route[] = [
+  { id: 'r101', name: 'Route 101', stops: ['Main St & 1st Ave', 'Oak Street & 5th Ave', 'Pine Lane', 'University Main Gate'] },
+  { id: 'r202', name: 'Route 202', stops: ['City Library', 'Downtown Square', 'West End Terminal', 'University Main Gate'] },
+  { id: 'r303', name: 'Route 303', stops: ['Elm Street Plaza', 'Maple & 12th', 'North Hub', 'East Campus'] },
+  { id: 'r404', name: 'Route 404', stops: ['South Station', 'Green Park', 'Lakeview Drive', 'East Campus'] },
+  { id: 'r505', name: 'Route 505', stops: ['Airport', 'Convention Center', 'Business Park', 'West End Terminal'] },
+];
+
 export const drivers: Driver[] = [
   { id: 'd001', name: 'John Doe', email: 'john.doe@example.com', phone: '555-0101', assignedVehicleId: 'v001', status: 'Active', avatarUrl: 'https://placehold.co/100x100.png' },
   { id: 'd002', name: 'Jane Smith', email: 'jane.smith@example.com', phone: '555-0102', assignedVehicleId: 'v002', status: 'Active', avatarUrl: 'https://placehold.co/100x100.png' },
@@ -97,18 +110,18 @@ export const drivers: Driver[] = [
 ];
 
 export const vehicles: Vehicle[] = [
-  { id: 'v001', name: 'Bus 1', model: 'Mercedes Sprinter', year: 2022, licensePlate: 'CC-001', driverId: 'd001', route: '101', status: 'On Time', lastService: new Date('2024-05-10'), availability: { total: 40, occupied: 25 }, location: { lat: 34.0522, lng: -118.2437 } },
-  { id: 'v002', name: 'Bus 2', model: 'Ford Transit', year: 2021, licensePlate: 'EX-202', driverId: 'd002', route: '202', status: 'Delayed', lastService: new Date('2024-04-22'), availability: { total: 50, occupied: 48 }, location: { lat: 34.059, lng: -118.251 } },
-  { id: 'v003', name: 'Bus 3', model: 'Volvo 9700', year: 2023, licensePlate: 'SC-003', driverId: 'd003', route: '303', status: 'On Time', lastService: new Date('2024-06-01'), availability: { total: 35, occupied: 10 }, location: { lat: 34.045, lng: -118.239 } },
-  { id: 'v004', name: 'Bus 4', model: 'Mercedes Sprinter', year: 2022, licensePlate: 'ML-004', driverId: 'd005', route: '404', status: 'Early', lastService: new Date('2024-05-15'), availability: { total: 40, occupied: 38 }, location: { lat: 34.061, lng: -118.245 } },
-  { id: 'v005', name: 'Bus 5', model: 'Ford Transit', year: 2021, licensePlate: 'NO-005', driverId: null, route: '505', status: 'Maintenance', lastService: new Date('2024-07-01'), availability: { total: 40, occupied: 0 }, location: { lat: 34.05, lng: -118.24 } },
+  { id: 'v001', name: 'Bus 1', model: 'Mercedes Sprinter', year: 2022, licensePlate: 'CC-001', driverId: 'd001', routeId: 'r101', status: 'On Time', lastService: new Date('2024-05-10'), availability: { total: 40, occupied: 25 }, location: { lat: 34.0522, lng: -118.2437 } },
+  { id: 'v002', name: 'Bus 2', model: 'Ford Transit', year: 2021, licensePlate: 'EX-202', driverId: 'd002', routeId: 'r202', status: 'Delayed', lastService: new Date('2024-04-22'), availability: { total: 50, occupied: 48 }, location: { lat: 34.059, lng: -118.251 } },
+  { id: 'v003', name: 'Bus 3', model: 'Volvo 9700', year: 2023, licensePlate: 'SC-003', driverId: 'd003', routeId: 'r303', status: 'On Time', lastService: new Date('2024-06-01'), availability: { total: 35, occupied: 10 }, location: { lat: 34.045, lng: -118.239 } },
+  { id: 'v004', name: 'Bus 4', model: 'Mercedes Sprinter', year: 2022, licensePlate: 'ML-004', driverId: 'd005', routeId: 'r404', status: 'Early', lastService: new Date('2024-05-15'), availability: { total: 40, occupied: 38 }, location: { lat: 34.061, lng: -118.245 } },
+  { id: 'v005', name: 'Bus 5', model: 'Ford Transit', year: 2021, licensePlate: 'NO-005', driverId: null, routeId: 'r505', status: 'Maintenance', lastService: new Date('2024-07-01'), availability: { total: 40, occupied: 0 }, location: { lat: 34.05, lng: -118.24 } },
 ];
 
 export const passes: BusPass[] = [
-  { id: 'p001', holderName: 'Liam Miller', holderType: 'Student', bloodGroup: 'A+', vehicleId: 'v001', route: '101', seat: '12A', busStop: 'Oak Street & 5th Ave', validFrom: new Date('2024-07-01'), validUntil: new Date('2024-12-31'), status: 'Active' },
-  { id: 'p002', holderName: 'Dr. Olivia Garcia', holderType: 'Faculty', bloodGroup: 'O-', vehicleId: 'v002', route: '202', seat: '5B', busStop: 'University Main Gate', validFrom: new Date('2024-01-01'), validUntil: new Date('2024-06-30'), status: 'Expired' },
-  { id: 'p003', holderName: 'Noah Martinez', holderType: 'Student', bloodGroup: 'B+', vehicleId: 'v003', route: '303', seat: '21F', busStop: 'Elm Street Plaza', validFrom: new Date('2024-07-10'), validUntil: new Date('2024-12-31'), status: 'Active' },
-  { id: 'p004', holderName: 'Emma Rodriguez', holderType: 'Student', bloodGroup: 'AB+', vehicleId: 'v001', route: '101', seat: '3C', busStop: 'Maple & 12th', validFrom: new Date('2024-01-01'), validUntil: new Date('2024-01-01'), status: 'Invalid' },
+  { id: 'p001', holderName: 'Liam Miller', holderType: 'Student', bloodGroup: 'A+', vehicleId: 'v001', seat: '12A', busStop: 'Oak Street & 5th Ave', validFrom: new Date('2024-07-01'), validUntil: new Date('2024-12-31'), status: 'Active' },
+  { id: 'p002', holderName: 'Dr. Olivia Garcia', holderType: 'Faculty', bloodGroup: 'O-', vehicleId: 'v002', seat: '5B', busStop: 'University Main Gate', validFrom: new Date('2024-01-01'), validUntil: new Date('2024-06-30'), status: 'Expired' },
+  { id: 'p003', holderName: 'Noah Martinez', holderType: 'Student', bloodGroup: 'B+', vehicleId: 'v003', seat: '21F', busStop: 'Elm Street Plaza', validFrom: new Date('2024-07-10'), validUntil: new Date('2024-12-31'), status: 'Active' },
+  { id: 'p004', holderName: 'Emma Rodriguez', holderType: 'Student', bloodGroup: 'AB+', vehicleId: 'v001', seat: '3C', busStop: 'Maple & 12th', validFrom: new Date('2024-01-01'), validUntil: new Date('2024-01-01'), status: 'Invalid' },
 ];
 
 export const documents: Document[] = [
@@ -213,8 +226,8 @@ export const generateHistoricalPayments = (): Payment[] => {
 
 export const chatContacts: ChatContact[] = [
     { id: 'group_drivers', name: 'All Drivers', type: 'Group', avatarUrl: '', lastMessage: 'Remember to complete pre-trip inspections.', lastMessageTime: '8:30 AM' },
-    { id: 'group_route_101', name: 'Route 101 Passengers', type: 'Group', avatarUrl: '', lastMessage: 'I left my backpack on the bus.', lastMessageTime: '10:05 AM', route: '101' },
-    { id: 'group_route_303', name: 'Route 303 Passengers', type: 'Group', avatarUrl: '', lastMessage: 'Is the bus running on schedule?', lastMessageTime: '9:15 AM', route: '303' },
+    { id: 'group_route_101', name: 'Route 101 Passengers', type: 'Group', avatarUrl: '', lastMessage: 'I left my backpack on the bus.', lastMessageTime: '10:05 AM', routeId: 'r101' },
+    { id: 'group_route_303', name: 'Route 303 Passengers', type: 'Group', avatarUrl: '', lastMessage: 'Is the bus running on schedule?', lastMessageTime: '9:15 AM', routeId: 'r303' },
 ];
 
 export const messages: Record<string, Message[]> = {

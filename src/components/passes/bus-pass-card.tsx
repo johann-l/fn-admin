@@ -15,8 +15,10 @@ interface BusPassCardProps {
 }
 
 export default function BusPassCard({ pass }: BusPassCardProps) {
-  const { vehicles } = useAppData()
+  const { vehicles, routes } = useAppData()
   const vehicle = vehicles.find(v => v.id === pass.vehicleId);
+  const route = routes.find(r => r.id === vehicle?.routeId);
+
   const qrValue = JSON.stringify({
     passId: pass.id,
     holderName: pass.holderName,
@@ -97,7 +99,7 @@ export default function BusPassCard({ pass }: BusPassCardProps) {
                     </div>
                     <div className="flex items-center justify-between">
                         <span className="text-muted-foreground flex items-center"><MapPin className="h-4 w-4 mr-2" />Route</span>
-                        <span className="font-semibold">{pass.route !== 'N/A' ? `Route ${pass.route}` : 'N/A'}</span>
+                        <span className="font-semibold">{route?.name || 'N/A'}</span>
                     </div>
                     <div className="flex items-center justify-between">
                         <span className="text-muted-foreground flex items-center"><Signpost className="h-4 w-4 mr-2" />Bus Stop</span>

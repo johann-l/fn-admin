@@ -8,11 +8,16 @@ import { useAppData } from "@/context/app-data-context"
 import { cn } from "@/lib/utils"
 
 export default function FleetStatusTable() {
-  const { vehicles, drivers } = useAppData()
+  const { vehicles, drivers, routes } = useAppData()
 
   const getDriverName = (driverId: string | null) => {
     if (!driverId) return 'Unassigned'
     return drivers.find(d => d.id === driverId)?.name || 'Unassigned'
+  }
+
+  const getRouteName = (routeId: string | null) => {
+    if (!routeId) return 'Unassigned'
+    return routes.find(r => r.id === routeId)?.name || 'Unassigned'
   }
 
   const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
@@ -48,7 +53,7 @@ export default function FleetStatusTable() {
                 <TableRow key={vehicle.id}>
                   <TableCell>
                     <div className="font-medium">{vehicle.name}</div>
-                    <div className="text-sm text-muted-foreground">{vehicle.route !== 'Unassigned' ? `Route ${vehicle.route}` : 'Unassigned'}</div>
+                    <div className="text-sm text-muted-foreground">{getRouteName(vehicle.routeId)}</div>
                   </TableCell>
                   <TableCell>{getDriverName(vehicle.driverId)}</TableCell>
                   <TableCell>

@@ -54,6 +54,7 @@ const vehicleFormSchema = z.object({
   year: z.coerce.number().min(1990, "Year must be after 1990"),
   licensePlate: z.string().min(1, "License plate is required"),
   driverId: z.string().nullable(),
+  routeId: z.string().nullable(),
   status: z.enum(['On Time', 'Delayed', 'Early', 'Maintenance', 'Out of Service']),
   lastService: z.date({ required_error: "Last service date is required." }),
 })
@@ -61,7 +62,7 @@ const vehicleFormSchema = z.object({
 type VehicleFormValues = z.infer<typeof vehicleFormSchema>
 
 export default function VehicleManagement() {
-  const { vehicles, drivers, addVehicle, updateVehicle, removeVehicle } = useAppData()
+  const { vehicles, drivers, routes, addVehicle, updateVehicle, removeVehicle } = useAppData()
   const [isDialogOpen, setIsDialogOpen] = React.useState(false)
   const [selectedVehicle, setSelectedVehicle] = React.useState<Vehicle | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false)
@@ -80,6 +81,7 @@ export default function VehicleManagement() {
       year: vehicle.year,
       licensePlate: vehicle.licensePlate,
       driverId: vehicle.driverId,
+      routeId: vehicle.routeId,
       status: vehicle.status,
       lastService: vehicle.lastService,
     })
@@ -94,6 +96,7 @@ export default function VehicleManagement() {
         year: new Date().getFullYear(),
         licensePlate: "",
         driverId: null,
+        routeId: null,
         status: "On Time",
         lastService: new Date(),
     });
@@ -117,6 +120,7 @@ export default function VehicleManagement() {
     const finalValues = {
       ...values,
       driverId: values.driverId === 'none' ? null : values.driverId,
+      routeId: values.routeId === 'none' ? null : values.routeId,
     };
     if (selectedVehicle) {
       updateVehicle({ ...selectedVehicle, ...finalValues });
@@ -276,6 +280,25 @@ export default function VehicleManagement() {
                 />
                  <FormField
                   control={form.control}
+                  name="routeId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Assigned Route</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value ?? "none"}>
+                        <FormControl><SelectTrigger><SelectValue placeholder="Select a route" /></SelectTrigger></FormControl>
+                        <SelectContent>
+                          <SelectItem value="none">None</SelectItem>
+                          {routes.map(route => (<SelectItem key={route.id} value={route.id}>{route.name}</SelectItem>))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+               <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
                   name="status"
                   render={({ field }) => (
                     <FormItem>
@@ -294,8 +317,6 @@ export default function VehicleManagement() {
                     </FormItem>
                   )}
                 />
-              </div>
-
                 <FormField
                   control={form.control}
                   name="lastService"
@@ -315,7 +336,7 @@ export default function VehicleManagement() {
                       </Popover><FormMessage /></FormItem>
                   )}
                 />
-            
+            </div>
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
                 <Button type="submit">Save Vehicle</Button>

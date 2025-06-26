@@ -1,4 +1,5 @@
 
+
 export type Vehicle = {
   id: string;
   name: string;
@@ -117,16 +118,36 @@ export const documents: Document[] = [
   { id: 'doc004', name: 'Permit-Bus-4.pdf', vehicleId: 'v004', uploadDate: new Date('2024-03-10'), expiryDate: new Date('2026-03-09'), status: 'Valid', url: 'https://placehold.co/850x1100.png' },
 ];
 
-export const expenses: Expense[] = [
-  { id: 'exp001', vehicleId: 'v001', type: 'Fuel', description: 'Refuel for Bus 1', amount: 150.75, date: new Date('2024-07-15'), status: 'Paid', billUrl: 'https://placehold.co/850x1100.png' },
-  { id: 'exp002', vehicleId: 'v002', type: 'Maintenance', description: 'Brake pad replacement', amount: 350.00, date: new Date('2024-07-14'), status: 'Unpaid', billUrl: 'https://placehold.co/850x1100.png' },
-  { id: 'exp003', vehicleId: 'v003', type: 'Insurance', description: 'Monthly premium', amount: 500.00, date: new Date('2024-07-01'), status: 'Paid', billUrl: 'https://placehold.co/850x1100.png' },
-  { id: 'exp004', vehicleId: 'v004', type: 'Fuel', description: 'Refuel for Bus 4', amount: 180.50, date: new Date('2024-07-16'), status: 'Unpaid', billUrl: 'https://placehold.co/850x1100.png' },
-  { id: 'exp005', vehicleId: 'v001', type: 'Other', description: 'Cleaning supplies', amount: 45.25, date: new Date('2024-07-12'), status: 'Paid', billUrl: 'https://placehold.co/850x1100.png' },
-  { id: 'exp006', vehicleId: 'v005', type: 'Maintenance', description: 'Oil change and filter', amount: 120.00, date: new Date('2024-07-10'), status: 'Unpaid', billUrl: 'https://placehold.co/850x1100.png' },
-  { id: 'exp007', vehicleId: 'v002', type: 'Tolls', description: 'Toll for university trip', amount: 12.50, date: new Date('2024-07-18'), status: 'Paid', billUrl: 'https://placehold.co/850x1100.png' },
-  { id: 'exp008', vehicleId: 'v004', type: 'Misc', description: 'Driver meal for field trip', amount: 25.00, date: new Date('2024-07-19'), status: 'Paid', billUrl: 'https://placehold.co/850x1100.png' },
-];
+const generateHistoricalExpenses = (): Expense[] => {
+    const expenses: Expense[] = [];
+    const now = new Date();
+    const vehicleIds = ['v001', 'v002', 'v003', 'v004', 'v005'];
+    const expenseTypes: Expense['type'][] = ['Fuel', 'Maintenance', 'Insurance', 'Tolls', 'Misc', 'Other'];
+
+    for (let i = 11; i >= 0; i--) {
+        const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
+
+        const expenseCount = Math.floor(Math.random() * 4) + 2; // 2 to 5 expenses per month
+        for (let j = 0; j < expenseCount; j++) {
+            const day = Math.floor(Math.random() * 28) + 1;
+            const expenseDate = new Date(monthDate.getFullYear(), monthDate.getMonth(), day);
+            const type = expenseTypes[Math.floor(Math.random() * expenseTypes.length)];
+            expenses.push({
+                id: `exp_${i}_${j}`,
+                vehicleId: vehicleIds[Math.floor(Math.random() * vehicleIds.length)],
+                type: type,
+                description: `${type} for vehicle`,
+                amount: Math.floor(Math.random() * 300) + 50, // 50-350
+                date: expenseDate,
+                status: Math.random() > 0.1 ? 'Paid' : 'Unpaid', // Most are paid
+                billUrl: 'https://placehold.co/850x1100.png',
+            });
+        }
+    }
+    return expenses;
+};
+
+export const expenses: Expense[] = generateHistoricalExpenses();
 
 const generateHistoricalPayments = (): Payment[] => {
   const payments: Payment[] = [];
@@ -198,3 +219,5 @@ export const messages: Record<string, Message[]> = {
     { id: 'msg_r303_2', sender: 'Admin', content: 'Yes, everything is on time so far. You can track the bus live on the main dashboard map.', timestamp: new Date(new Date().setHours(9, 16, 0)) },
   ],
 };
+
+    

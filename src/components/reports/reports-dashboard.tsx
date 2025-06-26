@@ -65,6 +65,11 @@ const expenseByVehicleChartConfig = {
   },
 } satisfies ChartConfig
 
+const expenseCategories = Object.keys(expenseChartConfig).filter(
+  (key) => key !== "expenses"
+) as (keyof typeof expenseChartConfig)[];
+
+const incomeCategories = ["Bus Pass Fees", "Other Revenue"];
 
 export default function ReportsDashboard() {
   const { expenses, vehicles, payments } = useAppData()
@@ -208,29 +213,56 @@ export default function ReportsDashboard() {
 
   const categorizedIncome = React.useMemo(() => {
     if (!incomePayments) return [];
-    const byCategory = incomePayments.reduce((acc, payment) => {
-        let category = "Other Revenue";
-        if (payment.description.toLowerCase().includes('bus pass fee')) {
-            category = "Bus Pass Fees";
-        }
-        acc[category] = (acc[category] || 0) + payment.amount;
-        return acc;
+
+    const initialCategories = incomeCategories.reduce((acc, category) => {
+      acc[category] = 0;
+      return acc;
     }, {} as Record<string, number>);
-    
+
+    const byCategory = incomePayments.reduce((acc, payment) => {
+      let category = "Other Revenue";
+      if (payment.description.toLowerCase().includes("bus pass fee")) {
+        category = "Bus Pass Fees";
+      }
+      if (Object.prototype.hasOwnProperty.call(acc, category)) {
+        acc[category] += payment.amount;
+      }
+      return acc;
+    }, initialCategories);
+
     return Object.entries(byCategory)
       .map(([category, amount]) => ({ category, amount }))
-      .sort((a, b) => b.amount - a.amount);
+      .sort((a, b) => {
+        return (
+          incomeCategories.indexOf(a.category) -
+          incomeCategories.indexOf(b.category)
+        );
+      });
   }, [incomePayments]);
 
   const categorizedExpenses = React.useMemo(() => {
     if (!paidExpenses) return [];
-    const byCategory = paidExpenses.reduce((acc, expense) => {
-        acc[expense.type] = (acc[expense.type] || 0) + expense.amount;
-        return acc;
+
+    const initialCategories = expenseCategories.reduce((acc, category) => {
+      acc[category] = 0;
+      return acc;
     }, {} as Record<string, number>);
+
+    const byCategory = paidExpenses.reduce((acc, expense) => {
+      if (Object.prototype.hasOwnProperty.call(acc, expense.type)) {
+        acc[expense.type] += expense.amount;
+      }
+      return acc;
+    }, initialCategories);
+
     return Object.entries(byCategory)
       .map(([category, amount]) => ({ category, amount }))
-      .sort((a,b) => b.amount - a.amount);
+      .sort((a, b) => {
+        return (
+          expenseCategories.indexOf(a.category as any) -
+          expenseCategories.indexOf(b.category as any)
+        );
+      });
   }, [paidExpenses]);
 
 
@@ -585,3 +617,5 @@ export default function ReportsDashboard() {
     </div>
   )
 }
+
+    

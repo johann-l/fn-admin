@@ -7,6 +7,7 @@ import type { BusPass } from "@/lib/data"
 import { buses } from "@/lib/data"
 import { format } from "date-fns"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import QRCode from "react-qr-code"
 
 interface BusPassCardProps {
   pass: BusPass;
@@ -14,6 +15,12 @@ interface BusPassCardProps {
 
 export default function BusPassCard({ pass }: BusPassCardProps) {
   const bus = buses.find(b => b.id === pass.busId);
+  const qrValue = JSON.stringify({
+    passId: pass.id,
+    passengerName: pass.passengerName,
+    busId: pass.busId,
+    validUntil: pass.validUntil.toISOString(),
+  });
 
   return (
     <>
@@ -61,9 +68,14 @@ export default function BusPassCard({ pass }: BusPassCardProps) {
                 </div>
             </div>
             <CardContent className="p-6 pt-12 space-y-4">
-                <div className="text-left">
-                    <h3 className="text-xl font-semibold">{pass.passengerName}</h3>
-                    <p className="text-sm text-muted-foreground">Bus Pass</p>
+                <div className="flex justify-between items-center">
+                    <div className="text-left">
+                        <h3 className="text-xl font-semibold">{pass.passengerName}</h3>
+                        <p className="text-sm text-muted-foreground">Bus Pass</p>
+                    </div>
+                    <div className="p-1 bg-white rounded-md">
+                        <QRCode value={qrValue} size={64} />
+                    </div>
                 </div>
 
                 <div className="space-y-3 text-sm pt-4">

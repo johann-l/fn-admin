@@ -4,6 +4,8 @@ import * as React from "react"
 import { useSearchParams } from 'next/navigation'
 import { format } from "date-fns"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Cell } from "recharts"
+import { useFormStatus } from "react-dom"
+import { Loader2 } from "lucide-react"
 
 import { expenses as initialExpenses, Expense } from "@/lib/data"
 import { useAppData } from "@/context/app-data-context"
@@ -46,6 +48,14 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
+function PayButton() {
+  const { pending } = useFormStatus()
+  return (
+    <Button type="submit" size="sm" disabled={pending} className="w-[82px]">
+      {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Pay Now"}
+    </Button>
+  )
+}
 
 export default function ExpenseTracker() {
   const { vehicles } = useAppData()
@@ -150,7 +160,7 @@ export default function ExpenseTracker() {
               {expense.status === 'Unpaid' && (
                 <form action={createCheckoutSession}>
                   <input type="hidden" name="expenseId" value={expense.id} />
-                  <Button type="submit" size="sm">Pay Now</Button>
+                  <PayButton />
                 </form>
               )}
             </TableCell>

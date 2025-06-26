@@ -9,13 +9,9 @@ export default function DashboardPage() {
       <Header title="Live Dashboard" />
       <main className="flex-1 p-4 md:p-6 space-y-6">
         <SummaryCards />
-        <div className="grid gap-6 grid-cols-1 xl:grid-cols-3">
-          <div className="xl:col-span-2">
-            <MapPlaceholder />
-          </div>
-          <div className="xl:col-span-1">
-            <FleetStatusTable />
-          </div>
+        <div className="grid gap-6 grid-cols-1">
+          <MapPlaceholder />
+          <FleetStatusTable />
         </div>
       </main>
     </div>

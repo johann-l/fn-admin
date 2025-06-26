@@ -20,7 +20,7 @@ import {
   generateHistoricalPayments
 } from "@/lib/data"
 
-type VehicleFormData = Omit<Vehicle, 'id' | 'availability' | 'location'>;
+type VehicleFormData = Omit<Vehicle, 'id' | 'availability' | 'location' | 'currentStopIndex'>;
 type PassFormData = Omit<BusPass, 'id' | 'status' | 'bloodGroup'>;
 type DriverFormData = Omit<Driver, 'id' | 'avatarUrl'>;
 type ExpenseFormData = Omit<Expense, 'id'>;
@@ -75,6 +75,7 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
       id: `v${Date.now()}`,
       availability: { total: 40, occupied: 0 },
       location: { lat: 34.0522, lng: -118.2437 }, // Default to LA
+      currentStopIndex: -1,
     }
     setVehicles(prev => [...prev, newVehicle])
   }

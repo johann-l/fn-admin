@@ -13,6 +13,7 @@ export type Vehicle = {
     total: number;
     occupied: number;
   };
+  currentStopIndex: number;
   location: { lat: number; lng: number };
 };
 
@@ -110,11 +111,11 @@ export const drivers: Driver[] = [
 ];
 
 export const vehicles: Vehicle[] = [
-  { id: 'v001', name: 'Bus 1', model: 'Mercedes Sprinter', year: 2022, licensePlate: 'CC-001', driverId: 'd001', routeId: 'r101', status: 'On Time', lastService: new Date('2024-05-10'), availability: { total: 40, occupied: 25 }, location: { lat: 34.0522, lng: -118.2437 } },
-  { id: 'v002', name: 'Bus 2', model: 'Ford Transit', year: 2021, licensePlate: 'EX-202', driverId: 'd002', routeId: 'r202', status: 'Delayed', lastService: new Date('2024-04-22'), availability: { total: 50, occupied: 48 }, location: { lat: 34.059, lng: -118.251 } },
-  { id: 'v003', name: 'Bus 3', model: 'Volvo 9700', year: 2023, licensePlate: 'SC-003', driverId: 'd003', routeId: 'r303', status: 'On Time', lastService: new Date('2024-06-01'), availability: { total: 35, occupied: 10 }, location: { lat: 34.045, lng: -118.239 } },
-  { id: 'v004', name: 'Bus 4', model: 'Mercedes Sprinter', year: 2022, licensePlate: 'ML-004', driverId: 'd005', routeId: 'r404', status: 'Early', lastService: new Date('2024-05-15'), availability: { total: 40, occupied: 38 }, location: { lat: 34.061, lng: -118.245 } },
-  { id: 'v005', name: 'Bus 5', model: 'Ford Transit', year: 2021, licensePlate: 'NO-005', driverId: null, routeId: 'r505', status: 'Maintenance', lastService: new Date('2024-07-01'), availability: { total: 40, occupied: 0 }, location: { lat: 34.05, lng: -118.24 } },
+  { id: 'v001', name: 'Bus 1', model: 'Mercedes Sprinter', year: 2022, licensePlate: 'CC-001', driverId: 'd001', routeId: 'r101', status: 'On Time', lastService: new Date('2024-05-10'), availability: { total: 40, occupied: 25 }, currentStopIndex: 2, location: { lat: 34.0522, lng: -118.2437 } },
+  { id: 'v002', name: 'Bus 2', model: 'Ford Transit', year: 2021, licensePlate: 'EX-202', driverId: 'd002', routeId: 'r202', status: 'Delayed', lastService: new Date('2024-04-22'), availability: { total: 50, occupied: 48 }, currentStopIndex: 1, location: { lat: 34.059, lng: -118.251 } },
+  { id: 'v003', name: 'Bus 3', model: 'Volvo 9700', year: 2023, licensePlate: 'SC-003', driverId: 'd003', routeId: 'r303', status: 'On Time', lastService: new Date('2024-06-01'), availability: { total: 35, occupied: 10 }, currentStopIndex: 3, location: { lat: 34.045, lng: -118.239 } },
+  { id: 'v004', name: 'Bus 4', model: 'Mercedes Sprinter', year: 2022, licensePlate: 'ML-004', driverId: 'd005', routeId: 'r404', status: 'Early', lastService: new Date('2024-05-15'), availability: { total: 40, occupied: 38 }, currentStopIndex: 0, location: { lat: 34.061, lng: -118.245 } },
+  { id: 'v005', name: 'Bus 5', model: 'Ford Transit', year: 2021, licensePlate: 'NO-005', driverId: null, routeId: 'r505', status: 'Maintenance', lastService: new Date('2024-07-01'), availability: { total: 40, occupied: 0 }, currentStopIndex: -1, location: { lat: 34.05, lng: -118.24 } },
 ];
 
 export const passes: BusPass[] = [

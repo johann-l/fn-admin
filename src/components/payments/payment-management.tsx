@@ -78,7 +78,7 @@ export default function PaymentManagement() {
           key={payment.id} 
           className={cn(
             "group flex flex-col cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-xl",
-            payment.type === 'Incoming' ? "hover:shadow-primary/10" : "hover:shadow-destructive/10"
+            payment.type === 'Incoming' ? "hover:shadow-primary/20" : "hover:shadow-destructive/20"
           )}
           onClick={() => handlePaymentClick(payment)}
         >

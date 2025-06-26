@@ -21,6 +21,7 @@ import {
   MessageSquare,
   Settings,
   LogOut,
+  Banknote,
 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
@@ -29,6 +30,7 @@ const links = [
   { href: "/drivers", label: "Drivers", icon: Users },
   { href: "/passes", label: "Bus Passes", icon: Ticket },
   { href: "/documents", label: "Documents", icon: FileText },
+  { href: "/expenses", label: "Expenses", icon: Banknote },
   { href: "/communication", label: "Communication", icon: MessageSquare },
   { href: "/optimize", label: "AI Optimization", icon: Wand2 },
 ]

@@ -41,6 +41,15 @@ export type Document = {
   status: 'Valid' | 'Expiring Soon' | 'Expired';
 };
 
+export type Expense = {
+  id: string;
+  busId: string;
+  type: 'Fuel' | 'Maintenance' | 'Insurance' | 'Other';
+  description: string;
+  amount: number;
+  date: Date;
+};
+
 export type Message = {
   id: string;
   sender: 'Admin' | string; // driver name
@@ -85,6 +94,15 @@ export const documents: Document[] = [
   { id: 'doc002', name: 'Insurance-E202.pdf', busId: 'b002', uploadDate: new Date('2023-08-01'), expiryDate: new Date('2024-07-31'), status: 'Expiring Soon' },
   { id: 'doc003', name: 'Maintenance-SC.pdf', busId: 'b003', uploadDate: new Date('2024-05-20'), expiryDate: new Date('2024-06-19'), status: 'Expired' },
   { id: 'doc004', name: 'Permit-ML.pdf', busId: 'b004', uploadDate: new Date('2024-03-10'), expiryDate: new Date('2026-03-09'), status: 'Valid' },
+];
+
+export const expenses: Expense[] = [
+  { id: 'exp001', busId: 'b001', type: 'Fuel', description: 'Refuel for City Cruiser 1', amount: 150.75, date: new Date('2024-07-15') },
+  { id: 'exp002', busId: 'b002', type: 'Maintenance', description: 'Brake pad replacement', amount: 350.00, date: new Date('2024-07-14') },
+  { id: 'exp003', busId: 'b003', type: 'Insurance', description: 'Monthly premium', amount: 500.00, date: new Date('2024-07-01') },
+  { id: 'exp004', busId: 'b004', type: 'Fuel', description: 'Refuel for Metro Link', amount: 180.50, date: new Date('2024-07-16') },
+  { id: 'exp005', busId: 'b001', type: 'Other', description: 'Tire cleaning supplies', amount: 45.25, date: new Date('2024-07-12') },
+  { id: 'exp006', busId: 'b005', type: 'Maintenance', description: 'Oil change and filter', amount: 120.00, date: new Date('2024-07-10') },
 ];
 
 export const chatContacts: ChatContact[] = [

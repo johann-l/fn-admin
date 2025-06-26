@@ -57,7 +57,24 @@ const passFormSchema = z.object({
   busStop: z.string().min(1, "Bus stop is required"),
   validFrom: z.date({ required_error: "A start date is required." }),
   validUntil: z.date({ required_error: "An end date is required." }),
-})
+  studentId: z.string().optional(),
+  semester: z.string().optional(),
+  course: z.string().optional(),
+  department: z.string().optional(),
+  facultyId: z.string().optional(),
+}).superRefine((data, ctx) => {
+    if (data.holderType === 'Student') {
+        if (!data.studentId) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Student ID is required.", path: ['studentId'] });
+        if (!data.semester) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Semester is required.", path: ['semester'] });
+        if (!data.course) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Course is required.", path: ['course'] });
+        if (!data.department) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Department is required.", path: ['department'] });
+    }
+    if (data.holderType === 'Faculty') {
+        if (!data.facultyId) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Faculty ID is required.", path: ['facultyId'] });
+        if (!data.department) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Department is required.", path: ['department'] });
+    }
+});
+
 
 type PassFormValues = z.infer<typeof passFormSchema>
 
@@ -75,6 +92,8 @@ export default function BusPassAdmin() {
   const form = useForm<PassFormValues>({
     resolver: zodResolver(passFormSchema),
   })
+  
+  const holderType = form.watch("holderType");
 
   const handleEditClick = (pass: BusPass) => {
     setSelectedPass(pass)
@@ -86,6 +105,11 @@ export default function BusPassAdmin() {
       busStop: pass.busStop,
       validFrom: pass.validFrom,
       validUntil: pass.validUntil,
+      studentId: pass.studentId,
+      semester: pass.semester,
+      course: pass.course,
+      department: pass.department,
+      facultyId: pass.facultyId,
     })
     setIsDialogOpen(true)
   }
@@ -99,7 +123,12 @@ export default function BusPassAdmin() {
       seat: "",
       busStop: "",
       validFrom: undefined,
-      validUntil: undefined
+      validUntil: undefined,
+      studentId: "",
+      semester: "",
+      course: "",
+      department: "",
+      facultyId: "",
     });
     setIsDialogOpen(true);
   }
@@ -268,7 +297,7 @@ export default function BusPassAdmin() {
       </Card>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>{selectedPass ? "Edit Bus Pass" : "Create Bus Pass"}</DialogTitle>
             <DialogDescription>
@@ -291,7 +320,7 @@ export default function BusPassAdmin() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Holder Type</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl><SelectTrigger><SelectValue placeholder="Select a type" /></SelectTrigger></FormControl>
                         <SelectContent>
                           <SelectItem value="Student">Student</SelectItem>
@@ -303,13 +332,60 @@ export default function BusPassAdmin() {
                   )}
                 />
               </div>
+
+              {holderType === 'Student' && (
+                <>
+                  <div className="grid grid-cols-2 gap-4">
+                     <FormField
+                        control={form.control}
+                        name="studentId"
+                        render={({ field }) => (
+                            <FormItem><FormLabel>Student ID</FormLabel><FormControl><Input {...field} placeholder="e.g. STU12345" /></FormControl><FormMessage /></FormItem>
+                        )}
+                      />
+                      <FormField
+                          control={form.control}
+                          name="semester"
+                          render={({ field }) => (
+                              <FormItem><FormLabel>Semester</FormLabel><FormControl><Input {...field} placeholder="e.g. Fall 2024" /></FormControl><FormMessage /></FormItem>
+                          )}
+                      />
+                  </div>
+                  <FormField
+                        control={form.control}
+                        name="course"
+                        render={({ field }) => (
+                            <FormItem><FormLabel>Course</FormLabel><FormControl><Input {...field} placeholder="e.g. Computer Science" /></FormControl><FormMessage /></FormItem>
+                        )}
+                    />
+                </>
+              )}
+              
+              {holderType === 'Faculty' && (
+                 <FormField
+                    control={form.control}
+                    name="facultyId"
+                    render={({ field }) => (
+                        <FormItem><FormLabel>Faculty ID</FormLabel><FormControl><Input {...field} placeholder="e.g. FAC67890" /></FormControl><FormMessage /></FormItem>
+                    )}
+                  />
+              )}
+
+              <FormField
+                  control={form.control}
+                  name="department"
+                  render={({ field }) => (
+                      <FormItem><FormLabel>Department</FormLabel><FormControl><Input {...field} placeholder="e.g. School of Engineering" /></FormControl><FormMessage /></FormItem>
+                  )}
+              />
+
               <FormField
                   control={form.control}
                   name="vehicleId"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Vehicle</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl><SelectTrigger><SelectValue placeholder="Select a vehicle" /></SelectTrigger></FormControl>
                         <SelectContent>{vehicles.map(vehicle => (<SelectItem key={vehicle.id} value={vehicle.id}>{vehicle.name}</SelectItem>))}</SelectContent>
                       </Select>

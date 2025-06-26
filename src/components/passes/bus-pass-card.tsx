@@ -3,7 +3,7 @@
 
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Bus, MapPin, Calendar, Droplets, Ticket, Printer, Signpost } from "lucide-react"
+import { Bus, MapPin, Calendar, Droplets, Ticket, Printer, Signpost, User, ClipboardUser, Book, Building } from "lucide-react"
 import type { BusPass } from "@/lib/data"
 import { useAppData } from "@/context/app-data-context"
 import { format } from "date-fns"
@@ -85,14 +85,39 @@ export default function BusPassCard({ pass }: BusPassCardProps) {
                 </div>
 
                 <div className="space-y-3 text-sm pt-4">
-                    <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground flex items-center"><Ticket className="h-4 w-4 mr-2" />Pass ID</span>
-                        <span className="font-semibold font-mono text-xs">{pass.id}</span>
-                    </div>
-                     <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground flex items-center"><Droplets className="h-4 w-4 mr-2" />Blood Group</span>
-                        <span className="font-semibold">{pass.bloodGroup}</span>
-                    </div>
+                    {pass.holderType === 'Student' && pass.studentId && (
+                        <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground flex items-center"><User className="h-4 w-4 mr-2" />Student ID</span>
+                            <span className="font-semibold">{pass.studentId}</span>
+                        </div>
+                    )}
+                    {pass.holderType === 'Faculty' && pass.facultyId && (
+                        <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground flex items-center"><ClipboardUser className="h-4 w-4 mr-2" />Faculty ID</span>
+                            <span className="font-semibold">{pass.facultyId}</span>
+                        </div>
+                    )}
+                    {pass.holderType === 'Student' && (
+                      <>
+                        <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground flex items-center"><Book className="h-4 w-4 mr-2" />Course</span>
+                            <span className="font-semibold">{pass.course}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground flex items-center"><Calendar className="h-4 w-4 mr-2" />Semester</span>
+                            <span className="font-semibold">{pass.semester}</span>
+                        </div>
+                      </>
+                    )}
+                    {pass.department && (
+                        <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground flex items-center"><Building className="h-4 w-4 mr-2" />Department</span>
+                            <span className="font-semibold">{pass.department}</span>
+                        </div>
+                    )}
+
+                    <div className="border-t border-dashed my-2"></div>
+
                     <div className="flex items-center justify-between">
                         <span className="text-muted-foreground flex items-center"><Bus className="h-4 w-4 mr-2" />Vehicle / Seat</span>
                         <span className="font-semibold">{vehicle?.name} / {pass.seat}</span>

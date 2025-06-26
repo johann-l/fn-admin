@@ -4,6 +4,7 @@
 import * as React from "react"
 import { Bar, BarChart, Line, LineChart, Pie, PieChart, Cell, CartesianGrid, XAxis, YAxis } from "recharts"
 import { subMonths, format } from "date-fns"
+import { motion } from "framer-motion"
 
 import { useAppData } from "@/context/app-data-context"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -16,6 +17,7 @@ import {
   ChartLegend,
   ChartLegendContent,
 } from "@/components/ui/chart"
+import { cn } from "@/lib/utils"
 
 const expenseChartConfig = {
   expenses: {
@@ -143,189 +145,217 @@ export default function ReportsDashboard() {
 
   return (
     <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-        <Card className="xl:col-span-1">
-            <CardHeader className="items-center pb-0">
-                <CardTitle>Expense Breakdown</CardTitle>
-                <CardDescription>Monthly spending by category</CardDescription>
-            </CardHeader>
-            <CardContent className="flex-1 pb-0">
-                <ChartContainer
-                    config={expenseChartConfig}
-                    className="mx-auto aspect-square max-h-[300px]"
-                >
-                <PieChart>
-                  <ChartTooltip
-                    cursor={false}
-                    content={<ChartTooltipContent hideLabel />}
-                  />
-                  <Pie
-                    data={expenseData}
-                    dataKey="amount"
-                    nameKey="type"
-                    innerRadius={60}
-                    strokeWidth={5}
-                    activeIndex={activeExpense}
-                    onMouseEnter={(_, index) => setActiveExpense(index)}
-                  >
-                     {expenseData.map((entry, index) => (
-                        <Cell
-                            key={`cell-${index}`}
-                            fill={entry.fill}
-                            className="focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                        />
-                    ))}
-                  </Pie>
-                  <ChartLegend
-                    content={<ChartLegendContent nameKey="type" />}
-                    className="-mt-4"
-                  />
-                </PieChart>
-                </ChartContainer>
-            </CardContent>
-            <CardContent className="mt-0 flex-col gap-2 text-sm">
-                <div className="flex justify-between font-medium">
-                    <span>Total</span>
-                    <span>${totalExpenses.toFixed(2)}</span>
-                </div>
-            </CardContent>
-        </Card>
-
-        <Card className="xl:col-span-2">
-           <CardHeader>
-                <div className="flex justify-between items-start">
-                    <div>
-                        <CardTitle>Revenue vs. Expenses</CardTitle>
-                        <CardDescription>Financial overview for the selected period.</CardDescription>
+        <motion.div
+            className="xl:col-span-1"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+        >
+            <Card>
+                <CardHeader className="items-center pb-0">
+                    <CardTitle>Expense Breakdown</CardTitle>
+                    <CardDescription>Monthly spending by category</CardDescription>
+                </CardHeader>
+                <CardContent className="flex-1 pb-0">
+                    <ChartContainer
+                        config={expenseChartConfig}
+                        className="mx-auto aspect-square max-h-[300px]"
+                    >
+                    <PieChart>
+                      <ChartTooltip
+                        cursor={false}
+                        content={<ChartTooltipContent hideLabel />}
+                      />
+                      <Pie
+                        data={expenseData}
+                        dataKey="amount"
+                        nameKey="type"
+                        innerRadius={60}
+                        strokeWidth={5}
+                        activeIndex={activeExpense}
+                        onMouseEnter={(_, index) => setActiveExpense(index)}
+                      >
+                         {expenseData.map((entry, index) => (
+                            <Cell
+                                key={`cell-${index}`}
+                                fill={entry.fill}
+                                className="focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                            />
+                        ))}
+                      </Pie>
+                      <ChartLegend
+                        content={<ChartLegendContent nameKey="type" />}
+                        className="-mt-4 flex-wrap"
+                      />
+                    </PieChart>
+                    </ChartContainer>
+                </CardContent>
+                <CardContent className="mt-0 flex-col gap-2 text-sm">
+                    <div className="flex justify-between font-medium">
+                        <span>Total</span>
+                        <span>${totalExpenses.toFixed(2)}</span>
                     </div>
-                    <Tabs value={timeFrame} onValueChange={(value) => setTimeFrame(value as any)} className="w-auto">
-                        <TabsList className="h-8">
-                            <TabsTrigger value="3m" className="h-6 px-2 text-xs">3M</TabsTrigger>
-                            <TabsTrigger value="6m" className="h-6 px-2 text-xs">6M</TabsTrigger>
-                            <TabsTrigger value="1y" className="h-6 px-2 text-xs">1Y</TabsTrigger>
-                        </TabsList>
-                    </Tabs>
-                </div>
-            </CardHeader>
-            <CardContent>
-                <ChartContainer config={revenueExpenseChartConfig} className="h-[300px] w-full">
-                    <BarChart data={revenueExpenseData} margin={{ left: -20, right: 12 }}>
+                </CardContent>
+            </Card>
+        </motion.div>
+
+        <motion.div
+            className="xl:col-span-2"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+        >
+           <Card>
+               <CardHeader>
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <CardTitle>Revenue vs. Expenses</CardTitle>
+                            <CardDescription>Financial overview for the selected period.</CardDescription>
+                        </div>
+                        <Tabs value={timeFrame} onValueChange={(value) => setTimeFrame(value as any)} className="w-auto">
+                            <TabsList className="h-8">
+                                <TabsTrigger value="3m" className="h-6 px-2 text-xs">3M</TabsTrigger>
+                                <TabsTrigger value="6m" className="h-6 px-2 text-xs">6M</TabsTrigger>
+                                <TabsTrigger value="1y" className="h-6 px-2 text-xs">1Y</TabsTrigger>
+                            </TabsList>
+                        </Tabs>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    <ChartContainer config={revenueExpenseChartConfig} className="h-[300px] w-full">
+                        <BarChart data={revenueExpenseData} margin={{ left: -20, right: 12 }}>
+                            <CartesianGrid vertical={false} />
+                            <XAxis
+                                dataKey="month"
+                                tickLine={false}
+                                axisLine={false}
+                                tickMargin={8}
+                            />
+                            <YAxis
+                                tickLine={false}
+                                axisLine={false}
+                                tickMargin={8}
+                                tickFormatter={(value) => `$${value / 1000}k`}
+                            />
+                            <ChartTooltip
+                                cursor={false}
+                                content={<ChartTooltipContent indicator="dot" />}
+                            />
+                            <ChartLegend content={<ChartLegendContent />} />
+                            <Bar
+                                dataKey="revenue"
+                                fill="var(--color-revenue)"
+                                radius={[4, 4, 0, 0]}
+                            />
+                            <Bar
+                                dataKey="expenses"
+                                fill="var(--color-expenses)"
+                                radius={[4, 4, 0, 0]}
+                            />
+                        </BarChart>
+                    </ChartContainer>
+                </CardContent>
+            </Card>
+        </motion.div>
+
+        <motion.div
+            className="xl:col-span-2"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+        >
+            <Card>
+                <CardHeader>
+                    <CardTitle>Vehicle Occupancy Rate</CardTitle>
+                    <CardDescription>Average seat occupancy per vehicle</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <ChartContainer config={occupancyChartConfig} className="h-[300px] w-full">
+                    <BarChart
+                        accessibilityLayer
+                        data={vehicleOccupancyData}
+                        margin={{
+                        left: 12,
+                        right: 12,
+                        }}
+                    >
                         <CartesianGrid vertical={false} />
                         <XAxis
-                            dataKey="month"
+                            dataKey="name"
                             tickLine={false}
                             axisLine={false}
                             tickMargin={8}
                         />
-                        <YAxis
+                        <YAxis 
                             tickLine={false}
                             axisLine={false}
                             tickMargin={8}
-                            tickFormatter={(value) => `$${value / 1000}k`}
+                            tickFormatter={(value) => `${value}%`}
                         />
                         <ChartTooltip
                             cursor={false}
                             content={<ChartTooltipContent indicator="dot" />}
                         />
-                        <ChartLegend content={<ChartLegendContent />} />
-                        <Bar
-                            dataKey="revenue"
-                            fill="var(--color-revenue)"
-                            radius={[4, 4, 0, 0]}
-                        />
-                        <Bar
-                            dataKey="expenses"
-                            fill="var(--color-expenses)"
-                            radius={[4, 4, 0, 0]}
-                        />
+                        <Bar dataKey="occupancy" fill="var(--color-occupancy)" radius={4} />
                     </BarChart>
-                </ChartContainer>
-            </CardContent>
-        </Card>
+                    </ChartContainer>
+                </CardContent>
+            </Card>
+        </motion.div>
 
-        <Card className="xl:col-span-2">
-            <CardHeader>
-                <CardTitle>Vehicle Occupancy Rate</CardTitle>
-                <CardDescription>Average seat occupancy per vehicle</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <ChartContainer config={occupancyChartConfig} className="h-[300px] w-full">
-                <BarChart
-                    accessibilityLayer
-                    data={vehicleOccupancyData}
-                    margin={{
-                    left: 12,
-                    right: 12,
-                    }}
-                >
-                    <CartesianGrid vertical={false} />
-                    <XAxis
-                        dataKey="name"
-                        tickLine={false}
-                        axisLine={false}
-                        tickMargin={8}
-                    />
-                    <YAxis 
-                        tickLine={false}
-                        axisLine={false}
-                        tickMargin={8}
-                        tickFormatter={(value) => `${value}%`}
-                    />
-                    <ChartTooltip
+        <motion.div
+            className="xl:col-span-1"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+        >
+            <Card>
+                <CardHeader className="items-center pb-0">
+                    <CardTitle>Fleet Status</CardTitle>
+                    <CardDescription>Live distribution of vehicle statuses</CardDescription>
+                </CardHeader>
+                <CardContent className="flex-1 pb-0">
+                     <ChartContainer
+                        config={fleetStatusChartConfig}
+                        className="mx-auto aspect-square max-h-[300px]"
+                    >
+                    <PieChart>
+                      <ChartTooltip
                         cursor={false}
-                        content={<ChartTooltipContent indicator="dot" />}
-                    />
-                    <Bar dataKey="occupancy" fill="var(--color-occupancy)" radius={4} />
-                </BarChart>
-                </ChartContainer>
-            </CardContent>
-        </Card>
-
-        <Card className="xl:col-span-1">
-            <CardHeader className="items-center pb-0">
-                <CardTitle>Fleet Status</CardTitle>
-                <CardDescription>Live distribution of vehicle statuses</CardDescription>
-            </CardHeader>
-            <CardContent className="flex-1 pb-0">
-                 <ChartContainer
-                    config={fleetStatusChartConfig}
-                    className="mx-auto aspect-square max-h-[300px]"
-                >
-                <PieChart>
-                  <ChartTooltip
-                    cursor={false}
-                    content={<ChartTooltipContent hideLabel />}
-                  />
-                  <Pie
-                    data={fleetStatusData}
-                    dataKey="count"
-                    nameKey="status"
-                    innerRadius={60}
-                    strokeWidth={5}
-                    activeIndex={activeStatus}
-                    onMouseEnter={(_, index) => setActiveStatus(index)}
-                  >
-                     {fleetStatusData.map((entry, index) => (
-                        <Cell
-                            key={`cell-${index}`}
-                            fill={entry.fill}
-                            className="focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                        />
-                    ))}
-                  </Pie>
-                  <ChartLegend
-                    content={<ChartLegendContent nameKey="status" />}
-                    className="-mt-4"
-                  />
-                </PieChart>
-                </ChartContainer>
-            </CardContent>
-            <CardContent className="mt-0 flex-col gap-2 text-sm">
-                <div className="flex justify-between font-medium">
-                    <span>Total Vehicles</span>
-                    <span>{totalVehicles}</span>
-                </div>
-            </CardContent>
-        </Card>
+                        content={<ChartTooltipContent hideLabel />}
+                      />
+                      <Pie
+                        data={fleetStatusData}
+                        dataKey="count"
+                        nameKey="status"
+                        innerRadius={60}
+                        strokeWidth={5}
+                        activeIndex={activeStatus}
+                        onMouseEnter={(_, index) => setActiveStatus(index)}
+                      >
+                         {fleetStatusData.map((entry, index) => (
+                            <Cell
+                                key={`cell-${index}`}
+                                fill={entry.fill}
+                                className="focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                            />
+                        ))}
+                      </Pie>
+                      <ChartLegend
+                        content={<ChartLegendContent nameKey="status" />}
+                        className="-mt-4 flex-wrap"
+                      />
+                    </PieChart>
+                    </ChartContainer>
+                </CardContent>
+                <CardContent className="mt-0 flex-col gap-2 text-sm">
+                    <div className="flex justify-between font-medium">
+                        <span>Total Vehicles</span>
+                        <span>{totalVehicles}</span>
+                    </div>
+                </CardContent>
+            </Card>
+        </motion.div>
     </div>
   )
 }

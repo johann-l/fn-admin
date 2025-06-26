@@ -80,9 +80,14 @@ export default function DriverManagement() {
 
   const onSubmit = (values: DriverFormValues) => {
     if (selectedDriverForEdit) {
-      updateDriver({ ...selectedDriverForEdit, ...values });
+      const finalValues = {
+        ...values,
+        assignedVehicleId:
+          values.assignedVehicleId === "none" ? null : values.assignedVehicleId,
+      };
+      updateDriver({ ...selectedDriverForEdit, ...finalValues });
     }
-    setIsEditDialogOpen(false)
+    setIsEditDialogOpen(false);
   }
 
   const getStatusVariant = (status: Driver["status"]): "default" | "secondary" | "destructive" => {
@@ -202,7 +207,7 @@ export default function DriverManagement() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Status</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select status" />
@@ -224,14 +229,14 @@ export default function DriverManagement() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Assigned Vehicle</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value || ""}>
+                      <Select onValueChange={field.onChange} value={field.value || ""}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select a vehicle" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="">None</SelectItem>
+                          <SelectItem value="none">None</SelectItem>
                           {vehicles.map(vehicle => (
                             <SelectItem key={vehicle.id} value={vehicle.id}>{vehicle.name}</SelectItem>
                           ))}

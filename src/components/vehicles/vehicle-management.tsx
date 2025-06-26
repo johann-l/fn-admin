@@ -85,12 +85,16 @@ export default function VehicleManagement() {
   }
 
   const onSubmit = (values: VehicleFormValues) => {
-    if(selectedVehicle) {
-      updateVehicle({ ...selectedVehicle, ...values });
+    const finalValues = {
+      ...values,
+      driverId: values.driverId === 'none' ? null : values.driverId,
+    };
+    if (selectedVehicle) {
+      updateVehicle({ ...selectedVehicle, ...finalValues });
     } else {
-      addVehicle(values)
+      addVehicle(finalValues);
     }
-    setIsDialogOpen(false)
+    setIsDialogOpen(false);
   }
 
   const getStatusVariant = (status: Vehicle["status"]): "default" | "secondary" | "destructive" | "outline" => {
@@ -205,10 +209,10 @@ export default function VehicleManagement() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Assigned Driver</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value || ""} defaultValue={field.value || ""}>
+                      <Select onValueChange={field.onChange} value={field.value || ""}>
                         <FormControl><SelectTrigger><SelectValue placeholder="Select a driver" /></SelectTrigger></FormControl>
                         <SelectContent>
-                          <SelectItem value="">None</SelectItem>
+                          <SelectItem value="none">None</SelectItem>
                           {drivers.map(driver => (<SelectItem key={driver.id} value={driver.id}>{driver.name}</SelectItem>))}
                         </SelectContent>
                       </Select>
@@ -222,7 +226,7 @@ export default function VehicleManagement() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Status</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl><SelectTrigger><SelectValue placeholder="Select status" /></SelectTrigger></FormControl>
                         <SelectContent>
                             <SelectItem value="On Time">On Time</SelectItem>

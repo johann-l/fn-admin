@@ -5,11 +5,14 @@ import { format } from "date-fns"
 
 import { payments, Payment } from "@/lib/data"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { PlusCircle, ArrowUpRight, ArrowDownLeft } from "lucide-react"
+import { PlusCircle, ArrowUpRight, ArrowDownLeft, CreditCard, CheckCircle2, XCircle, Clock } from "lucide-react"
+
+// Renaming Banknote import to avoid conflict with Banknote component from data
+import { Banknote as BanknoteIcon } from "lucide-react"
+
 
 export default function PaymentManagement() {
   const totalRevenue = payments
@@ -28,6 +31,14 @@ export default function PaymentManagement() {
     }
   }
 
+  const getStatusIcon = (status: Payment["status"]) => {
+    switch(status) {
+        case 'Paid': return <CheckCircle2 className="h-4 w-4" />;
+        case 'Pending': return <Clock className="h-4 w-4" />;
+        case 'Failed': return <XCircle className="h-4 w-4" />;
+    }
+  }
+
   const filteredPayments = (filter: 'all' | 'incoming' | 'outgoing') => {
     switch (filter) {
       case 'incoming':
@@ -40,37 +51,38 @@ export default function PaymentManagement() {
     }
   }
 
-  const PaymentTable = ({ filter }: { filter: 'all' | 'incoming' | 'outgoing' }) => (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Description</TableHead>
-          <TableHead>Date</TableHead>
-          <TableHead>Type</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Method</TableHead>
-          <TableHead className="text-right">Amount</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {[...filteredPayments(filter)].sort((a, b) => b.date.getTime() - a.date.getTime()).map((payment) => (
-          <TableRow key={payment.id}>
-            <TableCell className="font-medium">{payment.description}</TableCell>
-            <TableCell>{format(payment.date, "LLL dd, y")}</TableCell>
-            <TableCell>
-              <Badge variant={payment.type === 'Incoming' ? 'default' : 'secondary'}>{payment.type}</Badge>
-            </TableCell>
-            <TableCell>
-              <Badge variant={getStatusVariant(payment.status)}>{payment.status}</Badge>
-            </TableCell>
-            <TableCell>{payment.method}</TableCell>
-            <TableCell className={`text-right font-medium ${payment.type === 'Incoming' ? 'text-primary' : 'text-destructive'}`}>
+  const PaymentCards = ({ filter }: { filter: 'all' | 'incoming' | 'outgoing' }) => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 pt-4">
+      {[...filteredPayments(filter)].sort((a, b) => b.date.getTime() - a.date.getTime()).map((payment) => (
+        <Card key={payment.id} className="flex flex-col">
+          <CardHeader className="flex flex-row items-start justify-between gap-4 pb-4">
+            <div className="space-y-1">
+              <CardTitle className="text-base font-medium leading-none">{payment.description}</CardTitle>
+              <CardDescription className="text-xs">{format(payment.date, "PPpp")}</CardDescription>
+            </div>
+            {payment.type === 'Incoming' ? 
+              <ArrowUpRight className="h-5 w-5 text-primary shrink-0" /> : 
+              <ArrowDownLeft className="h-5 w-5 text-destructive shrink-0" />
+            }
+          </CardHeader>
+          <CardContent className="flex-1 space-y-4">
+            <div className={`text-2xl font-bold ${payment.type === 'Incoming' ? 'text-primary' : 'text-destructive'}`}>
               {payment.type === 'Incoming' ? '+' : '-'}${payment.amount.toFixed(2)}
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+            </div>
+            <div className="flex justify-between items-center text-xs text-muted-foreground">
+                <Badge variant={getStatusVariant(payment.status)} className="flex items-center gap-1 pl-1.5">
+                    {getStatusIcon(payment.status)}
+                    <span>{payment.status}</span>
+                </Badge>
+                <div className="flex items-center gap-1">
+                    {payment.method === 'Credit Card' ? <CreditCard className="h-4 w-4" /> : <BanknoteIcon className="h-4 w-4" />}
+                    <span>{payment.method}</span>
+                </div>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
   );
 
   return (
@@ -117,13 +129,13 @@ export default function PaymentManagement() {
               <TabsTrigger value="outgoing">Outgoing</TabsTrigger>
             </TabsList>
             <TabsContent value="all">
-              <PaymentTable filter="all" />
+              <PaymentCards filter="all" />
             </TabsContent>
             <TabsContent value="incoming">
-              <PaymentTable filter="incoming" />
+              <PaymentCards filter="incoming" />
             </TabsContent>
             <TabsContent value="outgoing">
-              <PaymentTable filter="outgoing" />
+              <PaymentCards filter="outgoing" />
             </TabsContent>
           </Tabs>
         </CardContent>

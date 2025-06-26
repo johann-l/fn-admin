@@ -93,18 +93,18 @@ export const drivers: Driver[] = [
 ];
 
 export const vehicles: Vehicle[] = [
-  { id: 'v001', name: 'City Cruiser 1', model: 'Mercedes Sprinter', year: 2022, licensePlate: 'CC-001', driverId: 'd001', route: 'Downtown Loop', status: 'On Time', lastService: new Date('2024-05-10'), availability: { total: 40, occupied: 25 }, location: { lat: 34.0522, lng: -118.2437 } },
-  { id: 'v002', name: 'Express 202', model: 'Ford Transit', year: 2021, licensePlate: 'EX-202', driverId: 'd002', route: 'Uptown Express', status: 'Delayed', lastService: new Date('2024-04-22'), availability: { total: 50, occupied: 48 }, location: { lat: 34.059, lng: -118.251 } },
-  { id: 'v003', name: 'Suburb Connect', model: 'Volvo 9700', year: 2023, licensePlate: 'SC-003', driverId: 'd003', route: 'West Suburbs', status: 'On Time', lastService: new Date('2024-06-01'), availability: { total: 35, occupied: 10 }, location: { lat: 34.045, lng: -118.239 } },
-  { id: 'v004', name: 'Metro Link', model: 'Mercedes Sprinter', year: 2022, licensePlate: 'ML-004', driverId: 'd005', route: 'Eastside Connector', status: 'Early', lastService: new Date('2024-05-15'), availability: { total: 40, occupied: 38 }, location: { lat: 34.061, lng: -118.245 } },
-  { id: 'v005', name: 'Night Owl', model: 'Ford Transit', year: 2021, licensePlate: 'NO-005', driverId: null, route: 'Late Night Route', status: 'Maintenance', lastService: new Date('2024-07-01'), availability: { total: 40, occupied: 0 }, location: { lat: 34.05, lng: -118.24 } },
+  { id: 'v001', name: 'City Cruiser 1', model: 'Mercedes Sprinter', year: 2022, licensePlate: 'CC-001', driverId: 'd001', route: '101', status: 'On Time', lastService: new Date('2024-05-10'), availability: { total: 40, occupied: 25 }, location: { lat: 34.0522, lng: -118.2437 } },
+  { id: 'v002', name: 'Express 202', model: 'Ford Transit', year: 2021, licensePlate: 'EX-202', driverId: 'd002', route: '202', status: 'Delayed', lastService: new Date('2024-04-22'), availability: { total: 50, occupied: 48 }, location: { lat: 34.059, lng: -118.251 } },
+  { id: 'v003', name: 'Suburb Connect', model: 'Volvo 9700', year: 2023, licensePlate: 'SC-003', driverId: 'd003', route: '303', status: 'On Time', lastService: new Date('2024-06-01'), availability: { total: 35, occupied: 10 }, location: { lat: 34.045, lng: -118.239 } },
+  { id: 'v004', name: 'Metro Link', model: 'Mercedes Sprinter', year: 2022, licensePlate: 'ML-004', driverId: 'd005', route: '404', status: 'Early', lastService: new Date('2024-05-15'), availability: { total: 40, occupied: 38 }, location: { lat: 34.061, lng: -118.245 } },
+  { id: 'v005', name: 'Night Owl', model: 'Ford Transit', year: 2021, licensePlate: 'NO-005', driverId: null, route: '505', status: 'Maintenance', lastService: new Date('2024-07-01'), availability: { total: 40, occupied: 0 }, location: { lat: 34.05, lng: -118.24 } },
 ];
 
 export const passes: BusPass[] = [
-  { id: 'p001', passengerName: 'Alice Williams', bloodGroup: 'A+', vehicleId: 'v001', route: 'Downtown Loop', seat: '12A', validFrom: new Date('2024-07-01'), validUntil: new Date('2024-07-31'), status: 'Active' },
-  { id: 'p002', passengerName: 'Bob Brown', bloodGroup: 'O-', vehicleId: 'v002', route: 'Uptown Express', seat: '5B', validFrom: new Date('2024-06-01'), validUntil: new Date('2024-06-30'), status: 'Expired' },
-  { id: 'p003', passengerName: 'Charlie Green', bloodGroup: 'B+', vehicleId: 'v003', route: 'West Suburbs', seat: '21F', validFrom: new Date('2024-07-10'), validUntil: new Date('2024-08-10'), status: 'Active' },
-  { id: 'p004', passengerName: 'Diana Prince', bloodGroup: 'AB+', vehicleId: 'v001', route: 'Downtown Loop', seat: '3C', validFrom: new Date('2024-01-01'), validUntil: new Date('2024-01-01'), status: 'Invalid' },
+  { id: 'p001', passengerName: 'Alice Williams', bloodGroup: 'A+', vehicleId: 'v001', route: '101', seat: '12A', validFrom: new Date('2024-07-01'), validUntil: new Date('2024-07-31'), status: 'Active' },
+  { id: 'p002', passengerName: 'Bob Brown', bloodGroup: 'O-', vehicleId: 'v002', route: '202', seat: '5B', validFrom: new Date('2024-06-01'), validUntil: new Date('2024-06-30'), status: 'Expired' },
+  { id: 'p003', passengerName: 'Charlie Green', bloodGroup: 'B+', vehicleId: 'v003', route: '303', seat: '21F', validFrom: new Date('2024-07-10'), validUntil: new Date('2024-08-10'), status: 'Active' },
+  { id: 'p004', passengerName: 'Diana Prince', bloodGroup: 'AB+', vehicleId: 'v001', route: '101', seat: '3C', validFrom: new Date('2024-01-01'), validUntil: new Date('2024-01-01'), status: 'Invalid' },
 ];
 
 export const documents: Document[] = [
@@ -137,9 +137,9 @@ export const payments: Payment[] = [
 
 export const chatContacts: ChatContact[] = [
     { id: 'group_drivers', name: 'All Drivers', type: 'Group', avatarUrl: '', lastMessage: 'Remember to complete pre-trip inspections.', lastMessageTime: '8:30 AM' },
-    { id: 'pass001', name: 'Alice Williams', type: 'Passenger', route: 'Downtown Loop', avatarUrl: 'https://placehold.co/40x40.png', lastMessage: 'Thank you for the help!', lastMessageTime: 'Yesterday' },
-    { id: 'pass003', name: 'Charlie Green', type: 'Passenger', route: 'West Suburbs', avatarUrl: 'https://placehold.co/40x40.png', lastMessage: 'Is the bus running on schedule?', lastMessageTime: '9:15 AM' },
-    { id: 'pass004', name: 'Diana Prince', type: 'Passenger', route: 'Downtown Loop', avatarUrl: 'https://placehold.co/40x40.png', lastMessage: 'I left my umbrella on the bus.', lastMessageTime: '10:05 AM' },
+    { id: 'pass001', name: 'Alice Williams', type: 'Passenger', route: '101', avatarUrl: 'https://placehold.co/40x40.png', lastMessage: 'Thank you for the help!', lastMessageTime: 'Yesterday' },
+    { id: 'pass003', name: 'Charlie Green', type: 'Passenger', route: '303', avatarUrl: 'https://placehold.co/40x40.png', lastMessage: 'Is the bus running on schedule?', lastMessageTime: '9:15 AM' },
+    { id: 'pass004', name: 'Diana Prince', type: 'Passenger', route: '101', avatarUrl: 'https://placehold.co/40x40.png', lastMessage: 'I left my umbrella on the bus.', lastMessageTime: '10:05 AM' },
 ];
 
 export const messages: Record<string, Message[]> = {

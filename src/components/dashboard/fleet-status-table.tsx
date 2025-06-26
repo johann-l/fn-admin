@@ -1,3 +1,4 @@
+
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -47,7 +48,7 @@ export default function FleetStatusTable() {
                 <TableRow key={vehicle.id}>
                   <TableCell>
                     <div className="font-medium">{vehicle.name}</div>
-                    <div className="text-sm text-muted-foreground">{vehicle.route}</div>
+                    <div className="text-sm text-muted-foreground">{vehicle.route !== 'Unassigned' ? `Route ${vehicle.route}` : 'Unassigned'}</div>
                   </TableCell>
                   <TableCell>{getDriverName(vehicle.driverId)}</TableCell>
                   <TableCell>

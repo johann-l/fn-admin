@@ -1,3 +1,4 @@
+
 "use client"
 
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
@@ -94,7 +95,7 @@ export default function BusPassCard({ pass }: BusPassCardProps) {
                     </div>
                     <div className="flex items-center justify-between">
                         <span className="text-muted-foreground flex items-center"><MapPin className="h-4 w-4 mr-2" />Route</span>
-                        <span className="font-semibold">{pass.route}</span>
+                        <span className="font-semibold">{pass.route !== 'N/A' ? `Route ${pass.route}` : 'N/A'}</span>
                     </div>
                 </div>
 

@@ -123,7 +123,7 @@ export default function ChatInterface() {
                             {routes.map(route => (
                                 <AccordionItem value={route} key={route}>
                                     <AccordionTrigger className="px-2 py-2 text-sm font-semibold hover:no-underline rounded-md hover:bg-accent">
-                                        {route}
+                                        {`Route ${route}`}
                                     </AccordionTrigger>
                                     <AccordionContent className="pt-1">
                                         <div className="space-y-1">

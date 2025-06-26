@@ -39,13 +39,16 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Edit, PlusCircle, Trash2 } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 const routeFormSchema = z.object({
   name: z.string().min(1, "Route name is required"),
-  stops: z.string().min(1, "At least one stop is required"),
+  stops: z.array(z.string()).refine(
+    (stops) => stops.some(stop => stop.trim() !== ''), 
+    { message: "At least one stop must be filled in." }
+  ),
 })
 
 type RouteFormValues = z.infer<typeof routeFormSchema>
@@ -59,6 +62,10 @@ export default function RouteManagement() {
 
   const form = useForm<RouteFormValues>({
     resolver: zodResolver(routeFormSchema),
+    defaultValues: {
+        name: "",
+        stops: Array(12).fill(""),
+    },
   })
 
   const getVehicleForRoute = (routeId: string) => {
@@ -67,9 +74,15 @@ export default function RouteManagement() {
 
   const handleEditClick = (route: Route) => {
     setSelectedRoute(route)
+    const stopsArray = Array(12).fill("");
+    route.stops.forEach((stop, i) => {
+        if (i < 12) {
+            stopsArray[i] = stop;
+        }
+    });
     form.reset({
       name: route.name,
-      stops: route.stops.join('\n'),
+      stops: stopsArray,
     })
     setIsDialogOpen(true)
   }
@@ -78,7 +91,7 @@ export default function RouteManagement() {
     setSelectedRoute(null);
     form.reset({
       name: "",
-      stops: "",
+      stops: Array(12).fill(""),
     });
     setIsDialogOpen(true);
   }
@@ -99,7 +112,7 @@ export default function RouteManagement() {
   const onSubmit = (values: RouteFormValues) => {
     const routeData = {
       name: values.name,
-      stops: values.stops.split('\n').filter(stop => stop.trim() !== ''),
+      stops: values.stops.filter(stop => stop.trim() !== ''),
     }
 
     if (selectedRoute) {
@@ -184,7 +197,7 @@ export default function RouteManagement() {
           <DialogHeader>
             <DialogTitle>{selectedRoute ? "Edit Route" : "Create New Route"}</DialogTitle>
             <DialogDescription>
-              {selectedRoute ? "Update the route details." : "Enter details for the new route."}
+              {selectedRoute ? "Update the route details." : "Enter details for the new route. You can add up to 12 stops."}
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>
@@ -200,23 +213,33 @@ export default function RouteManagement() {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="stops"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Stops (one per line)</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        placeholder="Main St & 1st Ave&#10;Oak Street & 5th Ave&#10;University Main Gate"
-                        className="min-h-[120px]"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+              <div className="space-y-2">
+                <FormLabel>Stops</FormLabel>
+                <ScrollArea className="h-64 rounded-md border p-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+                        {Array.from({ length: 12 }).map((_, index) => (
+                            <FormField
+                                key={index}
+                                control={form.control}
+                                name={`stops.${index}`}
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormControl>
+                                            <Input {...field} placeholder={`Stop ${index + 1}`} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        ))}
+                    </div>
+                </ScrollArea>
+                {form.formState.errors.stops && (
+                    <p className="text-sm font-medium text-destructive">
+                        {form.formState.errors.stops.message}
+                    </p>
                 )}
-              />
+              </div>
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
                 <Button type="submit">Save Route</Button>

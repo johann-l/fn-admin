@@ -17,7 +17,6 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-  DialogTrigger,
 } from "@/components/ui/dialog"
 import {
   Form,
@@ -30,7 +29,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Edit } from "lucide-react"
+import { Edit, Eye } from "lucide-react"
+import DriverIdCard from "./driver-id-card"
 
 const driverFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -43,8 +43,10 @@ const driverFormSchema = z.object({
 type DriverFormValues = z.infer<typeof driverFormSchema>
 
 export default function DriverManagement() {
-  const [isDialogOpen, setIsDialogOpen] = React.useState(false)
-  const [selectedDriver, setSelectedDriver] = React.useState<Driver | null>(null)
+  const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false)
+  const [selectedDriverForEdit, setSelectedDriverForEdit] = React.useState<Driver | null>(null)
+  const [isViewDialogOpen, setIsViewDialogOpen] = React.useState(false)
+  const [selectedDriverForView, setSelectedDriverForView] = React.useState<Driver | null>(null)
 
   const form = useForm<DriverFormValues>({
     resolver: zodResolver(driverFormSchema),
@@ -58,7 +60,7 @@ export default function DriverManagement() {
   })
 
   const handleEditClick = (driver: Driver) => {
-    setSelectedDriver(driver)
+    setSelectedDriverForEdit(driver)
     form.reset({
       name: driver.name,
       email: driver.email,
@@ -66,13 +68,18 @@ export default function DriverManagement() {
       status: driver.status,
       assignedBusId: driver.assignedBusId,
     })
-    setIsDialogOpen(true)
+    setIsEditDialogOpen(true)
+  }
+
+  const handleViewClick = (driver: Driver) => {
+    setSelectedDriverForView(driver)
+    setIsViewDialogOpen(true)
   }
 
   const onSubmit = (values: DriverFormValues) => {
     console.log("Updated driver data:", values)
     // Here you would typically call an API to update the driver data
-    setIsDialogOpen(false)
+    setIsEditDialogOpen(false)
   }
 
   const getStatusVariant = (status: Driver["status"]): "default" | "secondary" | "destructive" => {
@@ -121,7 +128,10 @@ export default function DriverManagement() {
                   <TableCell>
                     <Badge variant={getStatusVariant(driver.status)}>{driver.status}</Badge>
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right space-x-1">
+                    <Button variant="ghost" size="icon" onClick={() => handleViewClick(driver)}>
+                      <Eye className="h-4 w-4" />
+                    </Button>
                     <Button variant="ghost" size="icon" onClick={() => handleEditClick(driver)}>
                       <Edit className="h-4 w-4" />
                     </Button>
@@ -133,12 +143,12 @@ export default function DriverManagement() {
         </CardContent>
       </Card>
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Edit Driver Profile</DialogTitle>
             <DialogDescription>
-              Make changes to {selectedDriver?.name}'s profile here. Click save when you're done.
+              Make changes to {selectedDriverForEdit?.name}'s profile here. Click save when you're done.
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>
@@ -230,11 +240,17 @@ export default function DriverManagement() {
                 />
               </div>
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
+                <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancel</Button>
                 <Button type="submit">Save changes</Button>
               </DialogFooter>
             </form>
           </Form>
+        </DialogContent>
+      </Dialog>
+      
+      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+        <DialogContent className="sm:max-w-sm p-0 bg-transparent border-none shadow-none">
+          {selectedDriverForView && <DriverIdCard driver={selectedDriverForView} />}
         </DialogContent>
       </Dialog>
     </>

@@ -8,13 +8,17 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { PlusCircle, ArrowUpRight, ArrowDownLeft, CreditCard, CheckCircle2, XCircle, Clock } from "lucide-react"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { PlusCircle, ArrowUpRight, ArrowDownLeft, CreditCard, CheckCircle2, XCircle, Clock, LayoutGrid, List } from "lucide-react"
 
 // Renaming Banknote import to avoid conflict with Banknote component from data
 import { Banknote as BanknoteIcon } from "lucide-react"
 
 
 export default function PaymentManagement() {
+  const [viewMode, setViewMode] = React.useState<'card' | 'list'>('card');
+
   const totalRevenue = payments
     .filter(p => p.type === 'Incoming' && p.status === 'Paid')
     .reduce((acc, p) => acc + p.amount, 0);
@@ -85,6 +89,57 @@ export default function PaymentManagement() {
     </div>
   );
 
+  const PaymentTable = ({ filter }: { filter: 'all' | 'incoming' | 'outgoing' }) => (
+    <div className="pt-4 overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Description</TableHead>
+            <TableHead>Date</TableHead>
+            <TableHead>Amount</TableHead>
+            <TableHead>Type</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Method</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {[...filteredPayments(filter)].sort((a, b) => b.date.getTime() - a.date.getTime()).map((payment) => (
+            <TableRow key={payment.id}>
+              <TableCell className="font-medium">{payment.description}</TableCell>
+              <TableCell>{format(payment.date, "PP")}</TableCell>
+              <TableCell>
+                <div className={`font-semibold ${payment.type === 'Incoming' ? 'text-primary' : 'text-destructive'}`}>
+                  {payment.type === 'Incoming' ? '+' : '-'}${payment.amount.toFixed(2)}
+                </div>
+              </TableCell>
+              <TableCell>
+                <div className="flex items-center gap-2">
+                    {payment.type === 'Incoming' ? 
+                        <ArrowUpRight className="h-4 w-4 text-primary shrink-0" /> : 
+                        <ArrowDownLeft className="h-4 w-4 text-destructive shrink-0" />
+                    }
+                    <span className="hidden lg:inline">{payment.type}</span>
+                </div>
+              </TableCell>
+              <TableCell>
+                <Badge variant={getStatusVariant(payment.status)} className="flex items-center gap-1 pl-1.5 min-w-[70px] justify-center">
+                  {getStatusIcon(payment.status)}
+                  <span>{payment.status}</span>
+                </Badge>
+              </TableCell>
+              <TableCell>
+                <div className="flex items-center gap-1 text-muted-foreground">
+                    {payment.method === 'Credit Card' ? <CreditCard className="h-4 w-4" /> : <BanknoteIcon className="h-4 w-4" />}
+                    <span>{payment.method}</span>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+
   return (
     <div className="space-y-6">
        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
@@ -116,10 +171,36 @@ export default function PaymentManagement() {
                 <CardTitle>Transaction History</CardTitle>
                 <CardDescription>View and filter all incoming and outgoing payments.</CardDescription>
             </div>
-            <Button>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                New Payment
-            </Button>
+            <div className="flex items-center gap-2">
+                <div className="hidden md:flex items-center gap-1 p-1 rounded-lg bg-muted">
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button variant={viewMode === 'list' ? 'secondary' : 'ghost'} size="icon" className="h-8 w-8" onClick={() => setViewMode('list')}>
+                                    <List className="h-4 w-4" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>List View</p>
+                            </TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                 <Button variant={viewMode === 'card' ? 'secondary' : 'ghost'} size="icon" className="h-8 w-8" onClick={() => setViewMode('card')}>
+                                    <LayoutGrid className="h-4 w-4" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                <p>Card View</p>
+                            </TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+                </div>
+                <Button>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    New Payment
+                </Button>
+            </div>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="all">
@@ -129,13 +210,13 @@ export default function PaymentManagement() {
               <TabsTrigger value="outgoing">Outgoing</TabsTrigger>
             </TabsList>
             <TabsContent value="all">
-              <PaymentCards filter="all" />
+              {viewMode === 'card' ? <PaymentCards filter="all" /> : <PaymentTable filter="all" />}
             </TabsContent>
             <TabsContent value="incoming">
-              <PaymentCards filter="incoming" />
+              {viewMode === 'card' ? <PaymentCards filter="incoming" /> : <PaymentTable filter="incoming" />}
             </TabsContent>
             <TabsContent value="outgoing">
-              <PaymentCards filter="outgoing" />
+              {viewMode === 'card' ? <PaymentCards filter="outgoing" /> : <PaymentTable filter="outgoing" />}
             </TabsContent>
           </Tabs>
         </CardContent>

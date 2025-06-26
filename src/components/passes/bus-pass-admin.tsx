@@ -48,6 +48,7 @@ import { CalendarIcon, Edit, PlusCircle, Eye, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import BusPassCard from "./bus-pass-card"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Label } from "@/components/ui/label"
 
 const passFormSchema = z.object({
   holderName: z.string().min(1, "Pass holder name is required"),
@@ -68,6 +69,7 @@ export default function BusPassAdmin() {
   const [selectedPassForView, setSelectedPassForView] = React.useState<BusPass | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false)
   const [passToDelete, setPassToDelete] = React.useState<BusPass | null>(null)
+  const [busFilter, setBusFilter] = React.useState<string>('all')
 
   const form = useForm<PassFormValues>({
     resolver: zodResolver(passFormSchema),
@@ -139,6 +141,13 @@ export default function BusPassAdmin() {
     }
   }
 
+  const filteredPasses = passes.filter(pass => {
+    if (busFilter === 'all') {
+        return true;
+    }
+    return pass.vehicleId === busFilter;
+  });
+
   return (
     <>
       <Card>
@@ -153,6 +162,22 @@ export default function BusPassAdmin() {
             </Button>
         </CardHeader>
         <CardContent>
+          <div className="flex items-center gap-2 py-4">
+            <Label htmlFor="bus-filter">Filter by Bus</Label>
+            <Select value={busFilter} onValueChange={setBusFilter}>
+              <SelectTrigger id="bus-filter" className="w-[200px]">
+                <SelectValue placeholder="Select a bus" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Buses</SelectItem>
+                {vehicles.map(vehicle => (
+                  <SelectItem key={vehicle.id} value={vehicle.id}>
+                    {vehicle.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <TooltipProvider>
             <Table>
               <TableHeader>
@@ -166,7 +191,7 @@ export default function BusPassAdmin() {
               </TableHeader>
               <TableBody>
                 <AnimatePresence>
-                  {passes.map((pass) => (
+                  {filteredPasses.map((pass) => (
                     <motion.tr
                       key={pass.id}
                       layout

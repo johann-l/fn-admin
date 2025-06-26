@@ -29,6 +29,7 @@ import {
   Settings,
   LogOut,
   Banknote,
+  CreditCard,
   Sun,
   Moon,
 } from "lucide-react"
@@ -40,6 +41,7 @@ const links = [
   { href: "/passes", label: "Bus Passes", icon: Ticket },
   { href: "/documents", label: "Documents", icon: FileText },
   { href: "/expenses", label: "Expenses", icon: Banknote },
+  { href: "/payments", label: "Payments", icon: CreditCard },
   { href: "/communication", label: "Communication", icon: MessageSquare },
   { href: "/optimize", label: "AI Optimization", icon: Wand2 },
 ]

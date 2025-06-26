@@ -66,6 +66,16 @@ export type ChatContact = {
   lastMessageTime: string;
 };
 
+export type Payment = {
+  id: string;
+  description: string;
+  amount: number;
+  date: Date;
+  status: 'Paid' | 'Pending' | 'Failed';
+  type: 'Incoming' | 'Outgoing';
+  method: 'Credit Card' | 'Bank Transfer' | 'Cash';
+};
+
 export const drivers: Driver[] = [
   { id: 'd001', name: 'John Doe', email: 'john.doe@example.com', phone: '555-0101', assignedBusId: 'b001', status: 'Active', avatarUrl: 'https://placehold.co/100x100.png' },
   { id: 'd002', name: 'Jane Smith', email: 'jane.smith@example.com', phone: '555-0102', assignedBusId: 'b002', status: 'Active', avatarUrl: 'https://placehold.co/100x100.png' },
@@ -103,6 +113,16 @@ export const expenses: Expense[] = [
   { id: 'exp004', busId: 'b004', type: 'Fuel', description: 'Refuel for Metro Link', amount: 180.50, date: new Date('2024-07-16') },
   { id: 'exp005', busId: 'b001', type: 'Other', description: 'Tire cleaning supplies', amount: 45.25, date: new Date('2024-07-12') },
   { id: 'exp006', busId: 'b005', type: 'Maintenance', description: 'Oil change and filter', amount: 120.00, date: new Date('2024-07-10') },
+];
+
+export const payments: Payment[] = [
+  { id: 'pay001', description: 'Monthly Bus Pass - A. Williams', amount: 55.00, date: new Date('2024-07-01'), status: 'Paid', type: 'Incoming', method: 'Credit Card' },
+  { id: 'pay002', description: 'Fuel Supplier Invoice #FS-1024', amount: 1250.50, date: new Date('2024-07-05'), status: 'Paid', type: 'Outgoing', method: 'Bank Transfer' },
+  { id: 'pay003', description: 'Downtown Shuttle Service', amount: 300.00, date: new Date('2024-07-10'), status: 'Pending', type: 'Incoming', method: 'Credit Card' },
+  { id: 'pay004', description: 'Tire Replacement - Bus 202', amount: 800.00, date: new Date('2024-07-12'), status: 'Paid', type: 'Outgoing', method: 'Credit Card' },
+  { id: 'pay005', description: 'Ad Revenue - Route 5 Billboards', amount: 750.00, date: new Date('2024-07-15'), status: 'Paid', type: 'Incoming', method: 'Bank Transfer' },
+  { id: 'pay006', description: 'Office Cleaning Services', amount: 150.00, date: new Date('2024-07-18'), status: 'Pending', type: 'Outgoing', method: 'Bank Transfer' },
+  { id: 'pay007', description: 'Special Event Charter', amount: 1200.00, date: new Date('2024-07-20'), status: 'Failed', type: 'Incoming', method: 'Credit Card' },
 ];
 
 export const chatContacts: ChatContact[] = [

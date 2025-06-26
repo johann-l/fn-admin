@@ -1,9 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Bus, Clock, Users, AlertCircle } from "lucide-react"
+import FuelPriceCard from "./fuel-price-card"
 
 export default function SummaryCards() {
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
       <Card className="group transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Active Buses</CardTitle>
@@ -24,6 +25,7 @@ export default function SummaryCards() {
           <p className="text-xs text-muted-foreground">+2.5% from last week</p>
         </CardContent>
       </Card>
+      <FuelPriceCard />
       <Card className="group transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Available Drivers</CardTitle>

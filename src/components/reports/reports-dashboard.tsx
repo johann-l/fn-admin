@@ -79,6 +79,8 @@ export default function ReportsDashboard() {
   }, [expenseData])
 
   const revenueExpenseData = React.useMemo(() => {
+    if (!payments) return []
+
     const months = timeFrame === "3m" ? 3 : timeFrame === "6m" ? 6 : 12
     const now = new Date()
 

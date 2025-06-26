@@ -205,7 +205,10 @@ export default function VehicleManagement() {
                       <FormLabel>Assigned Driver</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value || ""}>
                         <FormControl><SelectTrigger><SelectValue placeholder="Select a driver" /></SelectTrigger></FormControl>
-                        <SelectContent>{drivers.map(driver => (<SelectItem key={driver.id} value={driver.id}>{driver.name}</SelectItem>))}</SelectContent>
+                        <SelectContent>
+                          <SelectItem value="">None</SelectItem>
+                          {drivers.map(driver => (<SelectItem key={driver.id} value={driver.id}>{driver.name}</SelectItem>))}
+                        </SelectContent>
                       </Select>
                       <FormMessage />
                     </FormItem>

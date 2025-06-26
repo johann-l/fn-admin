@@ -4,7 +4,7 @@ export type Vehicle = {
   model: string;
   year: number;
   licensePlate: string;
-  driverId: string;
+  driverId: string | null;
   route: string;
   status: 'On Time' | 'Delayed' | 'Early' | 'Maintenance' | 'Out of Service';
   lastService: Date;
@@ -95,7 +95,7 @@ export const vehicles: Vehicle[] = [
   { id: 'v002', name: 'Express 202', model: 'Ford Transit', year: 2021, licensePlate: 'EX-202', driverId: 'd002', route: 'Uptown Express', status: 'Delayed', lastService: new Date('2024-04-22'), availability: { total: 50, occupied: 48 }, location: { lat: 34.059, lng: -118.251 } },
   { id: 'v003', name: 'Suburb Connect', model: 'Volvo 9700', year: 2023, licensePlate: 'SC-003', driverId: 'd003', route: 'West Suburbs', status: 'On Time', lastService: new Date('2024-06-01'), availability: { total: 35, occupied: 10 }, location: { lat: 34.045, lng: -118.239 } },
   { id: 'v004', name: 'Metro Link', model: 'Mercedes Sprinter', year: 2022, licensePlate: 'ML-004', driverId: 'd005', route: 'Eastside Connector', status: 'Early', lastService: new Date('2024-05-15'), availability: { total: 40, occupied: 38 }, location: { lat: 34.061, lng: -118.245 } },
-  { id: 'v005', name: 'Night Owl', model: 'Ford Transit', year: 2021, licensePlate: 'NO-005', driverId: 'd001', route: 'Late Night Route', status: 'Maintenance', lastService: new Date('2024-07-01'), availability: { total: 40, occupied: 0 }, location: { lat: 34.05, lng: -118.24 } },
+  { id: 'v005', name: 'Night Owl', model: 'Ford Transit', year: 2021, licensePlate: 'NO-005', driverId: null, route: 'Late Night Route', status: 'Maintenance', lastService: new Date('2024-07-01'), availability: { total: 40, occupied: 0 }, location: { lat: 34.05, lng: -118.24 } },
 ];
 
 export const passes: BusPass[] = [

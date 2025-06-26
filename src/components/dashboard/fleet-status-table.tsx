@@ -5,7 +5,8 @@ import { vehicles, drivers } from "@/lib/data"
 import { cn } from "@/lib/utils"
 
 export default function FleetStatusTable() {
-  const getDriverName = (driverId: string) => {
+  const getDriverName = (driverId: string | null) => {
+    if (!driverId) return 'Unassigned'
     return drivers.find(d => d.id === driverId)?.name || 'Unassigned'
   }
 

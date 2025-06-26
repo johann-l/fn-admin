@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import AppSidebar from '@/components/layout/sidebar';
 import { ThemeProvider } from "next-themes";
+import { AppDataProvider } from '@/context/app-data-context';
 
 export const metadata: Metadata = {
   title: 'FleetNow',
@@ -29,12 +30,14 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <SidebarProvider>
-            <AppSidebar />
-            <SidebarInset>
-              {children}
-            </SidebarInset>
-          </SidebarProvider>
+          <AppDataProvider>
+            <SidebarProvider>
+              <AppSidebar />
+              <SidebarInset>
+                {children}
+              </SidebarInset>
+            </SidebarProvider>
+          </AppDataProvider>
           <Toaster />
         </ThemeProvider>
       </body>

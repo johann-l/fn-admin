@@ -6,7 +6,8 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { format } from "date-fns"
 
-import { vehicles, Vehicle, drivers } from "@/lib/data"
+import { useAppData } from "@/context/app-data-context"
+import type { Vehicle } from "@/lib/data"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
@@ -47,6 +48,7 @@ const vehicleFormSchema = z.object({
 type VehicleFormValues = z.infer<typeof vehicleFormSchema>
 
 export default function VehicleManagement() {
+  const { vehicles, drivers, addVehicle, updateVehicle } = useAppData()
   const [isDialogOpen, setIsDialogOpen] = React.useState(false)
   const [selectedVehicle, setSelectedVehicle] = React.useState<Vehicle | null>(null)
 
@@ -77,16 +79,16 @@ export default function VehicleManagement() {
         licensePlate: "",
         driverId: null,
         status: "On Time",
-        lastService: undefined,
+        lastService: new Date(),
     });
     setIsDialogOpen(true);
   }
 
   const onSubmit = (values: VehicleFormValues) => {
     if(selectedVehicle) {
-      console.log("Updated vehicle data:", values)
+      updateVehicle({ ...selectedVehicle, ...values });
     } else {
-      console.log("Created new vehicle:", values)
+      addVehicle(values)
     }
     setIsDialogOpen(false)
   }
@@ -203,7 +205,7 @@ export default function VehicleManagement() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Assigned Driver</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value || ""}>
+                      <Select onValueChange={field.onChange} value={field.value || ""} defaultValue={field.value || ""}>
                         <FormControl><SelectTrigger><SelectValue placeholder="Select a driver" /></SelectTrigger></FormControl>
                         <SelectContent>
                           <SelectItem value="">None</SelectItem>

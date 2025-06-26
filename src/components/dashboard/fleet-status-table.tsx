@@ -1,10 +1,14 @@
+"use client"
+
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { vehicles, drivers } from "@/lib/data"
+import { useAppData } from "@/context/app-data-context"
 import { cn } from "@/lib/utils"
 
 export default function FleetStatusTable() {
+  const { vehicles, drivers } = useAppData()
+
   const getDriverName = (driverId: string | null) => {
     if (!driverId) return 'Unassigned'
     return drivers.find(d => d.id === driverId)?.name || 'Unassigned'

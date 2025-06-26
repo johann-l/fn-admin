@@ -6,7 +6,8 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { format } from "date-fns"
 
-import { passes, BusPass, vehicles } from "@/lib/data"
+import { useAppData } from "@/context/app-data-context"
+import type { BusPass } from "@/lib/data"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
@@ -46,6 +47,7 @@ const passFormSchema = z.object({
 type PassFormValues = z.infer<typeof passFormSchema>
 
 export default function BusPassAdmin() {
+  const { passes, vehicles, addPass, updatePass } = useAppData()
   const [isDialogOpen, setIsDialogOpen] = React.useState(false)
   const [selectedPass, setSelectedPass] = React.useState<BusPass | null>(null)
   const [isViewDialogOpen, setIsViewDialogOpen] = React.useState(false)
@@ -86,9 +88,14 @@ export default function BusPassAdmin() {
 
   const onSubmit = (values: PassFormValues) => {
     if(selectedPass) {
-      console.log("Updated pass data:", values)
+      const vehicle = vehicles.find(v => v.id === values.vehicleId)
+      updatePass({
+        ...selectedPass,
+        ...values,
+        route: vehicle?.route || selectedPass.route,
+      });
     } else {
-      console.log("Created new pass:", values)
+      addPass(values)
     }
     setIsDialogOpen(false)
   }

@@ -5,7 +5,8 @@ import { useSearchParams } from 'next/navigation'
 import { format } from "date-fns"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Cell } from "recharts"
 
-import { expenses as initialExpenses, vehicles, Expense } from "@/lib/data"
+import { expenses as initialExpenses, Expense } from "@/lib/data"
+import { useAppData } from "@/context/app-data-context"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
@@ -39,6 +40,7 @@ const chartConfig = {
 
 
 export default function ExpenseTracker() {
+  const { vehicles } = useAppData()
   const [expenses, setExpenses] = React.useState<Expense[]>(initialExpenses)
   const searchParams = useSearchParams()
   const { toast } = useToast()

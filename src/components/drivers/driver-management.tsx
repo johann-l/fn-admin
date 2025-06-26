@@ -5,7 +5,8 @@ import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 
-import { drivers, Driver, vehicles } from "@/lib/data"
+import { useAppData } from "@/context/app-data-context"
+import type { Driver } from "@/lib/data"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
@@ -43,6 +44,7 @@ const driverFormSchema = z.object({
 type DriverFormValues = z.infer<typeof driverFormSchema>
 
 export default function DriverManagement() {
+  const { drivers, vehicles, updateDriver } = useAppData()
   const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false)
   const [selectedDriverForEdit, setSelectedDriverForEdit] = React.useState<Driver | null>(null)
   const [isViewDialogOpen, setIsViewDialogOpen] = React.useState(false)
@@ -77,8 +79,9 @@ export default function DriverManagement() {
   }
 
   const onSubmit = (values: DriverFormValues) => {
-    console.log("Updated driver data:", values)
-    // Here you would typically call an API to update the driver data
+    if (selectedDriverForEdit) {
+      updateDriver({ ...selectedDriverForEdit, ...values });
+    }
     setIsEditDialogOpen(false)
   }
 

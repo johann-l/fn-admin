@@ -4,7 +4,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Bus, MapPin, Calendar, Droplets, Ticket, Printer } from "lucide-react"
 import type { BusPass } from "@/lib/data"
-import { vehicles } from "@/lib/data"
+import { useAppData } from "@/context/app-data-context"
 import { format } from "date-fns"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import QRCode from "react-qr-code"
@@ -14,6 +14,7 @@ interface BusPassCardProps {
 }
 
 export default function BusPassCard({ pass }: BusPassCardProps) {
+  const { vehicles } = useAppData()
   const vehicle = vehicles.find(v => v.id === pass.vehicleId);
   const qrValue = JSON.stringify({
     passId: pass.id,

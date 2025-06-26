@@ -4,7 +4,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Bus, Phone, ShieldCheck, User, Printer, Mail } from "lucide-react"
 import type { Driver } from "@/lib/data"
-import { vehicles } from "@/lib/data"
+import { useAppData } from "@/context/app-data-context"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import QRCode from "react-qr-code"
 
@@ -13,6 +13,7 @@ interface DriverIdCardProps {
 }
 
 export default function DriverIdCard({ driver }: DriverIdCardProps) {
+  const { vehicles } = useAppData()
   const vehicle = vehicles.find(v => v.id === driver.assignedVehicleId);
   const qrValue = JSON.stringify({
     driverId: driver.id,

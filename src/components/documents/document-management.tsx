@@ -3,7 +3,8 @@
 import * as React from "react"
 import { format } from "date-fns"
 
-import { documents, Document, vehicles } from "@/lib/data"
+import { Document } from "@/lib/data"
+import { useAppData } from "@/context/app-data-context"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
@@ -11,6 +12,8 @@ import { Button } from "@/components/ui/button"
 import { Upload, Download, Trash2 } from "lucide-react"
 
 export default function DocumentManagement() {
+  const { documents, vehicles } = useAppData()
+
   const getStatusVariant = (status: Document["status"]): "default" | "secondary" | "destructive" => {
     switch (status) {
       case 'Valid': return "default";

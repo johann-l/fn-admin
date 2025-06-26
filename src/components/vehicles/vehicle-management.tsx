@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -175,7 +176,7 @@ export default function VehicleManagement() {
                     control={form.control}
                     name="name"
                     render={({ field }) => (
-                    <FormItem><FormLabel>Vehicle Name</FormLabel><FormControl><Input {...field} placeholder="e.g., City Cruiser 1" /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>Vehicle Name</FormLabel><FormControl><Input {...field} placeholder="e.g., Bus 1" /></FormControl><FormMessage /></FormItem>
                     )}
                 />
                 <FormField

@@ -94,11 +94,11 @@ export const drivers: Driver[] = [
 ];
 
 export const vehicles: Vehicle[] = [
-  { id: 'v001', name: 'City Cruiser 1', model: 'Mercedes Sprinter', year: 2022, licensePlate: 'CC-001', driverId: 'd001', route: '101', status: 'On Time', lastService: new Date('2024-05-10'), availability: { total: 40, occupied: 25 }, location: { lat: 34.0522, lng: -118.2437 } },
-  { id: 'v002', name: 'Express 202', model: 'Ford Transit', year: 2021, licensePlate: 'EX-202', driverId: 'd002', route: '202', status: 'Delayed', lastService: new Date('2024-04-22'), availability: { total: 50, occupied: 48 }, location: { lat: 34.059, lng: -118.251 } },
-  { id: 'v003', name: 'Suburb Connect', model: 'Volvo 9700', year: 2023, licensePlate: 'SC-003', driverId: 'd003', route: '303', status: 'On Time', lastService: new Date('2024-06-01'), availability: { total: 35, occupied: 10 }, location: { lat: 34.045, lng: -118.239 } },
-  { id: 'v004', name: 'Metro Link', model: 'Mercedes Sprinter', year: 2022, licensePlate: 'ML-004', driverId: 'd005', route: '404', status: 'Early', lastService: new Date('2024-05-15'), availability: { total: 40, occupied: 38 }, location: { lat: 34.061, lng: -118.245 } },
-  { id: 'v005', name: 'Night Owl', model: 'Ford Transit', year: 2021, licensePlate: 'NO-005', driverId: null, route: '505', status: 'Maintenance', lastService: new Date('2024-07-01'), availability: { total: 40, occupied: 0 }, location: { lat: 34.05, lng: -118.24 } },
+  { id: 'v001', name: 'Bus 1', model: 'Mercedes Sprinter', year: 2022, licensePlate: 'CC-001', driverId: 'd001', route: '101', status: 'On Time', lastService: new Date('2024-05-10'), availability: { total: 40, occupied: 25 }, location: { lat: 34.0522, lng: -118.2437 } },
+  { id: 'v002', name: 'Bus 2', model: 'Ford Transit', year: 2021, licensePlate: 'EX-202', driverId: 'd002', route: '202', status: 'Delayed', lastService: new Date('2024-04-22'), availability: { total: 50, occupied: 48 }, location: { lat: 34.059, lng: -118.251 } },
+  { id: 'v003', name: 'Bus 3', model: 'Volvo 9700', year: 2023, licensePlate: 'SC-003', driverId: 'd003', route: '303', status: 'On Time', lastService: new Date('2024-06-01'), availability: { total: 35, occupied: 10 }, location: { lat: 34.045, lng: -118.239 } },
+  { id: 'v004', name: 'Bus 4', model: 'Mercedes Sprinter', year: 2022, licensePlate: 'ML-004', driverId: 'd005', route: '404', status: 'Early', lastService: new Date('2024-05-15'), availability: { total: 40, occupied: 38 }, location: { lat: 34.061, lng: -118.245 } },
+  { id: 'v005', name: 'Bus 5', model: 'Ford Transit', year: 2021, licensePlate: 'NO-005', driverId: null, route: '505', status: 'Maintenance', lastService: new Date('2024-07-01'), availability: { total: 40, occupied: 0 }, location: { lat: 34.05, lng: -118.24 } },
 ];
 
 export const passes: BusPass[] = [
@@ -116,10 +116,10 @@ export const documents: Document[] = [
 ];
 
 export const expenses: Expense[] = [
-  { id: 'exp001', vehicleId: 'v001', type: 'Fuel', description: 'Refuel for City Cruiser 1', amount: 150.75, date: new Date('2024-07-15'), status: 'Paid' },
+  { id: 'exp001', vehicleId: 'v001', type: 'Fuel', description: 'Refuel for Bus 1', amount: 150.75, date: new Date('2024-07-15'), status: 'Paid' },
   { id: 'exp002', vehicleId: 'v002', type: 'Maintenance', description: 'Brake pad replacement', amount: 350.00, date: new Date('2024-07-14'), status: 'Unpaid' },
   { id: 'exp003', vehicleId: 'v003', type: 'Insurance', description: 'Monthly premium', amount: 500.00, date: new Date('2024-07-01'), status: 'Paid' },
-  { id: 'exp004', vehicleId: 'v004', type: 'Fuel', description: 'Refuel for Metro Link', amount: 180.50, date: new Date('2024-07-16'), status: 'Unpaid' },
+  { id: 'exp004', vehicleId: 'v004', type: 'Fuel', description: 'Refuel for Bus 4', amount: 180.50, date: new Date('2024-07-16'), status: 'Unpaid' },
   { id: 'exp005', vehicleId: 'v001', type: 'Other', description: 'Tire cleaning supplies', amount: 45.25, date: new Date('2024-07-12'), status: 'Paid' },
   { id: 'exp006', vehicleId: 'v005', type: 'Maintenance', description: 'Oil change and filter', amount: 120.00, date: new Date('2024-07-10'), status: 'Unpaid' },
   { id: 'exp007', vehicleId: 'v002', type: 'Tolls', description: 'Downtown Bridge Toll', amount: 12.50, date: new Date('2024-07-18'), status: 'Paid' },
@@ -130,7 +130,7 @@ export const payments: Payment[] = [
   { id: 'pay001', description: 'Monthly Bus Pass - A. Williams', amount: 55.00, date: new Date('2024-07-01T10:00:00Z'), status: 'Paid', type: 'Incoming', method: 'Credit Card' },
   { id: 'pay002', description: 'Fuel Supplier Invoice #FS-1024', amount: 1250.50, date: new Date('2024-07-05T11:30:00Z'), status: 'Paid', type: 'Outgoing', method: 'Bank Transfer' },
   { id: 'pay003', description: 'Downtown Shuttle Service', amount: 300.00, date: new Date('2024-07-10T14:00:00Z'), status: 'Pending', type: 'Incoming', method: 'Credit Card' },
-  { id: 'pay004', description: 'Tire Replacement - Bus 202', amount: 800.00, date: new Date('2024-07-12T09:45:00Z'), status: 'Paid', type: 'Outgoing', method: 'Credit Card' },
+  { id: 'pay004', description: 'Tire Replacement - Bus 2', amount: 800.00, date: new Date('2024-07-12T09:45:00Z'), status: 'Paid', type: 'Outgoing', method: 'Credit Card' },
   { id: 'pay005', description: 'Ad Revenue - Route 5 Billboards', amount: 750.00, date: new Date('2024-07-15T16:20:00Z'), status: 'Paid', type: 'Incoming', method: 'Bank Transfer' },
   { id: 'pay006', description: 'Office Cleaning Services', amount: 150.00, date: new Date('2024-07-18T18:00:00Z'), status: 'Pending', type: 'Outgoing', method: 'Bank Transfer' },
   { id: 'pay007', description: 'Special Event Charter', amount: 1200.00, date: new Date('2024-07-20T10:30:00Z'), status: 'Failed', type: 'Incoming', method: 'Credit Card' },
@@ -145,8 +145,8 @@ export const chatContacts: ChatContact[] = [
 export const messages: Record<string, Message[]> = {
   'group_drivers': [
     { id: 'msg_gd_1', sender: 'Admin', content: 'Good morning team. Just a reminder to complete your pre-trip vehicle inspections before heading out.', timestamp: new Date(new Date().setHours(8, 30, 0)) },
-    { id: 'msg_gd_2', sender: 'John Doe', content: 'Morning! Inspection done for City Cruiser 1.', timestamp: new Date(new Date().setHours(8, 32, 0)) },
-    { id: 'msg_gd_3', sender: 'Jane Smith', content: 'All good here on Express 202.', timestamp: new Date(new Date().setHours(8, 35, 0)) },
+    { id: 'msg_gd_2', sender: 'John Doe', content: 'Morning! Inspection done for Bus 1.', timestamp: new Date(new Date().setHours(8, 32, 0)) },
+    { id: 'msg_gd_3', sender: 'Jane Smith', content: 'All good here on Bus 2.', timestamp: new Date(new Date().setHours(8, 35, 0)) },
     { id: 'msg_gd_4', sender: 'Admin', content: 'Thanks, John and Jane. Drive safe!', timestamp: new Date(new Date().setHours(8, 40, 0)) },
   ],
   'group_route_101': [

@@ -106,7 +106,6 @@ export default function MapPlaceholder() {
                             y: { duration: 3, ease: "linear" },
                             scale: { duration: 0.3, ease: "easeOut" }
                         }}
-                        style={{ transform: `translate(-50%, -50%)`}}
                       >
                         <div className={cn("relative w-5 h-5 rounded-full flex items-center justify-center", getStatusColor(vehicle.status))}>
                           <Bus className="h-3 w-3 text-primary-foreground" />

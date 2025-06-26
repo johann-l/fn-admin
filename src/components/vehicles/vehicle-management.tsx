@@ -6,6 +6,7 @@ import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { format } from "date-fns"
+import { motion, AnimatePresence } from "framer-motion"
 
 import { useAppData } from "@/context/app-data-context"
 import type { Vehicle } from "@/lib/data"
@@ -163,40 +164,50 @@ export default function VehicleManagement() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {vehicles.map((vehicle) => (
-                  <TableRow key={vehicle.id}>
-                    <TableCell>
-                      <div className="font-medium">{vehicle.name}</div>
-                      <div className="text-sm text-muted-foreground">{vehicle.model} ({vehicle.year})</div>
-                    </TableCell>
-                    <TableCell className="font-mono">{vehicle.licensePlate}</TableCell>
-                    <TableCell>{drivers.find(d => d.id === vehicle.driverId)?.name || 'N/A'}</TableCell>
-                    <TableCell>
-                      <Badge variant={getStatusVariant(vehicle.status)}>{vehicle.status}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      {format(vehicle.lastService, "LLL dd, y")}
-                    </TableCell>
-                    <TableCell className="text-right space-x-1">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button variant="ghost" size="icon" onClick={() => handleEditClick(vehicle)}>
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent><p>Edit Vehicle</p></TooltipContent>
-                      </Tooltip>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDeleteClick(vehicle)}>
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent><p>Delete Vehicle</p></TooltipContent>
-                      </Tooltip>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                <AnimatePresence>
+                  {vehicles.map((vehicle) => (
+                    <motion.tr
+                      key={vehicle.id}
+                      layout
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
+                    >
+                      <TableCell>
+                        <div className="font-medium">{vehicle.name}</div>
+                        <div className="text-sm text-muted-foreground">{vehicle.model} ({vehicle.year})</div>
+                      </TableCell>
+                      <TableCell className="font-mono">{vehicle.licensePlate}</TableCell>
+                      <TableCell>{drivers.find(d => d.id === vehicle.driverId)?.name || 'N/A'}</TableCell>
+                      <TableCell>
+                        <Badge variant={getStatusVariant(vehicle.status)}>{vehicle.status}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        {format(vehicle.lastService, "LLL dd, y")}
+                      </TableCell>
+                      <TableCell className="text-right space-x-1">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" onClick={() => handleEditClick(vehicle)}>
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent><p>Edit Vehicle</p></TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDeleteClick(vehicle)}>
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent><p>Delete Vehicle</p></TooltipContent>
+                        </Tooltip>
+                      </TableCell>
+                    </motion.tr>
+                  ))}
+                </AnimatePresence>
               </TableBody>
             </Table>
           </TooltipProvider>

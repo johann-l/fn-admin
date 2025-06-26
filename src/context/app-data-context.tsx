@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -30,6 +31,7 @@ type AppDataContextType = {
   addPass: (pass: PassFormData) => void
   updatePass: (pass: BusPass) => void
   removePass: (passId: string) => void
+  removeDocument: (documentId: string) => void
 }
 
 const AppDataContext = React.createContext<AppDataContextType | undefined>(undefined)
@@ -99,8 +101,12 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
     setPasses(prev => prev.filter(p => p.id !== passId));
   }
 
+  const removeDocument = (documentId: string) => {
+    setDocuments(prev => prev.filter(doc => doc.id !== documentId));
+  };
+
   return (
-    <AppDataContext.Provider value={{ vehicles, drivers, passes, documents, addVehicle, updateVehicle, removeVehicle, addDriver, updateDriver, removeDriver, addPass, updatePass, removePass }}>
+    <AppDataContext.Provider value={{ vehicles, drivers, passes, documents, addVehicle, updateVehicle, removeVehicle, addDriver, updateDriver, removeDriver, addPass, updatePass, removePass, removeDocument }}>
       {children}
     </AppDataContext.Provider>
   )

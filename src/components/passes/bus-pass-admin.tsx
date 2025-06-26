@@ -6,6 +6,7 @@ import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { format } from "date-fns"
+import { motion, AnimatePresence } from "framer-motion"
 
 import { useAppData } from "@/context/app-data-context"
 import type { BusPass } from "@/lib/data"
@@ -161,47 +162,57 @@ export default function BusPassAdmin() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {passes.map((pass) => (
-                  <TableRow key={pass.id}>
-                    <TableCell className="font-medium">{pass.passengerName}</TableCell>
-                    <TableCell>
-                      <div>{vehicles.find(v => v.id === pass.vehicleId)?.name}</div>
-                      <div className="text-sm text-muted-foreground">Seat {pass.seat}</div>
-                    </TableCell>
-                    <TableCell>
-                      {format(pass.validFrom, "LLL dd, y")} - {format(pass.validUntil, "LLL dd, y")}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={getStatusVariant(pass.status)}>{pass.status}</Badge>
-                    </TableCell>
-                    <TableCell className="text-right space-x-1">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button variant="ghost" size="icon" onClick={() => handleViewClick(pass)}>
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent><p>View Pass</p></TooltipContent>
-                      </Tooltip>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button variant="ghost" size="icon" onClick={() => handleEditClick(pass)}>
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent><p>Edit Pass</p></TooltipContent>
-                      </Tooltip>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDeleteClick(pass)}>
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent><p>Delete Pass</p></TooltipContent>
-                      </Tooltip>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                <AnimatePresence>
+                  {passes.map((pass) => (
+                    <motion.tr
+                      key={pass.id}
+                      layout
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
+                    >
+                      <TableCell className="font-medium">{pass.passengerName}</TableCell>
+                      <TableCell>
+                        <div>{vehicles.find(v => v.id === pass.vehicleId)?.name}</div>
+                        <div className="text-sm text-muted-foreground">Seat {pass.seat}</div>
+                      </TableCell>
+                      <TableCell>
+                        {format(pass.validFrom, "LLL dd, y")} - {format(pass.validUntil, "LLL dd, y")}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={getStatusVariant(pass.status)}>{pass.status}</Badge>
+                      </TableCell>
+                      <TableCell className="text-right space-x-1">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" onClick={() => handleViewClick(pass)}>
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent><p>View Pass</p></TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" onClick={() => handleEditClick(pass)}>
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent><p>Edit Pass</p></TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDeleteClick(pass)}>
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent><p>Delete Pass</p></TooltipContent>
+                        </Tooltip>
+                      </TableCell>
+                    </motion.tr>
+                  ))}
+                </AnimatePresence>
               </TableBody>
             </Table>
           </TooltipProvider>

@@ -3,7 +3,7 @@
 
 import * as React from "react"
 import { Bar, BarChart, Pie, PieChart, Cell, CartesianGrid, XAxis, YAxis } from "recharts"
-import { subMonths, format } from "date-fns"
+import { subMonths, format, startOfMonth, startOfQuarter, startOfYear } from "date-fns"
 import { motion } from "framer-motion"
 
 import { useAppData } from "@/context/app-data-context"
@@ -71,6 +71,7 @@ export default function ReportsDashboard() {
   const [activeExpense, setActiveExpense] = React.useState(0);
   const [activeStatus, setActiveStatus] = React.useState(0);
   const [timeFrame, setTimeFrame] = React.useState<"3m" | "6m" | "1y">("6m");
+  const [summaryTimeFrame, setSummaryTimeFrame] = React.useState<'monthly' | 'quarterly' | '6-months' | 'yearly'>('monthly');
 
   const expenseData = React.useMemo(() => {
     if (!expenses) return [];
@@ -167,10 +168,26 @@ export default function ReportsDashboard() {
     })).sort((a, b) => b.amount - a.amount);
   }, [expenses, vehicles])
 
+  const summaryStartDate = React.useMemo(() => {
+    const now = new Date();
+    switch (summaryTimeFrame) {
+      case 'monthly':
+        return startOfMonth(now);
+      case 'quarterly':
+        return startOfQuarter(now);
+      case '6-months':
+        return subMonths(now, 6);
+      case 'yearly':
+        return startOfYear(now);
+      default:
+        return startOfMonth(now);
+    }
+  }, [summaryTimeFrame]);
+
   const incomePayments = React.useMemo(() => {
     if (!payments) return [];
-    return payments.filter((p) => p.type === 'Incoming' && p.status === 'Paid');
-  }, [payments]);
+    return payments.filter((p) => p.type === 'Incoming' && p.status === 'Paid' && p.date >= summaryStartDate);
+  }, [payments, summaryStartDate]);
 
   const totalIncome = React.useMemo(() => {
     return incomePayments.reduce((acc, p) => acc + p.amount, 0);
@@ -178,8 +195,8 @@ export default function ReportsDashboard() {
 
   const paidExpenses = React.useMemo(() => {
     if (!expenses) return [];
-    return expenses.filter((e) => e.status === "Paid");
-  }, [expenses]);
+    return expenses.filter((e) => e.status === "Paid" && e.date >= summaryStartDate);
+  }, [expenses, summaryStartDate]);
 
   const totalPaidExpenses = React.useMemo(() => {
     return paidExpenses.reduce((acc, e) => acc + e.amount, 0);
@@ -479,10 +496,22 @@ export default function ReportsDashboard() {
         >
             <Card className="group transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20">
                 <CardHeader>
-                    <CardTitle>Financial Summary</CardTitle>
-                    <CardDescription>
-                    Detailed breakdown of income and expenses.
-                    </CardDescription>
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                        <div>
+                            <CardTitle>Financial Summary</CardTitle>
+                            <CardDescription>
+                            Detailed breakdown of income and expenses.
+                            </CardDescription>
+                        </div>
+                        <Tabs value={summaryTimeFrame} onValueChange={(value) => setSummaryTimeFrame(value as any)} className="w-full sm:w-auto">
+                            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 h-auto sm:h-8">
+                                <TabsTrigger value="monthly" className="h-6 px-2 text-xs">Monthly</TabsTrigger>
+                                <TabsTrigger value="quarterly" className="h-6 px-2 text-xs">Quarterly</TabsTrigger>
+                                <TabsTrigger value="6-months" className="h-6 px-2 text-xs">6 Months</TabsTrigger>
+                                <TabsTrigger value="yearly" className="h-6 px-2 text-xs">Yearly</TabsTrigger>
+                            </TabsList>
+                        </Tabs>
+                    </div>
                 </CardHeader>
                 <CardContent>
                     <div className="grid md:grid-cols-2 gap-x-8 gap-y-6">

@@ -23,7 +23,7 @@
     "appId": "com.fleetnow.adminapp",
     "productName": "FleetNow Admin",
     "files": [
-      "build/**/*",
+      "./fn-admin/build/**/*",
       "main.js",
       "package.json"
     ],

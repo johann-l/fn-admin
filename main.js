@@ -17,12 +17,11 @@ function createMainWindow() {
     win.webContents.openDevTools();
   }
 
-  // win.loadURL(
-  //   isDev
-  //     ? "http://localhost:3000"
-  //     : `file://${path.join(__dirname, "./fn-admin/build/index.html")}`
-  // );
-  win.loadURL("http://localhost:3000");
+  win.loadURL(
+    isDev
+      ? "http://localhost:3000"
+      : `file://${path.join(__dirname, "./fn-admin/build/index.html")}`
+  );
 
   win.webContents.on("will-navigate", (e) => e.preventDefault());
 
@@ -34,6 +33,13 @@ app.on("ready", () => {
     app.quit(); // Quit early on unsupported OS
     return;
   }
+
+  const { autoUpdater } = require("electron-updater");
+
+  app.on("ready", () => {
+    createMainWindow();
+    autoUpdater.checkForUpdatesAndNotify(); // checks and downloads updates
+  });
 
   createMainWindow();
   autoUpdater.checkForUpdatesAndNotify();

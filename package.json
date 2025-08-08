@@ -1,6 +1,6 @@
 {
   "name": "major-proj",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Admin app for fleetNow",
   "main": "main.js",
   "scripts": {

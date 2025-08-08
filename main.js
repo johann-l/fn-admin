@@ -11,17 +11,17 @@ function createMainWindow() {
     width: 1920,
     height: 1080,
     fullscreen: true,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
   });
 
   if (isDev) {
     win.webContents.openDevTools();
   }
 
-  win.loadURL(
-    isDev
-      ? "http://localhost:3000"
-      : `file://${path.join(__dirname, "./fn-admin/build/index.html")}`
-  );
+  win.loadFile(path.join(__dirname, "../build/index.html"));
 
   win.webContents.on("will-navigate", (e) => e.preventDefault());
 
@@ -30,16 +30,9 @@ function createMainWindow() {
 
 app.on("ready", () => {
   if (!isWin) {
-    app.quit(); // Quit early on unsupported OS
+    app.quit();
     return;
   }
-
-  const { autoUpdater } = require("electron-updater");
-
-  app.on("ready", () => {
-    createMainWindow();
-    autoUpdater.checkForUpdatesAndNotify(); // checks and downloads updates
-  });
 
   createMainWindow();
   autoUpdater.checkForUpdatesAndNotify();

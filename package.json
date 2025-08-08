@@ -4,7 +4,9 @@
   "description": "Admin app for fleetNow",
   "main": "main.js",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development electron ."
+    "dev": "cross-env NODE_ENV=development electron .",
+    "build": "react-scripts build",
+    "dist": "electron-builder"
   },
   "author": "Johann, Gladlin, Ashwin, Ayman",
   "license": "ISC",
@@ -20,6 +22,14 @@
   "build": {
     "appId": "com.fleetnow.adminapp",
     "productName": "FleetNow Admin",
+    "files": [
+      "build/**/*",
+      "main.js",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    },
     "publish": {
       "provider": "github",
       "owner": "johann-l",

@@ -4,7 +4,6 @@ node_modules/
 # Electron build output
 dist/
 out/
-build/
 
 # OS-specific clutter
 .DS_Store

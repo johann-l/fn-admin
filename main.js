@@ -21,7 +21,7 @@ function createMainWindow() {
     win.webContents.openDevTools();
   }
 
-  win.loadFile(path.join(__dirname, "../build/index.html"));
+  win.loadFile(path.join(__dirname, "./fn-admin/build/index.html"));
 
   win.webContents.on("will-navigate", (e) => e.preventDefault());
 

@@ -1,7 +1,4 @@
-# Firebase Studio
+FleetNow Admin App
 
-This is a NextJS starter in Firebase Studio.
-
-To get started, take a look at src/app/page.tsx.
-
-run -> npm run electron:dev
+run -> npm run electron:dev (app)
+run -> npm run next:dev (web)

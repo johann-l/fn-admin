@@ -1,14 +1,12 @@
+"use client";
 
-import Header from "@/components/layout/header"
-import RouteManagement from "@/components/routes/route-management"
+import RouteManagement from "@/components/routes/route-management";
 
 export default function RoutesPage() {
   return (
-    <div className="flex flex-col h-full bg-background">
-      <Header title="Route Management" />
-      <main className="flex-1 p-4 md:p-6">
-        <RouteManagement />
-      </main>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-4">Route Management</h1>
+      <RouteManagement />
     </div>
-  )
+  );
 }

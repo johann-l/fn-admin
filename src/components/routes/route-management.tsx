@@ -1,270 +1,82 @@
+"use client";
 
-"use client"
+import { useState } from "react";
+import RouteFormModal from "./RouteFormModal";
 
-import * as React from "react"
-import { z } from "zod"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { motion, AnimatePresence } from "framer-motion"
-
-import { useAppData } from "@/context/app-data-context"
-import type { Route } from "@/lib/data"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Button, buttonVariants } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog"
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Edit, PlusCircle, Trash2 } from "lucide-react"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { ScrollArea } from "@/components/ui/scroll-area"
-
-const routeFormSchema = z.object({
-  name: z.string().min(1, "Route name is required"),
-  stops: z.array(z.string()).refine(
-    (stops) => stops.some(stop => stop.trim() !== ''), 
-    { message: "At least one stop must be filled in." }
-  ),
-})
-
-type RouteFormValues = z.infer<typeof routeFormSchema>
+type Route = {
+  id: number;
+  name: string;
+  vehicle: string;
+  stops: { lat: number; lng: number }[];
+};
 
 export default function RouteManagement() {
-  const { routes, vehicles, addRoute, updateRoute, removeRoute } = useAppData()
-  const [isDialogOpen, setIsDialogOpen] = React.useState(false)
-  const [selectedRoute, setSelectedRoute] = React.useState<Route | null>(null)
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false)
-  const [routeToDelete, setRouteToDelete] = React.useState<Route | null>(null)
+  const [routes, setRoutes] = useState<Route[]>([
+    { id: 1, name: "Route 101", vehicle: "Bus 1", stops: [] },
+    { id: 2, name: "Route 202", vehicle: "Bus 2", stops: [] },
+    { id: 3, name: "Route 303", vehicle: "Bus 3", stops: [] },
+  ]);
 
-  const form = useForm<RouteFormValues>({
-    resolver: zodResolver(routeFormSchema),
-    defaultValues: {
-        name: "",
-        stops: Array(12).fill(""),
-    },
-  })
+  const [editingRoute, setEditingRoute] = useState<Route | null>(null);
 
-  const getVehicleForRoute = (routeId: string) => {
-    return vehicles.find(v => v.routeId === routeId)
-  }
-
-  const handleEditClick = (route: Route) => {
-    setSelectedRoute(route)
-    const stopsArray = Array(12).fill("");
-    route.stops.forEach((stop, i) => {
-        if (i < 12) {
-            stopsArray[i] = stop;
-        }
-    });
-    form.reset({
-      name: route.name,
-      stops: stopsArray,
-    })
-    setIsDialogOpen(true)
-  }
-
-  const handleCreateClick = () => {
-    setSelectedRoute(null);
-    form.reset({
-      name: "",
-      stops: Array(12).fill(""),
-    });
-    setIsDialogOpen(true);
-  }
-
-  const handleDeleteClick = (route: Route) => {
-    setRouteToDelete(route)
-    setIsDeleteDialogOpen(true)
-  }
-
-  const handleConfirmDelete = () => {
-    if (routeToDelete) {
-      removeRoute(routeToDelete.id)
-    }
-    setIsDeleteDialogOpen(false)
-    setRouteToDelete(null)
-  }
-
-  const onSubmit = (values: RouteFormValues) => {
-    const routeData = {
-      name: values.name,
-      stops: values.stops.filter(stop => stop.trim() !== ''),
-    }
-
-    if (selectedRoute) {
-      updateRoute({ ...selectedRoute, ...routeData });
+  const handleSave = (route: Route) => {
+    if (route.id) {
+      setRoutes((prev) => prev.map((r) => (r.id === route.id ? route : r)));
     } else {
-      addRoute(routeData);
+      setRoutes((prev) => [...prev, { ...route, id: prev.length + 1 }]);
     }
-    setIsDialogOpen(false);
-  }
+    setEditingRoute(null);
+  };
 
   return (
-    <>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle>All Routes</CardTitle>
-            <CardDescription>Define and manage all bus routes.</CardDescription>
-          </div>
-          <Button onClick={handleCreateClick}>
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Create Route
-          </Button>
-        </CardHeader>
-        <CardContent>
-          <TooltipProvider>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Route Name</TableHead>
-                  <TableHead>Stops</TableHead>
-                  <TableHead>Assigned Vehicle</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <AnimatePresence>
-                  {routes.map((route) => {
-                    const assignedVehicle = getVehicleForRoute(route.id);
-                    return (
-                      <motion.tr
-                        key={route.id}
-                        layout
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ type: "spring", stiffness: 350, damping: 35 }}
-                        className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
-                      >
-                        <TableCell className="font-medium">{route.name}</TableCell>
-                        <TableCell>{route.stops.length}</TableCell>
-                        <TableCell>{assignedVehicle?.name || 'Unassigned'}</TableCell>
-                        <TableCell className="text-right space-x-1">
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button variant="ghost" size="icon" onClick={() => handleEditClick(route)}>
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent><p>Edit Route</p></TooltipContent>
-                          </Tooltip>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDeleteClick(route)}>
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent><p>Delete Route</p></TooltipContent>
-                          </Tooltip>
-                        </TableCell>
-                      </motion.tr>
-                    );
-                  })}
-                </AnimatePresence>
-              </TableBody>
-            </Table>
-          </TooltipProvider>
-        </CardContent>
-      </Card>
+    <div className="bg-neutral-900 p-4 rounded-xl">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-semibold">All Routes</h2>
+        <button
+          onClick={() =>
+            setEditingRoute({ id: 0, name: "", vehicle: "", stops: [] })
+          }
+          className="bg-green-600 hover:bg-green-700 px-3 py-1 rounded text-white"
+        >
+          Create Route
+        </button>
+      </div>
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>{selectedRoute ? "Edit Route" : "Create New Route"}</DialogTitle>
-            <DialogDescription>
-              {selectedRoute ? "Update the route details." : "Enter details for the new route. You can add up to 12 stops."}
-            </DialogDescription>
-          </DialogHeader>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Route Name</FormLabel>
-                    <FormControl><Input {...field} placeholder="e.g., Downtown Express" /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div className="space-y-2">
-                <FormLabel>Stops</FormLabel>
-                <ScrollArea className="h-64 rounded-md border p-2">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
-                        {Array.from({ length: 12 }).map((_, index) => (
-                            <FormField
-                                key={index}
-                                control={form.control}
-                                name={`stops.${index}`}
-                                render={({ field }) => (
-                                    <FormItem>
-                                        <FormControl>
-                                            <Input {...field} placeholder={`Stop ${index + 1}`} />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                        ))}
-                    </div>
-                </ScrollArea>
-                {form.formState.errors.stops && (
-                    <p className="text-sm font-medium text-destructive">
-                        {form.formState.errors.stops.message}
-                    </p>
-                )}
-              </div>
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-                <Button type="submit">Save Route</Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
+      <table className="w-full text-left">
+        <thead>
+          <tr className="border-b border-gray-700">
+            <th className="p-2">Route Name</th>
+            <th className="p-2">Stops</th>
+            <th className="p-2">Vehicle</th>
+            <th className="p-2">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {routes.map((route) => (
+            <tr key={route.id} className="border-b border-gray-800">
+              <td className="p-2">{route.name}</td>
+              <td className="p-2">{route.stops.length}</td>
+              <td className="p-2">{route.vehicle || "—"}</td>
+              <td className="p-2 space-x-2">
+                <button
+                  onClick={() => setEditingRoute(route)}
+                  className="text-blue-400 hover:underline"
+                >
+                  Edit
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the route "{routeToDelete?.name}" and unassign it from any vehicles.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmDelete} className={buttonVariants({ variant: "destructive" })}>
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
-  )
+      {editingRoute && (
+        <RouteFormModal
+          route={editingRoute}
+          onSave={handleSave}
+          onClose={() => setEditingRoute(null)}
+        />
+      )}
+    </div>
+  );
 }

@@ -1,16 +1,24 @@
 {
-  "name": "nextn",
-  "version": "0.1.0",
+  "name": "fleetnow-admin",
+  "version": "1.0.6",
+  "description": "Admin app for FleetNow",
   "private": true,
+  "main": "main.js",
   "scripts": {
-    "dev": "next dev --turbopack -p 9002",
+    "prod": "cross-env NEXT_TELEMETRY_DISABLED=1 next build && electron -r esm -e \"const { app, BrowserWindow } = require('electron'); const express = require('express'); const path = require('path'); const getPort = require('get-port'); (async()=>{const server = express(); const port = await getPort(); const buildPath = path.join(__dirname,'.next'); server.use(express.static(buildPath)); server.get('*',(req,res)=>res.sendFile(path.join(buildPath,'server','pages','index.html'))); server.listen(port,()=>{app.whenReady().then(()=>{const win=new BrowserWindow({width:1200,height:800}); win.loadURL('http://localhost:'+port);});});})();\"",
+    "next:dev": "next dev --turbopack -p 9002",
+    "next:build": "next build",
+    "next:start": "next start",
     "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
     "genkit:watch": "genkit start -- tsx --watch src/ai/dev.ts",
-    "build": "next build",
-    "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "electron:dev": "cross-env NODE_ENV=development concurrently \"npm run next:dev\" \"wait-on http://localhost:9002 && electron .\"",
+    "electron:prod": "npm run next:build && npm run next:start",
+    "dist": "npm run next:build && electron-builder"
   },
+  "author": "Johann, Gladlin, Ashwin, Ayman",
+  "license": "ISC",
   "dependencies": {
     "@genkit-ai/googleai": "^1.13.0",
     "@genkit-ai/next": "^1.13.0",
@@ -36,15 +44,20 @@
     "@radix-ui/react-tabs": "^1.1.3",
     "@radix-ui/react-toast": "^1.2.6",
     "@radix-ui/react-tooltip": "^1.1.8",
+    "@supabase/supabase-js": "^2.55.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
     "dotenv": "^16.5.0",
+    "electron-updater": "^6.6.2",
     "embla-carousel-autoplay": "^8.1.3",
     "embla-carousel-react": "^8.6.0",
     "firebase": "^11.9.1",
     "framer-motion": "^11.2.12",
     "genkit": "^1.13.0",
+    "get-port": "^7.1.0",
+    "leaflet": "^1.9.4",
+    "leaflet-routing-machine": "^3.2.12",
     "lucide-react": "^0.475.0",
     "next": "15.3.3",
     "next-themes": "^0.3.0",
@@ -53,6 +66,7 @@
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.54.2",
+    "react-leaflet": "^4.2.1",
     "react-qr-code": "^2.0.12",
     "recharts": "^2.15.1",
     "stripe": "^16.2.0",
@@ -61,12 +75,37 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@types/leaflet": "^1.9.20",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "concurrently": "^9.2.0",
+    "cross-env": "^7.0.3",
+    "electron": "^37.3.0",
+    "electron-builder": "^26.0.12",
+    "electron-packager": "^17.1.2",
     "genkit-cli": "^1.13.0",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wait-on": "^8.0.4"
+  },
+  "build": {
+    "appId": "com.fleetnow.adminapp",
+    "productName": "FleetNow Admin",
+    "files": [
+      ".next/**/*",
+      "public/**/*",
+      "main.js",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "johann-l",
+      "repo": "fn-admin"
+    }
   }
 }

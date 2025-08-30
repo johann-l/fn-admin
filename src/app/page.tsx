@@ -1,7 +1,7 @@
-import Header from '@/components/layout/header';
-import MapPlaceholder from '@/components/dashboard/map-placeholder';
-import FleetStatusTable from '@/components/dashboard/fleet-status-table';
-import SummaryCards from '@/components/dashboard/summary-cards';
+import Header from "@/components/layout/header";
+import MapPlaceholder from "@/components/dashboard/map-placeholder";
+import FleetStatusTable from "@/components/dashboard/fleet-status-table";
+import SummaryCards from "@/components/dashboard/summary-cards";
 
 export default function DashboardPage() {
   return (

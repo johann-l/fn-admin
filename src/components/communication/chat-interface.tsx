@@ -1,334 +1,155 @@
+"use client";
 
-"use client"
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
 
-import * as React from "react"
-import { chatContacts, messages as allMessages, Message } from "@/lib/data"
-import { useAppData } from "@/context/app-data-context"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Card } from "@/components/ui/card"
-import { Send, MoreVertical, ArrowLeft, Users } from "lucide-react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { cn } from "@/lib/utils"
-import { useIsMobile } from "@/hooks/use-mobile"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
+type Message = {
+  id: number;
+  chatroom_id: string;
+  sender_id: string;
+  message_text: string;
+  created_at: string;
+  sender?: { name: string };
+};
 
-export default function ChatInterface() {
-  const { drivers, passes, vehicles } = useAppData()
-  
-  const [selectedContactId, setSelectedContactId] = React.useState(chatContacts[0].id)
-  const [messages, setMessages] = React.useState<Message[]>(allMessages[chatContacts[0].id] || [])
-  const [isMounted, setIsMounted] = React.useState(false);
-  const scrollAreaRef = React.useRef<HTMLDivElement>(null);
-  const isMobile = useIsMobile()
-  const [mobileView, setMobileView] = React.useState<'list' | 'chat'>('list');
-  const [isGroupInfoOpen, setIsGroupInfoOpen] = React.useState(false)
+const userId =
+  typeof window !== "undefined" ? localStorage.getItem("user_id") : null;
+const REGISTERED_ROUTE_ID = "11111111-1111-1111-1111-111111111111";
 
-  const driverContact = chatContacts.find(c => c.id === 'group_drivers');
-  const passengerGroupChats = chatContacts.filter(c => c.type === 'Group' && c.routeId);
-  
-  const selectedContact = chatContacts.find(c => c.id === selectedContactId)
+export default function ChatRoom() {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [newMessage, setNewMessage] = useState("");
+  const [chatroomId, setChatroomId] = useState<string | null>(null);
 
-  const groupMembers = React.useMemo(() => {
-    if (!selectedContact || selectedContact.type !== 'Group') {
-        return [];
+  // 1. Fetch existing chatroom for this route
+  useEffect(() => {
+    async function fetchChatroom() {
+      const { data: chatroom, error } = await supabase
+        .from("chatrooms")
+        .select("id")
+        .eq("route_id", REGISTERED_ROUTE_ID)
+        .single();
+
+      if (error) {
+        console.error("Error fetching chatroom:", error);
+        return;
+      }
+
+      if (chatroom) {
+        setChatroomId(chatroom.id);
+      }
     }
-    if (selectedContact.id === 'group_drivers') {
-        return drivers.map(driver => ({
-            id: driver.id,
-            name: driver.name,
-            avatarUrl: `${driver.avatarUrl}?m=${driver.id}`,
-            type: 'Driver'
-        }));
-    }
-    if (selectedContact.routeId) {
-        const passesForRoute = passes.filter(pass => {
-            const vehicle = vehicles.find(v => v.id === pass.vehicleId);
-            return vehicle?.routeId === selectedContact.routeId;
-        });
 
-        const passHolders = passesForRoute.map(pass => ({
-            id: pass.id,
-            name: pass.holderName,
-            avatarUrl: `https://placehold.co/100x100.png?text=${pass.holderName.charAt(0)}`,
-            type: pass.holderType
-        }));
-        
-        const uniquePassHolders = Array.from(new Map(passHolders.map(item => [item.name, item])).values());
-        
-        const vehicleForRoute = vehicles.find(v => v.routeId === selectedContact.routeId);
-        const driverForRoute = drivers.find(d => d.id === vehicleForRoute?.driverId);
-        
-        const allMembers = [...uniquePassHolders];
-        
-        if (driverForRoute) {
-            allMembers.unshift({
-                id: driverForRoute.id,
-                name: driverForRoute.name,
-                avatarUrl: `${driverForRoute.avatarUrl}?m=${driverForRoute.id}`,
-                type: 'Driver'
-            });
-        }
-        
-        return allMembers;
-    }
-    return [];
-  }, [selectedContact, drivers, passes, vehicles]);
-
-
-  React.useEffect(() => {
-    setIsMounted(true);
+    fetchChatroom();
   }, []);
 
-  React.useEffect(() => {
-    if (scrollAreaRef.current) {
-        const viewport = scrollAreaRef.current.querySelector('div[data-radix-scroll-area-viewport]');
-        if (viewport) {
-            viewport.scrollTop = viewport.scrollHeight;
-        }
-    }
-  }, [messages, selectedContactId]);
+  // 2. Fetch messages for that chatroom
+  useEffect(() => {
+    if (!chatroomId) return;
 
-  const handleContactSelect = (contactId: string) => {
-    setSelectedContactId(contactId)
-    setMessages(allMessages[contactId] || [])
-    if (isMobile) {
-      setMobileView('chat');
+    async function fetchMessages() {
+      const { data, error } = await supabase
+        .from("messages")
+        .select("*, sender:users(name)")
+        .eq("chatroom_id", chatroomId)
+        .order("created_at", { ascending: true });
+
+      if (error) {
+        console.error("Error fetching messages:", error);
+        return;
+      }
+
+      setMessages(data || []);
     }
+
+    fetchMessages();
+
+    // 3. Subscribe to new messages in realtime
+    const channel = supabase
+      .channel("realtime-messages")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+          filter: `chatroom_id=eq.${chatroomId}`,
+        },
+        (payload) => {
+          setMessages((prev) => [...prev, payload.new as Message]);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [chatroomId]);
+
+  // 4. Send message (only if chatroom exists)
+  async function sendMessage() {
+    if (!chatroomId || !newMessage.trim()) return;
+
+    const { error } = await supabase.from("messages").insert([
+      {
+        chatroom_id: chatroomId,
+        sender_id: userId,
+        message_text: newMessage,
+      },
+    ]);
+
+    if (error) {
+      console.error("Error sending message:", error);
+      return;
+    }
+
+    setNewMessage("");
   }
 
-  const ContactButton = ({ contact }: { contact: typeof chatContacts[0] }) => (
-    <button
-        key={contact.id}
-        className={cn(
-            "flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors hover:bg-accent text-left w-full",
-            selectedContactId === contact.id && "bg-accent"
-        )}
-        onClick={() => handleContactSelect(contact.id)}
-        >
-        <Avatar className="h-10 w-10">
-            {contact.type === 'Group' ? (
-                <div className="flex h-full w-full items-center justify-center rounded-full bg-muted">
-                    <Users className="h-5 w-5" />
-                </div>
-            ) : (
-                <>
-                    <AvatarImage src={`${contact.avatarUrl}?c=${contact.id}`} alt={contact.name} data-ai-hint="person avatar" />
-                    <AvatarFallback>{contact.name.charAt(0)}</AvatarFallback>
-                </>
-            )}
-        </Avatar>
-        <div className="flex-1 overflow-hidden">
-            <div className="font-semibold truncate">{contact.name}</div>
-            <div className="text-sm text-muted-foreground truncate">{contact.lastMessage}</div>
-        </div>
-        <div className="text-xs text-muted-foreground self-start pt-1">{contact.lastMessageTime}</div>
-    </button>
-  )
-
   return (
-    <>
-    <Card className="h-full flex overflow-hidden">
-        {/* Contact List */}
-        <div className={cn(
-            "w-full md:w-1/3 border-r flex-col bg-muted/50",
-            isMobile && mobileView === 'chat' ? 'hidden' : 'flex'
-        )}>
-            <Tabs defaultValue="drivers" className="flex flex-col h-full">
-                <div className="p-4 border-b">
-                     <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="drivers">Drivers</TabsTrigger>
-                        <TabsTrigger value="passengers">Passengers</TabsTrigger>
-                    </TabsList>
-                </div>
-
-                <TabsContent value="drivers" className="flex-1 overflow-auto">
-                    <ScrollArea className="h-full">
-                        <div className="p-2 space-y-1">
-                            {driverContact && <ContactButton contact={driverContact} />}
-                        </div>
-                    </ScrollArea>
-                </TabsContent>
-
-                <TabsContent value="passengers" className="flex-1 overflow-auto">
-                    <ScrollArea className="h-full">
-                        <div className="p-2 space-y-1">
-                            {passengerGroupChats.map(contact => (
-                                <ContactButton key={contact.id} contact={contact} />
-                            ))}
-                        </div>
-                    </ScrollArea>
-                </TabsContent>
-            </Tabs>
-        </div>
-
-        {/* Chat Window */}
-        <div className={cn(
-            "w-full md:w-2/3 flex-col h-full",
-            isMobile && mobileView === 'list' ? 'hidden' : 'flex'
-        )}>
-          <TooltipProvider>
-            {selectedContact ? (
-            <>
-                <div className="p-3 border-b flex items-center gap-2">
-                    {isMobile && (
-                        <Button variant="ghost" size="icon" onClick={() => setMobileView('list')}>
-                            <ArrowLeft className="h-5 w-5" />
-                        </Button>
-                    )}
-                    <Avatar className="h-10 w-10">
-                       {selectedContact.type === 'Group' ? (
-                            <div className="flex h-full w-full items-center justify-center rounded-full bg-muted">
-                                <Users className="h-5 w-5" />
-                            </div>
-                        ) : (
-                            <>
-                                <AvatarImage src={`${selectedContact.avatarUrl}?s=${selectedContact.id}`} alt={selectedContact.name} data-ai-hint="person avatar" />
-                                <AvatarFallback>{selectedContact.name.charAt(0)}</AvatarFallback>
-                            </>
-                        )}
-                    </Avatar>
-                    <div className="flex-1">
-                        <div className="font-bold">{selectedContact.name}</div>
-                        <div className="text-sm text-muted-foreground">{selectedContact.type === 'Group' ? `Group Chat ・ ${groupMembers.length + 1} members` : selectedContact.type}</div>
-                    </div>
-                    <div className="flex items-center gap-1">
-                       {selectedContact.type === 'Group' && (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button variant="ghost" size="icon" onClick={() => setIsGroupInfoOpen(true)}>
-                                <MoreVertical className="h-5 w-5" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Group Info</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        )}
-                    </div>
-                </div>
-
-                <div className="flex-1 overflow-hidden">
-                    <ScrollArea className="h-full p-4 sm:p-6" ref={scrollAreaRef}>
-                        <div className="space-y-4">
-                            {messages.map(message => {
-                                const isGroupChat = selectedContact?.type === 'Group';
-                                const senderIsAdmin = message.sender === 'Admin';
-                                let senderName = selectedContact.name;
-                                let senderAvatarUrl = selectedContact.avatarUrl;
-                                let fallback = senderName.charAt(0);
-
-                                if (isGroupChat && !senderIsAdmin) {
-                                  senderName = message.sender;
-                                  fallback = senderName.charAt(0);
-                                  const senderDriver = drivers.find(d => d.name === message.sender);
-                                  if (senderDriver) {
-                                    senderAvatarUrl = senderDriver.avatarUrl;
-                                  } else {
-                                    // It's a student/parent
-                                    senderAvatarUrl = `https://placehold.co/100x100.png?text=${fallback}`;
-                                  }
-                                }
-
-                                return (
-                                <div key={message.id} className={cn("flex items-end gap-3 w-full", senderIsAdmin ? 'justify-end' : 'justify-start')}>
-                                    {!senderIsAdmin && (
-                                        <Avatar className="h-8 w-8 self-end">
-                                            <AvatarImage src={`${senderAvatarUrl}?m=${message.id}`} alt={senderName} data-ai-hint="person avatar"/>
-                                            <AvatarFallback>{fallback}</AvatarFallback>
-                                        </Avatar>
-                                    )}
-                                    <div className={cn(
-                                    "max-w-xs lg:max-w-md px-4 py-2 rounded-xl",
-                                    senderIsAdmin 
-                                        ? 'bg-primary text-primary-foreground rounded-br-none' 
-                                        : 'bg-muted rounded-bl-none'
-                                    )}>
-                                    {isGroupChat && !senderIsAdmin && <p className="text-xs font-bold mb-1 text-primary">{senderName}</p>}
-                                    <p className="text-sm break-words">{message.content}</p>
-                                    <p className="text-xs mt-1.5 text-right opacity-70">{isMounted ? message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '...'}</p>
-                                    </div>
-                                </div>
-                            )})}
-                        </div>
-                    </ScrollArea>
-                </div>
-
-                <div className="p-4 border-t bg-background">
-                    <form className="relative" onSubmit={(e) => e.preventDefault()}>
-                        <Input placeholder="Type a message..." className="pr-12 h-10" />
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button size="icon" type="submit" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full">
-                                <Send className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Send Message</p>
-                          </TooltipContent>
-                        </Tooltip>
-                    </form>
-                </div>
-            </>
-            ) : (
-            <div className="flex-1 flex items-center justify-center text-muted-foreground">
-                Select a conversation to start messaging
+    <div className="flex flex-col h-screen w-full">
+      {/* Chat messages */}
+      <div className="flex-1 overflow-y-auto p-4 bg-gray-100">
+        {messages.map((msg) => (
+          <div
+            key={msg.id}
+            className={`mb-2 flex ${
+              msg.sender_id === userId ? "justify-end" : "justify-start"
+            }`}
+          >
+            <div
+              className={`px-4 py-2 rounded-2xl shadow ${
+                msg.sender_id === userId
+                  ? "bg-blue-500 text-white"
+                  : "bg-white text-gray-900"
+              }`}
+            >
+              <p className="text-sm">{msg.message_text}</p>
+              <p className="text-[10px] opacity-70 mt-1">
+                {new Date(msg.created_at).toLocaleTimeString()}
+              </p>
             </div>
-            )}
-            </TooltipProvider>
-        </div>
-    </Card>
+          </div>
+        ))}
+      </div>
 
-    {selectedContact && (
-        <Sheet open={isGroupInfoOpen} onOpenChange={setIsGroupInfoOpen}>
-            <SheetContent className="w-full sm:max-w-md flex flex-col p-0">
-                <SheetHeader className="p-6 text-center border-b">
-                     <div className="flex flex-col items-center gap-4">
-                         <Avatar className="h-24 w-24">
-                            <div className="flex h-full w-full items-center justify-center rounded-full bg-muted text-4xl">
-                                <Users className="h-12 w-12" />
-                            </div>
-                        </Avatar>
-                        <div className="space-y-1">
-                            <SheetTitle className="text-2xl">{selectedContact.name}</SheetTitle>
-                            <SheetDescription>
-                                Group Chat &middot; {groupMembers.length + 1} members
-                            </SheetDescription>
-                        </div>
-                    </div>
-                </SheetHeader>
-                <div className="flex-1 overflow-y-auto">
-                    <div className="p-6 space-y-5">
-                         <div className="flex items-center gap-4">
-                            <Avatar className="h-10 w-10">
-                                <AvatarImage src="https://placehold.co/100x100.png" alt="Admin" data-ai-hint="person avatar" />
-                                <AvatarFallback>AD</AvatarFallback>
-                            </Avatar>
-                            <div>
-                                <p className="font-semibold">You</p>
-                                <p className="text-sm text-muted-foreground">Admin</p>
-                            </div>
-                        </div>
-                        {groupMembers.map(member => (
-                            <div key={member.id} className="flex items-center gap-4">
-                                <Avatar className="h-10 w-10">
-                                    <AvatarImage src={member.avatarUrl} alt={member.name} data-ai-hint="person avatar"/>
-                                    <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
-                                </Avatar>
-                                <div>
-                                    <p className="font-semibold">{member.name}</p>
-                                    <p className="text-sm text-muted-foreground">{member.type}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </SheetContent>
-        </Sheet>
-    )}
-    </>
-  )
+      {/* Input box */}
+      <div className="p-4 bg-white border-t flex">
+        <input
+          type="text"
+          className="flex-1 border rounded-xl px-3 py-2 mr-2"
+          placeholder="Type a message..."
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+        />
+        <button
+          onClick={sendMessage}
+          className="bg-blue-500 text-white px-4 py-2 rounded-xl shadow"
+        >
+          Send
+        </button>
+      </div>
+    </div>
+  );
 }

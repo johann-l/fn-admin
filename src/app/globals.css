@@ -4,6 +4,9 @@
 @tailwind components;
 @tailwind utilities;
 
+.leaflet-routing-container.leaflet-routing-container-hide {
+  display: none !important;
+}
 
 body {
   font-family: 'Inter', sans-serif;

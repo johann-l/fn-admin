@@ -12,6 +12,7 @@ export interface Stop {
 export interface Route {
   id?: string;
   name: string;
+  vehicle: string;
   stops: Stop[];
 }
 
@@ -25,16 +26,19 @@ export default function RouteFormModal({
   onSave: (route: Route) => void;
 }) {
   const [routeName, setRouteName] = useState(route?.name || "");
+  const [vehicle, setVehicle] = useState(route?.vehicle || "");
   const [stops, setStops] = useState<Stop[]>(route?.stops || []);
   const [showMap, setShowMap] = useState(false);
 
   const handleSave = () => {
     if (!routeName.trim()) return alert("Route name is required!");
+    if (!vehicle.trim()) return alert("Bus number is required!");
     if (stops.length < 2) return alert("A route must have at least 2 stops!");
 
     const newRoute: Route = {
       id: route?.id || crypto.randomUUID(),
       name: routeName,
+      vehicle,
       stops,
     };
 
@@ -53,16 +57,22 @@ export default function RouteFormModal({
           {route ? "Edit Route" : "Create Route"}
         </h2>
 
-        {/* Route name */}
         <input
           type="text"
           placeholder="Route Name"
           value={routeName}
           onChange={(e) => setRouteName(e.target.value)}
+          className="w-full border rounded px-3 py-2 mb-2"
+        />
+
+        <input
+          type="text"
+          placeholder="Bus Number"
+          value={vehicle}
+          onChange={(e) => setVehicle(e.target.value)}
           className="w-full border rounded px-3 py-2 mb-4"
         />
 
-        {/* Stops */}
         <div className="mb-4">
           <h3 className="font-semibold mb-2">Stops</h3>
           {stops.length === 0 && (
@@ -92,7 +102,6 @@ export default function RouteFormModal({
           </button>
         </div>
 
-        {/* Actions */}
         <div className="flex justify-end gap-2">
           <button
             onClick={onClose}
@@ -109,16 +118,12 @@ export default function RouteFormModal({
         </div>
       </div>
 
-      {/* Map modal */}
       {showMap && (
         <MapPickerModal
-          onSelect={(lat, lng) => {
-            setStops((prev) => [
-              ...prev,
-              { name: `Stop ${prev.length + 1}`, lat, lng },
-            ]);
-            setShowMap(false);
-          }}
+          stops={stops}
+          onSelect={(lat, lng, name) =>
+            setStops((prev) => [...prev, { lat, lng, name }])
+          }
           onClose={() => setShowMap(false)}
         />
       )}

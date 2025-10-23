@@ -4,7 +4,11 @@
 import { useEffect, useState } from "react";
 import RouteFormModal, { Route } from "./RouteFormModal";
 import RouteViewModal from "../map/RouteViewModal";
-import { EyeIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
+import {
+  EyeIcon,
+  PencilSquareIcon,
+  TrashIcon,
+} from "@heroicons/react/24/outline";
 import { supabase } from "@/lib/supabaseClient";
 
 // DB row helpers
@@ -42,22 +46,21 @@ export default function RouteManagement() {
           )
         `);
 
-        console.log("SUPABASE DATA:", data);
-        console.log("SUPABASE ERROR:", error);
-
         if (error) throw error;
 
         const routesWithStops = (data || []).map((route) => ({
           id: route.id,
           name: route.name,
-          vehicle: route.vehicle,
-          stops: (route.points || []).sort((a, b) => a.order - b.order),
+          vehicle: route.vehicle || "",
+          stops: (route.points || []).sort(
+            (a, b) => (a.order ?? 0) - (b.order ?? 0)
+          ),
         }));
 
         setRoutes(routesWithStops);
       } catch (err: any) {
-        console.error("Supabase save error:", err.message ?? err);
-        alert("Failed to save route.");
+        console.error("Supabase load error:", err.message ?? err);
+        alert("Failed to load routes.");
       } finally {
         setLoading(false);
       }
@@ -78,28 +81,20 @@ export default function RouteManagement() {
           .select()
           .single();
 
-        if (insertError) {
-          console.error("Insert error:", insertError);
-          throw insertError;
-        }
+        if (insertError) throw insertError;
         pathId = newPath.id;
       } else {
-        // Update existing path
-        const { error: UpdateError } = await supabase
+        const { error: updateError } = await supabase
           .from("paths")
           .update({ name: route.name, vehicle: route.vehicle })
           .eq("id", pathId);
-
-        if (UpdateError) {
-          console.error("Update error:", UpdateError);
-          throw UpdateError;
-        }
+        if (updateError) throw updateError;
       }
 
-      // Delete old points for this path
+      // Delete old points
       await supabase.from("points").delete().eq("path_id", pathId);
 
-      // Insert stops
+      // Insert new stops
       const pointsToInsert = route.stops.map((stop, index) => ({
         path_id: pathId,
         name: stop.name,
@@ -108,38 +103,39 @@ export default function RouteManagement() {
         order: index,
       }));
 
-      // Insert stops into points
       if (pointsToInsert.length) {
-        const { data: insertedPoints, error: pointsError } = await supabase
+        const { error: pointsError } = await supabase
           .from("points")
-          .insert(pointsToInsert)
-          .select();
-
-        if (pointsError) {
-          console.error("❌ Error inserting points:", pointsError);
-          throw pointsError;
-        } else {
-          console.log("✅ Inserted points:", insertedPoints);
-        }
+          .insert(pointsToInsert);
+        if (pointsError) throw pointsError;
       }
 
       // Update local state
       setRoutes((prev) => {
         const exists = prev.some((r) => r.id === pathId);
-        if (exists) {
-          return prev.map((r) =>
-            r.id === pathId ? { ...route, id: pathId } : r
-          );
-        } else {
-          return [...prev, { ...route, id: pathId }];
-        }
+        const updatedRoute = { ...route, id: pathId };
+        return exists
+          ? prev.map((r) => (r.id === pathId ? updatedRoute : r))
+          : [...prev, updatedRoute];
       });
 
-      alert("Route saved!");
       setEditingRoute(null);
     } catch (err: any) {
       console.error("Supabase save error:", err.message ?? err);
       alert("Failed to save route.");
+    }
+  };
+
+  // Delete route
+  const handleDelete = async (routeId: string) => {
+    if (!confirm("Are you sure you want to delete this route?")) return;
+    try {
+      await supabase.from("points").delete().eq("path_id", routeId);
+      await supabase.from("paths").delete().eq("id", routeId);
+      setRoutes((prev) => prev.filter((r) => r.id !== routeId));
+    } catch (err: any) {
+      console.error("Supabase delete error:", err.message ?? err);
+      alert("Failed to delete route.");
     }
   };
 
@@ -166,6 +162,7 @@ export default function RouteManagement() {
               <th className="p-2">Stops</th>
               <th className="p-2">Vehicle</th>
               <th className="p-2">Edit</th>
+              <th className="p-2">Delete</th>
             </tr>
           </thead>
           <tbody>
@@ -182,6 +179,11 @@ export default function RouteManagement() {
                 <td className="p-2">
                   <button onClick={() => setEditingRoute(route)}>
                     <PencilSquareIcon className="w-5 h-5 text-green-400 mx-auto" />
+                  </button>
+                </td>
+                <td className="p-2">
+                  <button onClick={() => route.id && handleDelete(route.id)}>
+                    <TrashIcon className="w-5 h-5 text-red-500 mx-auto" />
                   </button>
                 </td>
               </tr>

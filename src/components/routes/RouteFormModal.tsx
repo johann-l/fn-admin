@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MapPickerModal from "../map/MapPickerModal";
+import { supabase } from "@/lib/supabaseClient";
 
 export interface Stop {
+  id?: string;
   name: string;
   lat: number;
   lng: number;
@@ -30,20 +32,64 @@ export default function RouteFormModal({
   const [stops, setStops] = useState<Stop[]>(route?.stops || []);
   const [showMap, setShowMap] = useState(false);
 
-  const handleSave = () => {
+  useEffect(() => {
+    if (route) {
+      setRouteName(route.name);
+      setVehicle(route.vehicle);
+      setStops(route.stops || []);
+    }
+  }, [route]);
+
+  const handleSave = async () => {
     if (!routeName.trim()) return alert("Route name is required!");
     if (!vehicle.trim()) return alert("Bus number is required!");
     if (stops.length < 2) return alert("A route must have at least 2 stops!");
 
-    const newRoute: Route = {
-      id: route?.id || crypto.randomUUID(),
-      name: routeName,
-      vehicle,
-      stops,
-    };
+    let pathId = route?.id;
 
-    onSave(newRoute);
-    onClose();
+    try {
+      // --- Create or update route ---
+      if (!pathId) {
+        const { data: newPath, error: insertError } = await supabase
+          .from("paths")
+          .insert([{ name: routeName, vehicle }])
+          .select()
+          .single();
+        if (insertError) throw insertError;
+        pathId = newPath.id;
+      } else {
+        const { error: updateError } = await supabase
+          .from("paths")
+          .update({ name: routeName, vehicle })
+          .eq("id", pathId);
+        if (updateError) throw updateError;
+      }
+
+      // --- Delete old stops ---
+      await supabase.from("points").delete().eq("path_id", pathId);
+
+      // --- Insert new stops ---
+      const stopsToInsert = stops.map((s, i) => ({
+        path_id: pathId,
+        name: s.name,
+        lat: s.lat,
+        lng: s.lng,
+        order: i,
+      }));
+
+      if (stopsToInsert.length) {
+        const { error: pointsError } = await supabase
+          .from("points")
+          .insert(stopsToInsert);
+        if (pointsError) throw pointsError;
+      }
+
+      onSave({ id: pathId, name: routeName, vehicle, stops });
+      onClose();
+    } catch (err: any) {
+      console.error("Supabase save error:", err);
+      alert("Failed to save route: " + JSON.stringify(err));
+    }
   };
 
   const handleRemoveStop = (index: number) => {
@@ -120,6 +166,7 @@ export default function RouteFormModal({
 
       {showMap && (
         <MapPickerModal
+          routeId={route?.id || ""} // optional for Supabase linking
           stops={stops}
           onSelect={(lat, lng, name) =>
             setStops((prev) => [...prev, { lat, lng, name }])

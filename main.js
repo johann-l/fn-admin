@@ -30,10 +30,12 @@ function createSplashWindow() {
 function createMainWindow() {
   mainWindow = new BrowserWindow({
     title: "FleetNow",
-    width: 1920,
-    height: 1080,
-    fullscreen: true,
+    width: isDev ? 1280 : 1920, // smaller in dev
+    height: isDev ? 800 : 1080,
+    fullscreen: !isDev, // only fullscreen in prod
+    center: true, // center in dev
     show: false, // don’t show until ready
+    autoHideMenuBar: true, // hide menubar
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -42,7 +44,6 @@ function createMainWindow() {
 
   if (isDev) {
     mainWindow.loadURL("http://localhost:9002/login");
-    mainWindow.webContents.openDevTools();
   } else {
     mainWindow.loadURL("http://localhost:3000/login");
   }
@@ -112,7 +113,9 @@ app.on("ready", () => {
   createSplashWindow();
   tryLoadApp();
 
-  autoUpdater.checkForUpdatesAndNotify();
+  if (!isDev) {
+    autoUpdater.checkForUpdatesAndNotify();
+  }
 });
 
 app.on("window-all-closed", () => {

@@ -4,6 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-routing-machine";
+import { createClient } from "@supabase/supabase-js";
+
+// --- Supabase client setup ---
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 const DefaultIcon = L.icon({
   iconUrl: "/leaflet/marker-icon.png",
@@ -19,10 +26,12 @@ L.Marker.prototype.options.icon = DefaultIcon;
 export type Stop = { name: string; lat: number; lng: number };
 
 export default function MapPickerModal({
+  routeId,
   stops = [],
   onSelect,
   onClose,
 }: {
+  routeId: string; // 👈 so we can link points to a specific path
   stops?: Stop[];
   onSelect: (lat: number, lng: number, name: string) => void;
   onClose: () => void;
@@ -32,7 +41,7 @@ export default function MapPickerModal({
   const [markers, setMarkers] = useState<L.Marker[]>([]);
   const routingRef = useRef<L.Control | null>(null);
 
-  // Initialize map
+  // --- Initialize map ---
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -56,7 +65,7 @@ export default function MapPickerModal({
     setMarkers(existingMarkers);
 
     // Add new stop on click
-    const handleMapClick = (e: L.LeafletMouseEvent) => {
+    const handleMapClick = async (e: L.LeafletMouseEvent) => {
       const name = prompt("Enter stop name:", `Stop ${markers.length + 1}`);
       if (!name) return;
 
@@ -67,6 +76,18 @@ export default function MapPickerModal({
 
       setMarkers((prev) => [...prev, marker]);
       onSelect(e.latlng.lat, e.latlng.lng, name);
+
+      // // --- Save to Supabase ---
+      // const { error } = await supabase.from("points").insert([
+      //   {
+      //     route_id: routeId, // 👈 foreign key to `paths`
+      //     name,
+      //     lat: e.latlng.lat,
+      //     lng: e.latlng.lng,
+      //   },
+      // ]);
+      // if (error) console.error("Error saving point:", error);
+
       mapRef.current!.setView(e.latlng, mapRef.current!.getZoom());
     };
 
@@ -77,7 +98,7 @@ export default function MapPickerModal({
     };
   }, []);
 
-  // Draw/update route
+  // --- Draw/update route ---
   useEffect(() => {
     if (!mapRef.current) return;
 

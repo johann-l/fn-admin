@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  "https://ltdxlajzilbvmipcuqxd.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx0ZHhsYWp6aWxidm1pcGN1cXhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3NTQxMDEsImV4cCI6MjA3MDMzMDEwMX0.si0smbCAHPa7w9qbhzErQpo8rWJ7_vyZWPYXyJrHzBE"
+);
 
 type Message = {
   id: number;
@@ -105,10 +110,9 @@ export default function ChatRoom() {
 
     setNewMessage("");
   }
-
   return (
-    <div className="flex flex-col h-screen w-full">
-      {/* Chat messages */}
+    <div className="flex flex-col h-full w-full">
+      {/* Chat messages (scrollable) */}
       <div className="flex-1 overflow-y-auto p-4 bg-gray-100">
         {messages.map((msg) => (
           <div
@@ -133,7 +137,7 @@ export default function ChatRoom() {
         ))}
       </div>
 
-      {/* Input box */}
+      {/* Input stays fixed at bottom */}
       <div className="p-4 bg-white border-t flex">
         <input
           type="text"

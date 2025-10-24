@@ -1,367 +1,321 @@
+"use client";
 
-"use client"
-
-import * as React from "react"
-import { z } from "zod"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { format } from "date-fns"
-import { motion, AnimatePresence } from "framer-motion"
-
-import { useAppData } from "@/context/app-data-context"
-import type { Vehicle } from "@/lib/data"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { Button, buttonVariants } from "@/components/ui/button"
+import React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
   DialogFooter,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
-import { CalendarIcon, Edit, PlusCircle, Trash2 } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
-const vehicleFormSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  model: z.string().min(1, "Model is required"),
-  year: z.coerce.number().min(1990, "Year must be after 1990"),
-  licensePlate: z.string().min(1, "License plate is required"),
-  driverId: z.string().nullable(),
-  routeId: z.string().nullable(),
-  status: z.enum(['On Time', 'Delayed', 'Early', 'Maintenance', 'Out of Service']),
-  lastService: z.date({ required_error: "Last service date is required." }),
-})
+import { v4 as uuidv4 } from "uuid";
+import { supabase } from "@/lib/supabaseClient";
 
-type VehicleFormValues = z.infer<typeof vehicleFormSchema>
+const vehicleSchema = z.object({
+  name: z.string().min(1, "Required"),
+  model: z.string().min(1, "Required"),
+  year: z.number().min(1900).max(2100),
+  licensePlate: z.string().min(1, "Required"),
+  driverId: z.string().optional(),
+  routeId: z.string().optional(),
+  status: z.string(),
+  lastService: z.string(),
+  totalSeats: z.number().min(1),
+  occupiedSeats: z.number().min(0),
+});
 
-export default function VehicleManagement() {
-  const { vehicles, drivers, routes, addVehicle, updateVehicle, removeVehicle } = useAppData()
-  const [isDialogOpen, setIsDialogOpen] = React.useState(false)
-  const [selectedVehicle, setSelectedVehicle] = React.useState<Vehicle | null>(null)
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false)
-  const [vehicleToDelete, setVehicleToDelete] = React.useState<Vehicle | null>(null)
+type VehicleFormValues = z.infer<typeof vehicleSchema>;
 
+export default function FleetOverview() {
+  const [vehicles, setVehicles] = React.useState<any[]>([]);
+  const [selectedVehicle, setSelectedVehicle] = React.useState<any | null>(
+    null
+  );
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
+  const [vehicleToDelete, setVehicleToDelete] = React.useState<any | null>(
+    null
+  );
 
   const form = useForm<VehicleFormValues>({
-    resolver: zodResolver(vehicleFormSchema),
-  })
+    resolver: zodResolver(vehicleSchema),
+    defaultValues: {
+      name: "",
+      model: "",
+      year: new Date().getFullYear(),
+      licensePlate: "",
+      driverId: "none",
+      routeId: "none",
+      status: "On Time",
+      lastService: new Date().toISOString().split("T")[0],
+      totalSeats: 40,
+      occupiedSeats: 0,
+    },
+  });
 
-  const handleEditClick = (vehicle: Vehicle) => {
-    setSelectedVehicle(vehicle)
+  // Fetch vehicles on load
+  const fetchVehicles = async () => {
+    const { data, error } = await supabase.from("vehicles").select("*");
+    if (error) console.error("Error fetching vehicles:", error);
+    else setVehicles(data || []);
+  };
+
+  React.useEffect(() => {
+    fetchVehicles();
+  }, []);
+
+  // Handle Add / Update
+  const onSubmit = async (values: VehicleFormValues) => {
+    const finalValues = {
+      name: values.name,
+      model: values.model,
+      year: values.year,
+      license_plate: values.licensePlate,
+      driver_id: values.driverId === "none" ? null : values.driverId,
+      route_id: values.routeId === "none" ? null : values.routeId,
+      status: values.status,
+      last_service_date: values.lastService,
+      total_seats: values.totalSeats,
+      occupied_seats: values.occupiedSeats,
+    };
+
+    if (selectedVehicle) {
+      const { error } = await supabase
+        .from("vehicles")
+        .update(finalValues)
+        .eq("id", selectedVehicle.id);
+      if (error) console.error("Error updating vehicle:", error);
+    } else {
+      const newVehicle = { id: uuidv4(), ...finalValues };
+      const { error } = await supabase.from("vehicles").insert([newVehicle]);
+      if (error) console.error("Error adding vehicle:", error);
+    }
+
+    setIsDialogOpen(false);
+    setSelectedVehicle(null);
+    form.reset();
+    fetchVehicles();
+  };
+
+  // Handle Delete
+  const handleConfirmDelete = async () => {
+    if (vehicleToDelete) {
+      const { error } = await supabase
+        .from("vehicles")
+        .delete()
+        .eq("id", vehicleToDelete.id);
+      if (error) console.error("Error deleting vehicle:", error);
+    }
+    setIsDeleteDialogOpen(false);
+    setVehicleToDelete(null);
+    fetchVehicles();
+  };
+
+  const openEditDialog = (vehicle: any) => {
+    setSelectedVehicle(vehicle);
     form.reset({
       name: vehicle.name,
       model: vehicle.model,
       year: vehicle.year,
-      licensePlate: vehicle.licensePlate,
-      driverId: vehicle.driverId,
-      routeId: vehicle.routeId,
+      licensePlate: vehicle.license_plate,
+      driverId: vehicle.driver_id || "none",
+      routeId: vehicle.route_id || "none",
       status: vehicle.status,
-      lastService: vehicle.lastService,
-    })
-    setIsDialogOpen(true)
-  }
-  
-  const handleCreateClick = () => {
-    setSelectedVehicle(null);
-    form.reset({
-        name: "",
-        model: "",
-        year: new Date().getFullYear(),
-        licensePlate: "",
-        driverId: null,
-        routeId: null,
-        status: "On Time",
-        lastService: new Date(),
+      lastService: vehicle.last_service_date,
+      totalSeats: vehicle.total_seats,
+      occupiedSeats: vehicle.occupied_seats,
     });
     setIsDialogOpen(true);
-  }
+  };
 
-  const handleDeleteClick = (vehicle: Vehicle) => {
-    setVehicleToDelete(vehicle)
-    setIsDeleteDialogOpen(true)
-  }
-
-  const handleConfirmDelete = () => {
-    if (vehicleToDelete) {
-      removeVehicle(vehicleToDelete.id)
-    }
-    setIsDeleteDialogOpen(false)
-    setVehicleToDelete(null)
-  }
-
-  const onSubmit = (values: VehicleFormValues) => {
-    const finalValues = {
-      ...values,
-      driverId: values.driverId === 'none' ? null : values.driverId,
-      routeId: values.routeId === 'none' ? null : values.routeId,
-    };
-    if (selectedVehicle) {
-      updateVehicle({ ...selectedVehicle, ...finalValues });
-    } else {
-      addVehicle(finalValues);
-    }
-    setIsDialogOpen(false);
-  }
-
-  const getStatusVariant = (status: Vehicle["status"]): "default" | "secondary" | "destructive" | "outline" => {
-    switch (status) {
-      case 'On Time': return "default";
-      case 'Delayed': return "destructive";
-      case 'Early': return "secondary";
-      case 'Maintenance': return "outline";
-      case 'Out of Service': return "destructive";
-      default: return "default";
-    }
-  }
+  const openAddDialog = () => {
+    setSelectedVehicle(null);
+    form.reset();
+    setIsDialogOpen(true);
+  };
 
   return (
-    <>
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-                <CardTitle>Fleet Overview</CardTitle>
-                <CardDescription>Manage and monitor all vehicles in the fleet.</CardDescription>
-            </div>
-            <Button onClick={handleCreateClick}>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Add Vehicle
-            </Button>
-        </CardHeader>
-        <CardContent>
-          <TooltipProvider>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Vehicle</TableHead>
-                  <TableHead>License Plate</TableHead>
-                  <TableHead>Driver</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Last Service</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <AnimatePresence>
-                  {vehicles.map((vehicle) => (
-                    <motion.tr
-                      key={vehicle.id}
-                      layout
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ type: "spring", stiffness: 350, damping: 35 }}
-                      className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
-                    >
-                      <TableCell>
-                        <div className="font-medium">{vehicle.name}</div>
-                        <div className="text-sm text-muted-foreground">{vehicle.model} ({vehicle.year})</div>
-                      </TableCell>
-                      <TableCell className="font-mono">{vehicle.licensePlate}</TableCell>
-                      <TableCell>{drivers.find(d => d.id === vehicle.driverId)?.name || 'N/A'}</TableCell>
-                      <TableCell>
-                        <Badge variant={getStatusVariant(vehicle.status)}>{vehicle.status}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        {format(vehicle.lastService, "LLL dd, y")}
-                      </TableCell>
-                      <TableCell className="text-right space-x-1">
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" onClick={() => handleEditClick(vehicle)}>
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent><p>Edit Vehicle</p></TooltipContent>
-                        </Tooltip>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDeleteClick(vehicle)}>
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent><p>Delete Vehicle</p></TooltipContent>
-                        </Tooltip>
-                      </TableCell>
-                    </motion.tr>
-                  ))}
-                </AnimatePresence>
-              </TableBody>
-            </Table>
-          </TooltipProvider>
-        </CardContent>
-      </Card>
+    <div className="p-4">
+      <div className="flex justify-between mb-4">
+        <h1 className="text-2xl font-semibold">Fleet Overview</h1>
+        <Button onClick={openAddDialog}>Add Vehicle</Button>
+      </div>
 
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            <TableHead>Model</TableHead>
+            <TableHead>Year</TableHead>
+            <TableHead>License Plate</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Total Seats</TableHead>
+            <TableHead>Occupied</TableHead>
+            <TableHead>Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {vehicles.map((v) => (
+            <TableRow key={v.id}>
+              <TableCell>{v.name}</TableCell>
+              <TableCell>{v.model}</TableCell>
+              <TableCell>{v.year}</TableCell>
+              <TableCell>{v.license_plate}</TableCell>
+              <TableCell>{v.status}</TableCell>
+              <TableCell>{v.total_seats}</TableCell>
+              <TableCell>{v.occupied_seats}</TableCell>
+              <TableCell>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => openEditDialog(v)}
+                  className="mr-2"
+                >
+                  Edit
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => {
+                    setVehicleToDelete(v);
+                    setIsDeleteDialogOpen(true);
+                  }}
+                >
+                  Delete
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
+      {/* Vehicle Form Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle>{selectedVehicle ? "Edit Vehicle" : "Add Vehicle"}</DialogTitle>
-            <DialogDescription>
-                {selectedVehicle ? "Update vehicle details." : "Enter details for the new vehicle."}
-            </DialogDescription>
+            <DialogTitle>
+              {selectedVehicle ? "Edit Vehicle" : "Add Vehicle"}
+            </DialogTitle>
           </DialogHeader>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
-                <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                    <FormItem><FormLabel>Vehicle Name</FormLabel><FormControl><Input {...field} placeholder="e.g., Bus 1" /></FormControl><FormMessage /></FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="licensePlate"
-                    render={({ field }) => (
-                    <FormItem><FormLabel>License Plate</FormLabel><FormControl><Input {...field} placeholder="e.g., CC-001" /></FormControl><FormMessage /></FormItem>
-                    )}
-                />
+
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-3 mt-2"
+          >
+            <div>
+              <Label>Name</Label>
+              <Input {...form.register("name")} />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-                <FormField
-                    control={form.control}
-                    name="model"
-                    render={({ field }) => (
-                    <FormItem><FormLabel>Model</FormLabel><FormControl><Input {...field} placeholder="e.g., Mercedes Sprinter" /></FormControl><FormMessage /></FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="year"
-                    render={({ field }) => (
-                    <FormItem><FormLabel>Year</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
-                    )}
-                />
+
+            <div>
+              <Label>Model</Label>
+              <Input {...form.register("model")} />
             </div>
-             <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="driverId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Assigned Driver</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value ?? "none"}>
-                        <FormControl><SelectTrigger><SelectValue placeholder="Select a driver" /></SelectTrigger></FormControl>
-                        <SelectContent>
-                          <SelectItem value="none">None</SelectItem>
-                          {drivers.map(driver => (<SelectItem key={driver.id} value={driver.id}>{driver.name}</SelectItem>))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                 <FormField
-                  control={form.control}
-                  name="routeId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Assigned Route</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value ?? "none"}>
-                        <FormControl><SelectTrigger><SelectValue placeholder="Select a route" /></SelectTrigger></FormControl>
-                        <SelectContent>
-                          <SelectItem value="none">None</SelectItem>
-                          {routes.map(route => (<SelectItem key={route.id} value={route.id}>{route.name}</SelectItem>))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-               <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="status"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Status</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl><SelectTrigger><SelectValue placeholder="Select status" /></SelectTrigger></FormControl>
-                        <SelectContent>
-                            <SelectItem value="On Time">On Time</SelectItem>
-                            <SelectItem value="Delayed">Delayed</SelectItem>
-                            <SelectItem value="Early">Early</SelectItem>
-                            <SelectItem value="Maintenance">Maintenance</SelectItem>
-                            <SelectItem value="Out of Service">Out of Service</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="lastService"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col"><FormLabel>Last Service Date</FormLabel>
-                      <Popover><PopoverTrigger asChild>
-                          <FormControl>
-                            <Button variant={"outline"} className={cn("pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>
-                              {field.value ? (format(field.value, "PPP")) : (<span>Pick a date</span>)}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus />
-                        </PopoverContent>
-                      </Popover><FormMessage /></FormItem>
-                  )}
-                />
+
+            <div>
+              <Label>Year</Label>
+              <Input
+                type="number"
+                {...form.register("year", { valueAsNumber: true })}
+              />
             </div>
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-                <Button type="submit">Save Vehicle</Button>
-              </DialogFooter>
-            </form>
-          </Form>
+
+            <div>
+              <Label>License Plate</Label>
+              <Input {...form.register("licensePlate")} />
+            </div>
+
+            <div>
+              <Label>Status</Label>
+              <Select
+                onValueChange={(val) => form.setValue("status", val)}
+                defaultValue={form.watch("status")}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="On Time">On Time</SelectItem>
+                  <SelectItem value="Delayed">Delayed</SelectItem>
+                  <SelectItem value="Early">Early</SelectItem>
+                  <SelectItem value="Maintenance">Maintenance</SelectItem>
+                  <SelectItem value="Out of Service">Out of Service</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label>Last Service Date</Label>
+              <Input type="date" {...form.register("lastService")} />
+            </div>
+
+            <div>
+              <Label>Total Seats</Label>
+              <Input
+                type="number"
+                {...form.register("totalSeats", { valueAsNumber: true })}
+              />
+            </div>
+
+            <div>
+              <Label>Occupied Seats</Label>
+              <Input
+                type="number"
+                {...form.register("occupiedSeats", { valueAsNumber: true })}
+              />
+            </div>
+
+            <DialogFooter>
+              <Button type="submit">
+                {selectedVehicle ? "Update" : "Add"}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
-      
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the vehicle {vehicleToDelete?.name} and unassign its driver.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmDelete} className={buttonVariants({ variant: "destructive" })}>
+
+      {/* Delete Confirmation */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Vehicle</DialogTitle>
+          </DialogHeader>
+          <p>Are you sure you want to delete this vehicle?</p>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(false)}
+            >
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleConfirmDelete}>
               Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
-  )
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
 }

@@ -312,10 +312,10 @@ export default function FleetOverview() {
             </Button>
             <Button variant="destructive" onClick={handleConfirmDelete}>
               Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
-  )
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
 }

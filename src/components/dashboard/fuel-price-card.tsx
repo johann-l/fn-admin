@@ -30,6 +30,9 @@ export default function FuelPriceCard() {
   // Fetch fuel prices from Supabase Edge Function using hardcoded anon key
   const fetchFuelPrices = async () => {
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
       const res = await fetch(
         "https://jrgxheckjteefpavbhlm.supabase.co/functions/v1/fuel-prices",
         {
@@ -37,20 +40,35 @@ export default function FuelPriceCard() {
             Authorization:
               "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpyZ3hoZWNranRlZWZwYXZiaGxtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYwNzUzMjUsImV4cCI6MjA2MTY1MTMyNX0.IgwV1vyiZRZqt8nl9WAcijI0AMSeoGqPf72go-OIwtM",
           },
+          signal: controller.signal,
         }
       );
 
-      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      clearTimeout(timeoutId);
+
+      if (!res.ok) {
+        console.warn(`Fuel API returned status ${res.status}, using default prices`);
+        setLoading(false);
+        return;
+      }
+
       const data = await res.json();
 
-      setFuelData([
-        { name: "Petrol", price: data.bangalore.petrol, unit: "₹/L" },
-        { name: "Diesel", price: data.bangalore.diesel, unit: "₹/L" },
-        { name: "LPG", price: data.bangalore.lpg, unit: "₹/cylinder" },
-        { name: "CNG", price: data.bangalore.cng, unit: "₹/kg" },
-      ]);
-    } catch (err) {
-      console.error("Error fetching fuel prices:", err);
+      if (data?.bangalore) {
+        setFuelData([
+          { name: "Petrol", price: data.bangalore.petrol, unit: "₹/L" },
+          { name: "Diesel", price: data.bangalore.diesel, unit: "₹/L" },
+          { name: "LPG", price: data.bangalore.lpg, unit: "₹/cylinder" },
+          { name: "CNG", price: data.bangalore.cng, unit: "₹/kg" },
+        ]);
+      }
+    } catch (err: any) {
+      if (err.name === 'AbortError') {
+        console.warn("Fuel price fetch timed out, using default prices");
+      } else {
+        console.warn("Could not fetch live fuel prices, using defaults:", err.message);
+      }
+      // Keep default prices on error
     } finally {
       setLoading(false);
     }

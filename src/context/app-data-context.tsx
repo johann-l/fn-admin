@@ -19,6 +19,7 @@ import {
   generateHistoricalExpenses,
   generateHistoricalPayments,
 } from "@/lib/data";
+import { fetchTransactions, subscribeToTransactions } from "@/lib/supabaseService";
 
 type VehicleFormData = Omit<
   Vehicle,
@@ -71,9 +72,39 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
   const [alerts, setAlerts] = React.useState<Alert[]>(initialAlerts);
 
   React.useEffect(() => {
-    // Generate data on the client-side to avoid hydration errors
+    // Generate expenses data on the client-side
     setExpenses(generateHistoricalExpenses());
-    setPayments(generateHistoricalPayments());
+    
+    // Fetch real transactions from Supabase
+    async function loadTransactions() {
+      const transactions = await fetchTransactions();
+      console.log('Loaded transactions from Supabase:', transactions.length);
+      setPayments(transactions);
+    }
+    
+    loadTransactions();
+    
+    // Subscribe to realtime transaction updates
+    const unsubscribe = subscribeToTransactions((updatedPayment) => {
+      console.log('Transaction updated:', updatedPayment);
+      setPayments((prev) => {
+        if (!prev) return [updatedPayment];
+        const index = prev.findIndex((p) => p.id === updatedPayment.id);
+        if (index >= 0) {
+          // Update existing
+          const newPayments = [...prev];
+          newPayments[index] = updatedPayment;
+          return newPayments;
+        } else {
+          // Add new
+          return [updatedPayment, ...prev];
+        }
+      });
+    });
+    
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   const addVehicle = (vehicle: VehicleFormData) => {

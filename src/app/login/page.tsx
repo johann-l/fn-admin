@@ -20,16 +20,64 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      // 1️⃣ Try Supabase Auth login
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (error) {
-      setError(error.message);
-    } else if (data.user) {
-      localStorage.setItem("user_id", data.user.id);
-      router.replace("/"); // redirect to dashboard
+      if (error) {
+        setError(error.message);
+        setLoading(false);
+        return;
+      }
+
+      const user = data.user;
+      if (!user) {
+        setError("Login failed: no user returned.");
+        setLoading(false);
+        return;
+      }
+
+      // 2️⃣ Save to localStorage
+      localStorage.setItem("user_id", user.id);
+      localStorage.setItem("user_email", email);
+
+      // 3️⃣ Ensure user exists in `users` table
+      const { data: existingUser, error: selectError } = await supabase
+        .from("users")
+        .select("id")
+        .eq("email", email)
+        .single();
+
+      if (selectError && selectError.code !== "PGRST116") {
+        console.error("Error checking user:", selectError);
+      }
+
+      if (!existingUser) {
+        const { error: insertError } = await supabase.from("users").insert([
+          {
+            id: user.id, // use Supabase Auth ID as primary key
+            email,
+            name: email.split("@")[0],
+          },
+        ]);
+
+        if (insertError) {
+          console.error("Error creating user:", insertError);
+        } else {
+          console.log("✅ User created in database");
+        }
+      } else {
+        console.log("✅ Existing user found");
+      }
+
+      // 4️⃣ Redirect to home/dashboard
+      router.replace("/");
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      setError("Something went wrong during login.");
     }
 
     setLoading(false);

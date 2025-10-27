@@ -1,18 +1,32 @@
+"use client";
 
-"use client"
+import * as React from "react";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { motion, AnimatePresence } from "framer-motion";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
-import * as React from "react"
-import { z } from "zod"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { motion, AnimatePresence } from "framer-motion"
+import { useAppData } from "@/context/app-data-context";
+import type { Driver } from "@/lib/data";
 
-import { useAppData } from "@/context/app-data-context"
-import type { Driver } from "@/lib/data"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { Button, buttonVariants } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -20,7 +34,7 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,7 +44,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
 import {
   Form,
   FormControl,
@@ -38,13 +52,24 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Edit, Eye, PlusCircle, Trash2 } from "lucide-react"
-import DriverIdCard from "./driver-id-card"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Edit, Eye, PlusCircle, Trash2 } from "lucide-react";
+import DriverIdCard from "./driver-id-card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const driverFormSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -52,20 +77,25 @@ const driverFormSchema = z.object({
   phone: z.string().min(1, "Phone number is required"),
   status: z.enum(["Active", "Suspended", "Inactive"]),
   assignedVehicleId: z.string().nullable(),
-})
+});
 
-type DriverFormValues = z.infer<typeof driverFormSchema>
-type DriverFormData = Omit<Driver, 'id' | 'avatarUrl'>;
-
+type DriverFormValues = z.infer<typeof driverFormSchema>;
+type DriverFormData = Omit<Driver, "id" | "avatarUrl">;
 
 export default function DriverManagement() {
-  const { drivers, vehicles, addDriver, updateDriver, removeDriver } = useAppData()
-  const [isFormOpen, setIsFormOpen] = React.useState(false)
-  const [editingDriver, setEditingDriver] = React.useState<Driver | null>(null)
-  const [isViewDialogOpen, setIsViewDialogOpen] = React.useState(false)
-  const [selectedDriverForView, setSelectedDriverForView] = React.useState<Driver | null>(null)
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false)
-  const [driverToDelete, setDriverToDelete] = React.useState<Driver | null>(null)
+  const supabase = createClientComponentClient();
+  const { drivers, vehicles, addDriver, updateDriver, removeDriver } =
+    useAppData();
+
+  const [isFormOpen, setIsFormOpen] = React.useState(false);
+  const [editingDriver, setEditingDriver] = React.useState<Driver | null>(null);
+  const [isViewDialogOpen, setIsViewDialogOpen] = React.useState(false);
+  const [selectedDriverForView, setSelectedDriverForView] =
+    React.useState<Driver | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false);
+  const [driverToDelete, setDriverToDelete] = React.useState<Driver | null>(
+    null
+  );
 
   const form = useForm<DriverFormValues>({
     resolver: zodResolver(driverFormSchema),
@@ -76,7 +106,7 @@ export default function DriverManagement() {
       status: "Inactive",
       assignedVehicleId: null,
     },
-  })
+  });
 
   const handleCreateClick = () => {
     setEditingDriver(null);
@@ -88,39 +118,40 @@ export default function DriverManagement() {
       assignedVehicleId: null,
     });
     setIsFormOpen(true);
-  }
+  };
 
   const handleEditClick = (driver: Driver) => {
-    setEditingDriver(driver)
+    setEditingDriver(driver);
     form.reset({
       name: driver.name,
       email: driver.email,
       phone: driver.phone,
       status: driver.status,
       assignedVehicleId: driver.assignedVehicleId,
-    })
-    setIsFormOpen(true)
-  }
+    });
+    setIsFormOpen(true);
+  };
 
   const handleViewClick = (driver: Driver) => {
-    setSelectedDriverForView(driver)
-    setIsViewDialogOpen(true)
-  }
+    setSelectedDriverForView(driver);
+    setIsViewDialogOpen(true);
+  };
 
   const handleDeleteClick = (driver: Driver) => {
-    setDriverToDelete(driver)
-    setIsDeleteDialogOpen(true)
-  }
+    setDriverToDelete(driver);
+    setIsDeleteDialogOpen(true);
+  };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (driverToDelete) {
-      removeDriver(driverToDelete.id)
+      await supabase.from("drivers").delete().eq("id", driverToDelete.id);
+      removeDriver(driverToDelete.id);
     }
-    setIsDeleteDialogOpen(false)
-    setDriverToDelete(null)
-  }
+    setIsDeleteDialogOpen(false);
+    setDriverToDelete(null);
+  };
 
-  const onSubmit = (values: DriverFormValues) => {
+  const onSubmit = async (values: DriverFormValues) => {
     const finalValues = {
       ...values,
       assignedVehicleId:
@@ -128,20 +159,51 @@ export default function DriverManagement() {
     };
 
     if (editingDriver) {
-      updateDriver({ ...editingDriver, ...finalValues });
-    } else {
-      addDriver(finalValues as DriverFormData)
-    }
-    setIsFormOpen(false);
-  }
+      const { error } = await supabase
+        .from("drivers")
+        .update({
+          name: finalValues.name,
+          email: finalValues.email,
+          phone: finalValues.phone,
+          status: finalValues.status,
+          assigned_vehicle_id: finalValues.assignedVehicleId,
+        })
+        .eq("id", editingDriver.id);
 
-  const getStatusVariant = (status: Driver["status"]): "default" | "secondary" | "destructive" => {
-    switch (status) {
-      case 'Active': return "default";
-      case 'Suspended': return "destructive";
-      case 'Inactive': return "secondary";
+      if (!error) updateDriver({ ...editingDriver, ...finalValues });
+    } else {
+      const { data, error } = await supabase
+        .from("drivers")
+        .insert([
+          {
+            name: finalValues.name,
+            email: finalValues.email,
+            phone: finalValues.phone,
+            status: finalValues.status,
+            assigned_vehicle_id: finalValues.assignedVehicleId,
+          },
+        ])
+        .select()
+        .single();
+
+      if (!error && data) addDriver(data);
     }
-  }
+
+    setIsFormOpen(false);
+  };
+
+  const getStatusVariant = (
+    status: Driver["status"]
+  ): "default" | "secondary" | "destructive" => {
+    switch (status) {
+      case "Active":
+        return "default";
+      case "Suspended":
+        return "destructive";
+      case "Inactive":
+        return "secondary";
+    }
+  };
 
   return (
     <>
@@ -149,7 +211,9 @@ export default function DriverManagement() {
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle>All Drivers</CardTitle>
-            <CardDescription>View and manage all driver profiles in the fleet.</CardDescription>
+            <CardDescription>
+              View and manage all driver profiles in the fleet.
+            </CardDescription>
           </div>
           <Button onClick={handleCreateClick}>
             <PlusCircle className="mr-2 h-4 w-4" />
@@ -177,50 +241,85 @@ export default function DriverManagement() {
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
                       exit={{ opacity: 0, height: 0 }}
-                      transition={{ type: "spring", stiffness: 350, damping: 35 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 350,
+                        damping: 35,
+                      }}
                       className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
                     >
                       <TableCell>
                         <div className="flex items-center gap-3">
                           <Avatar className="h-10 w-10">
-                            <AvatarImage src={`${driver.avatarUrl}?${driver.id}`} alt={driver.name} data-ai-hint="person avatar"/>
-                            <AvatarFallback>{driver.name.charAt(0)}</AvatarFallback>
+                            <AvatarImage
+                              src={`${driver.avatarUrl}?${driver.id}`}
+                              alt={driver.name}
+                            />
+                            <AvatarFallback>
+                              {driver.name.charAt(0)}
+                            </AvatarFallback>
                           </Avatar>
                           <span className="font-medium">{driver.name}</span>
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="text-sm">{driver.email}</div>
-                        <div className="text-xs text-muted-foreground">{driver.phone}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {driver.phone}
+                        </div>
                       </TableCell>
-                      <TableCell>{vehicles.find(b => b.id === driver.assignedVehicleId)?.name || 'N/A'}</TableCell>
                       <TableCell>
-                        <Badge variant={getStatusVariant(driver.status)}>{driver.status}</Badge>
+                        {vehicles.find((b) => b.id === driver.assignedVehicleId)
+                          ?.name || "N/A"}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={getStatusVariant(driver.status)}>
+                          {driver.status}
+                        </Badge>
                       </TableCell>
                       <TableCell className="text-right space-x-1">
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" onClick={() => handleViewClick(driver)}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleViewClick(driver)}
+                            >
                               <Eye className="h-4 w-4" />
                             </Button>
                           </TooltipTrigger>
-                          <TooltipContent><p>View ID Card</p></TooltipContent>
+                          <TooltipContent>
+                            <p>View ID Card</p>
+                          </TooltipContent>
                         </Tooltip>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" onClick={() => handleEditClick(driver)}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleEditClick(driver)}
+                            >
                               <Edit className="h-4 w-4" />
                             </Button>
                           </TooltipTrigger>
-                          <TooltipContent><p>Edit Driver</p></TooltipContent>
+                          <TooltipContent>
+                            <p>Edit Driver</p>
+                          </TooltipContent>
                         </Tooltip>
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDeleteClick(driver)}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-destructive hover:text-destructive"
+                              onClick={() => handleDeleteClick(driver)}
+                            >
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </TooltipTrigger>
-                          <TooltipContent><p>Delete Driver</p></TooltipContent>
+                          <TooltipContent>
+                            <p>Delete Driver</p>
+                          </TooltipContent>
                         </Tooltip>
                       </TableCell>
                     </motion.tr>
@@ -232,16 +331,24 @@ export default function DriverManagement() {
         </CardContent>
       </Card>
 
+      {/* Form Dialog */}
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>{editingDriver ? "Edit Driver Profile" : "Add New Driver"}</DialogTitle>
+            <DialogTitle>
+              {editingDriver ? "Edit Driver Profile" : "Add New Driver"}
+            </DialogTitle>
             <DialogDescription>
-              {editingDriver ? `Make changes to ${editingDriver.name}'s profile here. Click save when you're done.` : "Enter the details for the new driver."}
+              {editingDriver
+                ? `Make changes to ${editingDriver.name}'s profile here.`
+                : "Enter the details for the new driver."}
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-4 py-4"
+            >
               <FormField
                 control={form.control}
                 name="name"
@@ -288,7 +395,10 @@ export default function DriverManagement() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Status</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select status" />
@@ -310,7 +420,10 @@ export default function DriverManagement() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Assigned Vehicle</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value ?? "none"}>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value ?? "none"}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select a vehicle" />
@@ -318,8 +431,10 @@ export default function DriverManagement() {
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="none">None</SelectItem>
-                          {vehicles.map(vehicle => (
-                            <SelectItem key={vehicle.id} value={vehicle.id}>{vehicle.name}</SelectItem>
+                          {vehicles.map((v) => (
+                            <SelectItem key={v.id} value={v.id}>
+                              {v.name}
+                            </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -329,46 +444,43 @@ export default function DriverManagement() {
                 />
               </div>
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsFormOpen(false)}>Cancel</Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsFormOpen(false)}
+                >
+                  Cancel
+                </Button>
                 <Button type="submit">Save changes</Button>
               </DialogFooter>
             </form>
           </Form>
         </DialogContent>
       </Dialog>
-      
-      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="sm:max-w-sm p-0 bg-transparent border-none shadow-none">
-          {selectedDriverForView && (
-            <>
-              <DialogHeader className="sr-only">
-                <DialogTitle>Driver ID Card: {selectedDriverForView.name}</DialogTitle>
-                <DialogDescription>
-                  View and print the driver&apos;s ID card.
-                </DialogDescription>
-              </DialogHeader>
-              <DriverIdCard driver={selectedDriverForView} />
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
 
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      {/* Delete Confirmation */}
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the profile for {driverToDelete?.name} and unassign them from any vehicles.
+              This will permanently delete {driverToDelete?.name}'s profile.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmDelete} className={buttonVariants({ variant: "destructive" })}>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className={buttonVariants({ variant: "destructive" })}
+            >
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </>
-  )
+  );
 }

@@ -1,141 +1,177 @@
-
 "use client"
 
-import * as React from "react"
-import { motion } from "framer-motion"
-import { MapPin, Bus } from "lucide-react"
-
-import { useAppData } from "@/context/app-data-context"
+import React, { useEffect, useState, useRef } from "react"
+import { GoogleMap, LoadScript, Marker, DirectionsRenderer } from "@react-google-maps/api"
+import { createClient } from "@supabase/supabase-js"
 import { Card, CardContent } from "@/components/ui/card"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { cn } from "@/lib/utils"
 
-export default function MapPlaceholder() {
-  const { vehicles, routes } = useAppData()
-  const mapRef = React.useRef<HTMLDivElement>(null)
-  
-  const [positions, setPositions] = React.useState<Map<string, { x: number; y: number }>>(new Map())
-  const isInitialized = React.useRef(false)
+const containerStyle = {
+  width: "100%",
+  height: "100%",
+}
 
-  React.useEffect(() => {
-    const updatePositions = () => {
-      if (mapRef.current) {
-        const { width, height } = mapRef.current.getBoundingClientRect()
-        if (width === 0 || height === 0) return;
+interface LatLng {
+  lat: number
+  lng: number
+}
 
-        setPositions(prevPositions => {
-          const newPositions = new Map(prevPositions)
-          
-          vehicles.forEach(vehicle => {
-            if (vehicle.status !== 'Out of Service' && vehicle.status !== 'Maintenance') {
-              const currentPos = newPositions.get(vehicle.id)
+// 🚌 Bus stops
+const busStops: LatLng[] = [
+  { lat: 12.80844040331948, lng: 74.89364123399675 },
+  { lat: 12.819459292923097, lng: 74.8784272810079 },
+  { lat: 12.818440530915483, lng: 74.86529114313304 },
+  { lat: 12.81844657910358, lng: 74.85868868324373 },
+  { lat: 12.825245114682806, lng: 74.85983867582144 },
+  { lat: 12.849938790374326, lng: 74.8621455669695 },
+  { lat: 12.911771642419597, lng: 74.89749712438976 },
+]
 
-              if (!currentPos || !isInitialized.current) {
-                newPositions.set(vehicle.id, {
-                  x: Math.random() * (width - 40) + 20,
-                  y: Math.random() * (height - 40) + 20,
-                })
-              } else {
-                const moveX = (Math.random() - 0.5) * 50
-                const moveY = (Math.random() - 0.5) * 50
-                
-                let newX = currentPos.x + moveX
-                let newY = currentPos.y + moveY
+export default function BusRouteMap() {
+  const [stopReached, setStopReached] = useState<boolean[]>(busStops.map(() => false))
+  const [busPos, setBusPos] = useState<LatLng>(busStops[0])
+  const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null)
+  const [mapLoaded, setMapLoaded] = useState<boolean>(false)
+  const mapRef = useRef<google.maps.Map | null>(null)
 
-                if (newX < 20) newX = 20
-                if (newX > width - 20) newX = width - 20
-                if (newY < 20) newY = 20
-                if (newY > height - 20) newY = height - 20
-                
-                newPositions.set(vehicle.id, { x: newX, y: newY })
-              }
-            } else {
-              newPositions.delete(vehicle.id);
-            }
-          })
+  const GOOGLE_MAPS_API_KEY = "AIzaSyBOePlGD0CiHVb3sP_S8R7NjbIu5wRdwXQ"
 
-          if (!isInitialized.current) {
-            isInitialized.current = true;
-          }
-          return newPositions
-        })
+  // 🧭 Get realistic driving route once map is ready
+  useEffect(() => {
+    if (!mapLoaded || !window.google) return
+    const directionsService = new window.google.maps.DirectionsService()
+    directionsService.route(
+      {
+        origin: busStops[0],
+        destination: busStops[busStops.length - 1],
+        waypoints: busStops.slice(1, -1).map(stop => ({ location: stop, stopover: true })),
+        travelMode: window.google.maps.TravelMode.DRIVING,
+      },
+      (result, status) => {
+        if (status === window.google.maps.DirectionsStatus.OK && result) {
+          setDirections(result)
+        } else {
+          console.error("Directions request failed due to " + status)
+        }
       }
+    )
+  }, [mapLoaded])
+
+  // ✅ LIVE COORDINATES FROM SUPABASE (driver_locations)
+  useEffect(() => {
+    const supabaseUrl = "https://ltdxlajzilbvmipcuqxd.supabase.co" // 🔹 replace with your Supabase URL
+    const supabaseAnonKey =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx0ZHhsYWp6aWxidm1pcGN1cXhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3NTQxMDEsImV4cCI6MjA3MDMzMDEwMX0.si0smbCAHPa7w9qbhzErQpo8rWJ7_vyZWPYXyJrHzBE"
+
+    const supabase = createClient(supabaseUrl, supabaseAnonKey)
+
+    console.log("📡 Subscribing to driver_locations realtime...")
+
+    const channel = supabase
+      .channel("realtime-driver")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "driver_locations" },
+        payload => {
+          const newData = payload.new
+          if (!newData) return
+
+          // only handle updates for driver_001
+          if (newData.driver_id === "driver_001") {
+            const newPos = {
+              lat: newData.latitude,
+              lng: newData.longitude,
+            }
+            console.log("📍 Live update from driver_001:", newPos)
+            setBusPos(newPos)
+            updateReachedStops(newPos)
+          }
+        }
+      )
+      .subscribe()
+
+    return () => {
+      console.log("🧹 Unsubscribed from realtime updates.")
+      supabase.removeChannel(channel)
     }
+  }, [])
 
-    updatePositions();
-    const interval = setInterval(updatePositions, 3000)
-
-    return () => clearInterval(interval)
-  }, [vehicles])
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'On Time': return "bg-primary";
-      case 'Delayed': return "bg-destructive";
-      case 'Early': return "bg-yellow-500";
-      default: return "bg-gray-400";
-    }
+  // 🧭 Update which stops are reached
+  const updateReachedStops = (curr: LatLng) => {
+    setStopReached(prevReached =>
+      prevReached.map((reached, idx) => {
+        if (reached) return true
+        const dist = haversineDistance(curr, busStops[idx])
+        return dist < 0.15 // ≈150 meters threshold
+      })
+    )
   }
-  
-  const activeVehicles = vehicles.filter(v => v.status !== 'Out of Service' && v.status !== 'Maintenance');
 
-  const getRouteName = (routeId: string | null) => {
-    if (!routeId) return 'Unassigned';
-    return routes.find(r => r.id === routeId)?.name || 'Unassigned';
+  // 📏 Distance between two coords in km
+  const haversineDistance = (a: LatLng, b: LatLng): number => {
+    const toRad = (x: number) => (x * Math.PI) / 180
+    const R = 6371
+    const dLat = toRad(b.lat - a.lat)
+    const dLng = toRad(b.lng - a.lng)
+    const s1 = Math.sin(dLat / 2)
+    const s2 = Math.sin(dLng / 2)
+    const aa = s1 * s1 + Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * s2 * s2
+    return R * 2 * Math.atan2(Math.sqrt(aa), Math.sqrt(1 - aa))
   }
+
+  const mapCenter = busStops[0]
 
   return (
     <Card className="h-[400px] lg:h-[calc(100vh-250px)]">
       <CardContent className="p-0 h-full">
-        <div ref={mapRef} className="h-full w-full rounded-lg flex items-center justify-center relative overflow-hidden map-grid">
-          {activeVehicles.length === 0 ? (
-            <div className="text-center text-muted-foreground z-0">
-              <MapPin className="h-12 w-12 mx-auto" />
-              <p className="mt-2 font-medium">Live Map View</p>
-              <p className="text-sm">No active buses to display.</p>
-            </div>
-          ) : (
-            <TooltipProvider>
-              {activeVehicles.map(vehicle => {
-                const position = positions.get(vehicle.id)
-                if (!position) return null
+        <LoadScript googleMapsApiKey={GOOGLE_MAPS_API_KEY} onLoad={() => setMapLoaded(true)}>
+          <GoogleMap
+            mapContainerStyle={containerStyle}
+            center={mapCenter}
+            zoom={13}
+            onLoad={map => (mapRef.current = map)}
+          >
+            {/* 🛣️ Real road-aligned route */}
+            {directions && (
+              <DirectionsRenderer
+                directions={directions}
+                options={{
+                  suppressMarkers: true,
+                  polylineOptions: {
+                    strokeColor: "#007BFF",
+                    strokeOpacity: 0.7,
+                    strokeWeight: 5,
+                  },
+                }}
+              />
+            )}
 
-                return (
-                  <Tooltip key={vehicle.id}>
-                    <TooltipTrigger asChild>
-                      <motion.div
-                        className="absolute flex items-center justify-center cursor-pointer"
-                        initial={{ x: position.x, y: position.y, scale: 0 }}
-                        animate={{ x: position.x, y: position.y, scale: 1 }}
-                        transition={{ 
-                            x: { duration: 3, ease: "linear" },
-                            y: { duration: 3, ease: "linear" },
-                            scale: { duration: 0.3, ease: "easeOut" }
-                        }}
-                      >
-                        <div className={cn("relative w-5 h-5 rounded-full flex items-center justify-center", getStatusColor(vehicle.status))}>
-                          <Bus className="h-3 w-3 text-primary-foreground" />
-                          <div className={cn(
-                            "absolute top-0 left-0 h-full w-full rounded-full animate-ping opacity-75",
-                             getStatusColor(vehicle.status)
-                          )} />
-                        </div>
-                      </motion.div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="font-semibold">{vehicle.name}</p>
-                      <p className="text-sm text-muted-foreground">{getRouteName(vehicle.routeId)}</p>
-                      <p className="text-sm flex items-center gap-2">
-                          <span className={cn("h-2 w-2 rounded-full inline-block", getStatusColor(vehicle.status))}></span>
-                          {vehicle.status}
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                )
-              })}
-            </TooltipProvider>
-          )}
-        </div>
+            {/* 🚏 Stops */}
+            {mapLoaded &&
+              busStops.map((stop, i) => (
+                <Marker
+                  key={i}
+                  position={stop}
+                  icon={{
+                    url: stopReached[i]
+                      ? "https://maps.google.com/mapfiles/ms/icons/green-dot.png"
+                      : "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
+                    scaledSize: new window.google.maps.Size(40, 40),
+                  }}
+                />
+              ))}
+
+            {/* 🚌 Live bus marker */}
+            {mapLoaded && (
+              <Marker
+                position={busPos}
+                icon={{
+                  url: "https://cdn-icons-png.flaticon.com/512/3448/3448339.png",
+                  scaledSize: new window.google.maps.Size(35, 35),
+                }}
+              />
+            )}
+          </GoogleMap>
+        </LoadScript>
       </CardContent>
     </Card>
   )

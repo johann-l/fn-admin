@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
+import { Send } from "lucide-react";
 
 // 🔹 Supabase client
 const supabase = createClient(
@@ -225,54 +226,72 @@ export default function ChatRoom() {
 
   // 🔹 Step 6: UI
   return (
-    <div className="flex flex-col h-full w-full">
-      {/* Chat messages */}
-      <div className="flex-1 overflow-y-auto p-4 bg-gray-100">
-        {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`mb-2 flex ${
-              msg.sender_id === userId ? "justify-end" : "justify-start"
-            }`}
-          >
-            <div
-              className={`px-4 py-2 rounded-2xl shadow max-w-[70%] ${
-                msg.sender_id === userId
-                  ? "bg-blue-500 text-white"
-                  : "bg-white text-gray-900"
-              }`}
-            >
-              {/* Sender name */}
-              {msg.sender_id !== userId && (
-                <p className="text-[11px] font-semibold text-green-600 mb-1">
-                  {msg.sender?.name || "Unknown"}
-                </p>
-              )}
-              <p className="text-sm break-words">{msg.message_text}</p>
-              <p className="text-[10px] opacity-70 mt-1 text-right">
-                {new Date(msg.created_at).toLocaleTimeString()}
-              </p>
-            </div>
+    <div className="flex flex-col h-full w-full bg-background">
+      {/* Chat messages (scrollable) */}
+      <div className="flex-1 overflow-y-auto p-6 space-y-3">
+        {messages.length === 0 ? (
+          <div className="flex items-center justify-center h-full text-muted-foreground">
+            <p>No messages yet. Start the conversation!</p>
           </div>
-        ))}
+        ) : (
+          messages.map((msg) => {
+            const isCurrentUser = msg.sender_id === userId;
+            const time = new Date(msg.created_at).toLocaleTimeString('en-US', {
+              hour: 'numeric',
+              minute: '2-digit',
+              hour12: true
+            });
+            
+            return (
+              <div
+                key={msg.id}
+                className={`flex ${isCurrentUser ? "justify-end" : "justify-start"}`}
+              >
+                <div className={`flex flex-col ${isCurrentUser ? "items-end" : "items-start"} max-w-[70%]`}>
+                  {!isCurrentUser && (
+                    <span className="text-xs font-medium text-primary mb-1 px-1">
+                      {msg.sender?.name || 'User'}
+                    </span>
+                  )}
+                  <div
+                    className={`px-4 py-2.5 rounded-2xl shadow-sm ${
+                      isCurrentUser
+                        ? "bg-primary text-primary-foreground rounded-br-sm"
+                        : "bg-card text-card-foreground border rounded-bl-sm"
+                    }`}
+                  >
+                    <p className="text-sm leading-relaxed">{msg.message_text}</p>
+                  </div>
+                  <span className="text-[10px] text-muted-foreground mt-1 px-1">
+                    {time}
+                  </span>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
 
-      {/* Input box */}
-      <div className="p-4 bg-white border-t flex">
-        <input
-          type="text"
-          className="flex-1 border rounded-xl px-3 py-2 mr-2"
-          placeholder="Type a message..."
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-        />
-        <button
-          onClick={sendMessage}
-          className="bg-blue-500 text-white px-4 py-2 rounded-xl shadow"
-        >
-          Send
-        </button>
+      {/* Input stays fixed at bottom */}
+      <div className="p-4 bg-card border-t border-border">
+        <div className="flex gap-3 max-w-5xl mx-auto">
+          <input
+            type="text"
+            className="flex-1 bg-background border border-input rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent placeholder:text-muted-foreground"
+            placeholder="Type a message..."
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
+          />
+          <button
+            onClick={sendMessage}
+            disabled={!newMessage.trim()}
+            className="bg-primary text-primary-foreground px-5 py-2.5 rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2 shadow-sm"
+          >
+            <Send className="h-4 w-4" />
+            <span className="font-medium">Send</span>
+          </button>
+        </div>
       </div>
     </div>
   );

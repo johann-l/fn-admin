@@ -3,10 +3,12 @@
 
 import * as React from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { ArrowUpRight, ArrowDownLeft, Calendar, CreditCard, CheckCircle2, XCircle, Clock } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { ArrowUpRight, ArrowDownLeft, Calendar, CreditCard, CheckCircle2, XCircle, Clock, Loader2 } from "lucide-react"
 import type { Payment } from "@/lib/data"
 import { format } from "date-fns"
 import { Banknote as BanknoteIcon } from "lucide-react"
+import { createTransactionCheckoutSession } from "@/app/actions/stripe"
 
 
 interface TransactionDetailCardProps {
@@ -15,10 +17,27 @@ interface TransactionDetailCardProps {
 
 export default function TransactionDetailCard({ payment }: TransactionDetailCardProps) {
   const [isMounted, setIsMounted] = React.useState(false)
+  const [paying, setPaying] = React.useState(false)
 
   React.useEffect(() => {
     setIsMounted(true)
   }, [])
+
+  const handlePayNow = async () => {
+    setPaying(true)
+    try {
+      const formData = new FormData()
+      formData.append('transactionId', payment.id)
+      formData.append('transactionDescription', payment.description)
+      formData.append('transactionAmount', payment.amount.toString())
+      formData.append('transactionType', payment.type)
+      
+      await createTransactionCheckoutSession(formData)
+    } catch (error) {
+      console.error('Error initiating payment:', error)
+      setPaying(false)
+    }
+  }
 
   const getStatusIcon = (status: Payment["status"]) => {
     switch(status) {
@@ -67,6 +86,30 @@ export default function TransactionDetailCard({ payment }: TransactionDetailCard
                     <span className="font-semibold">{payment.method}</span>
                 </div>
             </div>
+            
+            {payment.status === 'Pending' && payment.type === 'Incoming' && (
+              <div className="pt-4 mt-4 border-t border-dashed">
+                <Button 
+                  onClick={handlePayNow}
+                  disabled={paying}
+                  className="w-full"
+                  size="lg"
+                >
+                  {paying ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="mr-2 h-4 w-4" />
+                      Pay Now with Stripe
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
+            
              <div className="border-t border-dashed pt-4 mt-4 text-center">
                 <p className="text-xs text-muted-foreground">FleetNow Transaction Record</p>
             </div>

@@ -163,6 +163,33 @@ export default function ExpenseTracker() {
 
   React.useEffect(() => {
     fetchData()
+    
+    // Subscribe to real-time updates for expenses
+    const channel = supabase
+      .channel('expenses-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'expenses',
+        },
+        (payload) => {
+          console.log('Expense changed:', payload)
+          if (payload.eventType === 'INSERT') {
+            setExpenses(prev => [payload.new as DBExpense, ...prev])
+          } else if (payload.eventType === 'UPDATE') {
+            setExpenses(prev => prev.map(e => e.id === payload.new.id ? payload.new as DBExpense : e))
+          } else if (payload.eventType === 'DELETE') {
+            setExpenses(prev => prev.filter(e => e.id !== payload.old.id))
+          }
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
   }, [fetchData])
 
   // Handle Stripe redirect status (success/cancel)
@@ -270,30 +297,44 @@ export default function ExpenseTracker() {
   // Add expense -> insert into Supabase
   const onSubmit = async (values: ExpenseFormValues) => {
     // derive filename from URL if provided
-    const filename = values.billUrl ? (new URL(values.billUrl).pathname.split("/").pop() || null) : null
-    const vehicleName = vehicles.find(v => v.id === values.vehicleId)?.name ?? null
+    let filename = '';
+    if (values.billUrl && values.billUrl.trim() !== '') {
+      try {
+        filename = new URL(values.billUrl).pathname.split("/").pop() || '';
+      } catch {
+        filename = ''; // Invalid URL, use empty string
+      }
+    }
+    const vehicleName = vehicles.find(v => v.id === values.vehicleId)?.name ?? ''
 
     try {
       const insertRow = {
         description: values.description,
         vehicle_id: values.vehicleId || null,
-        vehicle: vehicleName,
+        vehicle: vehicleName || '',
         type: values.type,
         status: values.status,
         amount: values.amount, // numeric column — supabase will accept number
         date: values.date.toISOString(),
-        file_url: values.billUrl || null,
-        filename: filename || null,
+        file_url: (values.billUrl && values.billUrl.trim() !== '') ? values.billUrl : '',
+        filename: filename,
       }
 
+      console.log('Attempting to insert expense:', insertRow)
+      
       const { data: inserted, error: insertError } = await supabase
         .from("expenses")
         .insert([insertRow])
         .select("*")
         .single()
 
-      if (insertError) throw insertError
+      if (insertError) {
+        console.error('Supabase insert error:', insertError)
+        throw insertError
+      }
 
+      console.log('Expense inserted successfully:', inserted)
+      
       // append to local state
       setExpenses(prev => [inserted as DBExpense, ...prev])
       setIsDialogOpen(false)
@@ -303,10 +344,16 @@ export default function ExpenseTracker() {
       })
       form.reset()
     } catch (err: any) {
-      console.error("Insert error:", err)
+      console.error("Insert error details:", {
+        error: err,
+        message: err?.message,
+        details: err?.details,
+        hint: err?.hint,
+        code: err?.code
+      })
       toast({
         title: "Error adding expense",
-        description: err?.message ?? "Failed to add expense",
+        description: err?.message || err?.hint || "Failed to add expense. Check console for details.",
         variant: "destructive",
       })
     }

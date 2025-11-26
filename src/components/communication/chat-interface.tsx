@@ -31,6 +31,7 @@ export default function ChatRoom() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
   // 🔹 Step 1: Ensure user exists
+
   useEffect(() => {
     async function ensureUser() {
       try {
@@ -194,6 +195,7 @@ export default function ChatRoom() {
           filter: `chatroom_id=eq.${chatroomId}`,
         },
         (payload) => {
+          3;
           setMessages((prev) => [...prev, payload.new as Message]);
         }
       )
@@ -236,21 +238,27 @@ export default function ChatRoom() {
         ) : (
           messages.map((msg) => {
             const isCurrentUser = msg.sender_id === userId;
-            const time = new Date(msg.created_at).toLocaleTimeString('en-US', {
-              hour: 'numeric',
-              minute: '2-digit',
-              hour12: true
+            const time = new Date(msg.created_at).toLocaleTimeString("en-US", {
+              hour: "numeric",
+              minute: "2-digit",
+              hour12: true,
             });
-            
+
             return (
               <div
                 key={msg.id}
-                className={`flex ${isCurrentUser ? "justify-end" : "justify-start"}`}
+                className={`flex ${
+                  isCurrentUser ? "justify-end" : "justify-start"
+                }`}
               >
-                <div className={`flex flex-col ${isCurrentUser ? "items-end" : "items-start"} max-w-[70%]`}>
+                <div
+                  className={`flex flex-col ${
+                    isCurrentUser ? "items-end" : "items-start"
+                  } max-w-[70%]`}
+                >
                   {!isCurrentUser && (
                     <span className="text-xs font-medium text-primary mb-1 px-1">
-                      {msg.sender?.name || 'User'}
+                      {msg.sender?.name || "User"}
                     </span>
                   )}
                   <div
@@ -260,7 +268,9 @@ export default function ChatRoom() {
                         : "bg-card text-card-foreground border rounded-bl-sm"
                     }`}
                   >
-                    <p className="text-sm leading-relaxed">{msg.message_text}</p>
+                    <p className="text-sm leading-relaxed">
+                      {msg.message_text}
+                    </p>
                   </div>
                   <span className="text-[10px] text-muted-foreground mt-1 px-1">
                     {time}

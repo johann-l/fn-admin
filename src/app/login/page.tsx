@@ -10,114 +10,104 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    try {
-      // 1️⃣ Try Supabase Auth login
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+    // Step 1: Login
+    const { data, error: loginError } = await supabase.auth.signInWithPassword({
+      email: form.email,
+      password: form.password,
+    });
 
-      if (error) {
-        setError(error.message);
-        setLoading(false);
-        return;
-      }
-
-      const user = data.user;
-      if (!user) {
-        setError("Login failed: no user returned.");
-        setLoading(false);
-        return;
-      }
-
-      // 2️⃣ Save to localStorage
-      localStorage.setItem("user_id", user.id);
-      localStorage.setItem("user_email", email);
-
-      // 3️⃣ Ensure user exists in `users` table
-      const { data: existingUser, error: selectError } = await supabase
-        .from("users")
-        .select("id")
-        .eq("email", email)
-        .single();
-
-      if (selectError && selectError.code !== "PGRST116") {
-        console.error("Error checking user:", selectError);
-      }
-
-      if (!existingUser) {
-        const { error: insertError } = await supabase.from("users").insert([
-          {
-            id: user.id, // use Supabase Auth ID as primary key
-            email,
-            name: email.split("@")[0],
-          },
-        ]);
-
-        if (insertError) {
-          console.error("Error creating user:", insertError);
-        } else {
-          console.log("✅ User created in database");
-        }
-      } else {
-        console.log("✅ Existing user found");
-      }
-
-      // 4️⃣ Redirect to home/dashboard
-      router.replace("/");
-    } catch (err) {
-      console.error("Unexpected error:", err);
-      setError("Something went wrong during login.");
+    if (loginError) {
+      setError(loginError.message);
+      setLoading(false);
+      return;
     }
 
+    const user = data.user;
+    if (!user) {
+      setError("Login failed. No user found.");
+      setLoading(false);
+      return;
+    }
+
+    // Step 2: Fetch full name from app_users
+    const { data: userProfile, error: userFetchError } = await supabase
+      .from("app_users")
+      .select("full_name")
+      .eq("id", user.id)
+      .single();
+
+    if (userFetchError) {
+      setError("Failed to load user profile.");
+      setLoading(false);
+      return;
+    }
+
+    // Step 3: Store full name locally
+    if (userProfile?.full_name) {
+      localStorage.setItem("full_name", userProfile.full_name);
+    }
+
+    // Step 4: Redirect to dashboard/home
+    router.push("/");
     setLoading(false);
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
+    <div className="min-h-screen flex items-center justify-center bg-background">
       <Card className="w-full max-w-md shadow-2xl rounded-2xl">
         <CardHeader>
-          <CardTitle className="text-center text-xl font-bold">
-            FleetNow Login
-          </CardTitle>
+          <CardTitle className="text-center text-2xl">Login</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <Input
               type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              name="email"
+              placeholder="Email Address"
+              value={form.email}
+              onChange={handleChange}
               required
             />
             <Input
               type="password"
+              name="password"
               placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={form.password}
+              onChange={handleChange}
               required
             />
+
             {error && (
-              <p className="text-sm text-red-500 text-center">{error}</p>
+              <p className="text-red-500 text-sm text-center">{error}</p>
             )}
+
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Logging in..." : "Login"}
             </Button>
           </form>
+
           <p className="text-center text-sm mt-4">
             Don’t have an account?{" "}
             <Link href="/signup" className="text-primary hover:underline">
-              Sign up here
+              Sign up
             </Link>
           </p>
         </CardContent>

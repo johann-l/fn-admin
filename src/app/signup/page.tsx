@@ -7,6 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { createClient } from "@supabase/supabase-js";
+
+const adminSupabase = createClient(
+  "https://ltdxlajzilbvmipcuqxd.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx0ZHhsYWp6aWxidm1pcGN1cXhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3NTQxMDEsImV4cCI6MjA3MDMzMDEwMX0.si0smbCAHPa7w9qbhzErQpo8rWJ7_vyZWPYXyJrHzBE"
+);
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -41,11 +47,11 @@ export default function SignUpPage() {
       return;
     }
 
-    // Step 2: Insert into app_users table
+    // Step 2: Insert into app_users table (same workspace)
     if (data.user) {
       const { error: insertError } = await supabase.from("app_users").insert([
         {
-          id: data.user.id, // link to auth.users
+          id: data.user.id,
           full_name: form.full_name,
           email: form.email,
         },
@@ -53,6 +59,25 @@ export default function SignUpPage() {
 
       if (insertError) {
         setError(insertError.message);
+        setLoading(false);
+        return;
+      }
+
+      // Step 2b: Insert user into the OTHER Supabase workspace
+      const { error: adminInsertError } = await adminSupabase
+        .from("users")
+        .insert([
+          {
+            id: data.user.id,
+            name: form.full_name,
+            email: form.email,
+            is_admin: true,
+            role: "admin",
+          },
+        ]);
+
+      if (adminInsertError) {
+        setError(adminInsertError.message);
         setLoading(false);
         return;
       }

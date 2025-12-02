@@ -1,22 +1,20 @@
 {
   "name": "fleetnow-admin",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Admin app for FleetNow",
   "private": true,
   "main": "main.js",
-  "scripts": {
-    "prod": "cross-env NEXT_TELEMETRY_DISABLED=1 next build && electron -r esm -e \"const { app, BrowserWindow } = require('electron'); const express = require('express'); const path = require('path'); const getPort = require('get-port'); (async()=>{const server = express(); const port = await getPort(); const buildPath = path.join(__dirname,'.next'); server.use(express.static(buildPath)); server.get('*',(req,res)=>res.sendFile(path.join(buildPath,'server','pages','index.html'))); server.listen(port,()=>{app.whenReady().then(()=>{const win=new BrowserWindow({width:1200,height:800}); win.loadURL('http://localhost:'+port);});});})();\"",
-    "next:dev": "next dev --turbopack -p 9002",
-    "next:build": "next build",
-    "next:start": "next start",
-    "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
-    "genkit:watch": "genkit start -- tsx --watch src/ai/dev.ts",
-    "lint": "next lint",
-    "typecheck": "tsc --noEmit",
-    "electron:dev": "cross-env NODE_ENV=development concurrently \"npm run next:dev\" \"wait-on http://localhost:9002 && electron .\"",
-    "electron:prod": "npm run next:build && npm run next:start",
-    "dist": "npm run next:build && electron-builder"
-  },
+ "scripts": {
+  "dist": "npm run next:build && electron-builder",
+  "next:dev": "next dev -p 3000",
+  "next:build": "next build",
+  "next:start": "next start -p 3000",
+  "electron": "electron .",
+  "demo": "concurrently \"npm run next:start\" \"npm run electron\""
+}
+
+
+,
   "author": "Johann, Gladlin, Ashwin, Ayman",
   "license": "ISC",
   "dependencies": {
@@ -95,21 +93,20 @@
     "wait-on": "^8.0.4"
   },
   "build": {
-    "appId": "com.fleetnow.adminapp",
-    "productName": "FleetNow Admin",
-    "files": [
-      ".next/**/*",
-      "public/**/*",
-      "main.js",
-      "package.json"
-    ],
-    "directories": {
-      "buildResources": "assets"
-    },
-    "publish": {
-      "provider": "github",
-      "owner": "johann-l",
-      "repo": "fn-admin"
-    }
+  "appId": "com.fleetnow.adminapp",
+  "productName": "FleetNow Admin",
+  "files": [
+  "out/**/*",
+  "main.js",
+  "package.json"
+]
+,
+  "publish": {
+    "provider": "github",
+    "owner": "johann-l",
+    "repo": "fn-admin"
   }
+}
+
+
 }

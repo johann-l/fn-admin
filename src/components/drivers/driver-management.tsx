@@ -1,15 +1,19 @@
 "use client";
 
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+
+// Initialize Supabase client for client-side use
+const supabase = createClientComponentClient();
+
+import { Key } from "lucide-react";
 import * as React from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence } from "framer-motion";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 import { useAppData } from "@/context/app-data-context";
 import type { Driver } from "@/lib/data";
-
 import {
   Card,
   CardContent,
@@ -83,10 +87,8 @@ type DriverFormValues = z.infer<typeof driverFormSchema>;
 type DriverFormData = Omit<Driver, "id" | "avatarUrl">;
 
 export default function DriverManagement() {
-  const supabase = createClientComponentClient();
   const { drivers, vehicles, addDriver, updateDriver, removeDriver } =
     useAppData();
-
   const [isFormOpen, setIsFormOpen] = React.useState(false);
   const [editingDriver, setEditingDriver] = React.useState<Driver | null>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = React.useState(false);
@@ -107,6 +109,47 @@ export default function DriverManagement() {
       assignedVehicleId: null,
     },
   });
+
+  const handleGenerateKey = async (driver: Driver) => {
+    try {
+      // 1. Generate a random key
+      const key = Math.random().toString(36).substring(2, 10).toUpperCase();
+
+      // 2. Insert into driver_keys table via Supabase
+      const { error: insertError } = await supabase.from("driver_keys").insert({
+        driver_email: driver.email,
+        key_value: key,
+        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days validity
+      });
+
+      if (insertError) {
+        console.error("Error inserting key:", insertError);
+        alert("Failed to generate key");
+        return;
+      }
+
+      // 3. Call Edge Function to email the key
+      const res = await fetch(process.env.NEXT_PUBLIC_SUPABASE_EDGE as string, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({ email: driver.email, key }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        console.error("Error sending email:", data);
+        alert("Key generated but failed to send email");
+      } else {
+        alert("Driver key generated and emailed successfully!");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong while generating the key.");
+    }
+  };
 
   const handleCreateClick = () => {
     setEditingDriver(null);
@@ -142,16 +185,15 @@ export default function DriverManagement() {
     setIsDeleteDialogOpen(true);
   };
 
-  const handleConfirmDelete = async () => {
+  const handleConfirmDelete = () => {
     if (driverToDelete) {
-      await supabase.from("drivers").delete().eq("id", driverToDelete.id);
       removeDriver(driverToDelete.id);
     }
     setIsDeleteDialogOpen(false);
     setDriverToDelete(null);
   };
 
-  const onSubmit = async (values: DriverFormValues) => {
+  const onSubmit = (values: DriverFormValues) => {
     const finalValues = {
       ...values,
       assignedVehicleId:
@@ -159,36 +201,10 @@ export default function DriverManagement() {
     };
 
     if (editingDriver) {
-      const { error } = await supabase
-        .from("drivers")
-        .update({
-          name: finalValues.name,
-          email: finalValues.email,
-          phone: finalValues.phone,
-          status: finalValues.status,
-          assigned_vehicle_id: finalValues.assignedVehicleId,
-        })
-        .eq("id", editingDriver.id);
-
-      if (!error) updateDriver({ ...editingDriver, ...finalValues });
+      updateDriver({ ...editingDriver, ...finalValues });
     } else {
-      const { data, error } = await supabase
-        .from("drivers")
-        .insert([
-          {
-            name: finalValues.name,
-            email: finalValues.email,
-            phone: finalValues.phone,
-            status: finalValues.status,
-            assigned_vehicle_id: finalValues.assignedVehicleId,
-          },
-        ])
-        .select()
-        .single();
-
-      if (!error && data) addDriver(data);
+      addDriver(finalValues as DriverFormData);
     }
-
     setIsFormOpen(false);
   };
 
@@ -254,6 +270,7 @@ export default function DriverManagement() {
                             <AvatarImage
                               src={`${driver.avatarUrl}?${driver.id}`}
                               alt={driver.name}
+                              data-ai-hint="person avatar"
                             />
                             <AvatarFallback>
                               {driver.name.charAt(0)}
@@ -321,6 +338,20 @@ export default function DriverManagement() {
                             <p>Delete Driver</p>
                           </TooltipContent>
                         </Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleGenerateKey(driver)}
+                            >
+                              <Key className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Generate & Email Key</p>
+                          </TooltipContent>
+                        </Tooltip>
                       </TableCell>
                     </motion.tr>
                   ))}
@@ -331,7 +362,6 @@ export default function DriverManagement() {
         </CardContent>
       </Card>
 
-      {/* Form Dialog */}
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -340,7 +370,7 @@ export default function DriverManagement() {
             </DialogTitle>
             <DialogDescription>
               {editingDriver
-                ? `Make changes to ${editingDriver.name}'s profile here.`
+                ? `Make changes to ${editingDriver.name}'s profile here. Click save when you're done.`
                 : "Enter the details for the new driver."}
             </DialogDescription>
           </DialogHeader>
@@ -431,9 +461,9 @@ export default function DriverManagement() {
                         </FormControl>
                         <SelectContent>
                           <SelectItem value="none">None</SelectItem>
-                          {vehicles.map((v) => (
-                            <SelectItem key={v.id} value={v.id}>
-                              {v.name}
+                          {vehicles.map((vehicle) => (
+                            <SelectItem key={vehicle.id} value={vehicle.id}>
+                              {vehicle.name}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -458,7 +488,24 @@ export default function DriverManagement() {
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation */}
+      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+        <DialogContent className="sm:max-w-sm p-0 bg-transparent border-none shadow-none">
+          {selectedDriverForView && (
+            <>
+              <DialogHeader className="sr-only">
+                <DialogTitle>
+                  Driver ID Card: {selectedDriverForView.name}
+                </DialogTitle>
+                <DialogDescription>
+                  View and print the driver&apos;s ID card.
+                </DialogDescription>
+              </DialogHeader>
+              <DriverIdCard driver={selectedDriverForView} />
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
       <AlertDialog
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
@@ -467,7 +514,9 @@ export default function DriverManagement() {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete {driverToDelete?.name}'s profile.
+              This action cannot be undone. This will permanently delete the
+              profile for {driverToDelete?.name} and unassign them from any
+              vehicles.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

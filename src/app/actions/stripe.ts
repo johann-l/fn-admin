@@ -95,7 +95,7 @@ export async function createTransactionCheckoutSession(formData: FormData) {
     line_items: [
       {
         price_data: {
-          currency: 'inr', // Indian Rupees (same as mobile app)
+          currency: 'usd', // Changed to USD to allow smaller amounts
           product_data: {
             name: transactionDescription,
             description: `Transaction ID: ${transactionId}`,

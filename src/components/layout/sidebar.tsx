@@ -1,9 +1,8 @@
+"use client";
 
-"use client"
-
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { useTheme } from "next-themes"
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation"; // <-- IMPORTED useRouter
+import { useTheme } from "next-themes";
 import {
   Sidebar,
   SidebarHeader,
@@ -12,13 +11,13 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   Bus,
   LayoutDashboard,
@@ -35,8 +34,8 @@ import {
   Truck,
   AreaChart,
   Route,
-} from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+} from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const links = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -49,16 +48,26 @@ const links = [
   { href: "/payments", label: "Payments", icon: CreditCard },
   { href: "/communication", label: "Communication", icon: MessageSquare },
   { href: "/reports", label: "Reports", icon: AreaChart },
-]
+];
 
 export default function AppSidebar() {
-  const pathname = usePathname()
-  const { setTheme } = useTheme()
+  const pathname = usePathname();
+  const router = useRouter(); // <-- INITIALIZED
+  const { setTheme } = useTheme();
 
   // A simple function to check for the root path
   const isActive = (href: string) => {
-    return href === "/" ? pathname === href : pathname.startsWith(href)
-  }
+    return href === "/" ? pathname === href : pathname.startsWith(href);
+  };
+
+  // --- LOGOUT HANDLER FUNCTION ---
+  const handleLogout = () => {
+    // 1. Clear all items from Local Storage
+    localStorage.clear();
+
+    // 2. Route the user to the login page
+    router.push("/login");
+  };
 
   return (
     <Sidebar>
@@ -117,27 +126,30 @@ export default function AppSidebar() {
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip="Settings">
-              <Link href="#">
-                <Settings />
-                <span>Settings</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
         </SidebarMenu>
         <div className="flex items-center gap-3 p-2 rounded-md bg-sidebar-accent/50 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:justify-center">
-            <Avatar className="h-10 w-10">
-              <AvatarImage src="https://placehold.co/100x100.png" alt="Admin" data-ai-hint="person avatar" />
-              <AvatarFallback>AD</AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-              <span className="font-semibold text-sm text-sidebar-foreground">Admin User</span>
-              <span className="text-xs text-sidebar-foreground/70">admin@fleetnow.com</span>
-            </div>
-            <LogOut className="ml-auto h-5 w-5 cursor-pointer text-sidebar-foreground/70 hover:text-sidebar-foreground group-data-[collapsible=icon]:hidden" />
+          <Avatar className="h-10 w-10">
+            <AvatarImage
+              src="https://placehold.co/100x100.png"
+              alt="Admin"
+              data-ai-hint="person avatar"
+            />
+            <AvatarFallback>AD</AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col group-data-[collapsible=icon]:hidden">
+            <span className="font-semibold text-sm text-sidebar-foreground">
+              {localStorage.full_name}
+            </span>
+            <span className="text-xs text-sidebar-foreground/70">
+              {localStorage.email}
+            </span>
+          </div>
+          <LogOut
+            className="ml-auto h-5 w-5 cursor-pointer text-sidebar-foreground/70 hover:text-sidebar-foreground group-data-[collapsible=icon]:hidden"
+            onClick={handleLogout} // <-- ADDED onClick HANDLER HERE
+          />
         </div>
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

@@ -60,9 +60,24 @@ export default function LoginPage() {
       return;
     }
 
+    const { data: userProfile1, error: userFetchError1 } = await supabase
+      .from("app_users")
+      .select("email")
+      .eq("id", user.id)
+      .single();
+
+    if (userFetchError1) {
+      setError("Failed to load user profile.");
+      setLoading(false);
+      return;
+    }
+
     // Step 3: Store full name locally
     if (userProfile?.full_name) {
       localStorage.setItem("full_name", userProfile.full_name);
+    }
+    if (userProfile1?.email) {
+      localStorage.setItem("email", userProfile1.email);
     }
 
     // Step 4: Redirect to dashboard/home

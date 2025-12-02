@@ -624,7 +624,7 @@ export default function ReportsDashboard() {
             >
               <BarChart
                 data={revenueExpenseData}
-                margin={{ left: -20, right: 12 }}
+                margin={{ left: -10, right: 12 }}
               >
                 <CartesianGrid vertical={false} />
                 <XAxis
@@ -637,7 +637,7 @@ export default function ReportsDashboard() {
                   tickLine={false}
                   axisLine={false}
                   tickMargin={8}
-                  tickFormatter={(value) => `$${value / 1000}k`}
+                  tickFormatter={(value) => `₹${value / 1000}k`}
                 />
                 <ChartTooltip
                   cursor={false}
@@ -707,7 +707,7 @@ export default function ReportsDashboard() {
           <CardContent className="mt-0 flex-col gap-2 text-sm">
             <div className="flex justify-between font-medium">
               <span>Total</span>
-              <span>${totalCurrentMonthExpenses.toFixed(2)}</span>
+              <span>₹{totalCurrentMonthExpenses.toFixed(2)}</span>
             </div>
           </CardContent>
         </Card>
@@ -751,7 +751,7 @@ export default function ReportsDashboard() {
                   type="number"
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={(value) => `$${value / 1000}k`}
+                  tickFormatter={(value) => `₹${value / 1000}k`}
                 />
                 <ChartTooltip
                   cursor={false}
@@ -926,7 +926,7 @@ export default function ReportsDashboard() {
                               {p.category}
                             </TableCell>
                             <TableCell className="text-right font-medium text-primary">
-                              +${p.amount.toFixed(2)}
+                              +₹{p.amount.toFixed(2)}
                             </TableCell>
                           </TableRow>
                         ))}
@@ -936,7 +936,7 @@ export default function ReportsDashboard() {
                   <div className="flex justify-between items-center text-lg font-bold p-4 border-t bg-card/95 backdrop-blur-sm">
                     <span>Total Income</span>
                     <span className="text-primary">
-                      ${totalIncome.toFixed(2)}
+                      ₹{totalIncome.toFixed(2)}
                     </span>
                   </div>
                 </div>
@@ -959,7 +959,7 @@ export default function ReportsDashboard() {
                               {e.category}
                             </TableCell>
                             <TableCell className="text-right font-medium text-destructive">
-                              -${e.amount.toFixed(2)}
+                              -₹{e.amount.toFixed(2)}
                             </TableCell>
                           </TableRow>
                         ))}
@@ -969,7 +969,7 @@ export default function ReportsDashboard() {
                   <div className="flex justify-between items-center text-lg font-bold p-4 border-t bg-card/95 backdrop-blur-sm">
                     <span>Total Expenses</span>
                     <span className="text-destructive">
-                      ${totalPaidExpenses.toFixed(2)}
+                      ₹{totalPaidExpenses.toFixed(2)}
                     </span>
                   </div>
                 </div>
@@ -984,7 +984,7 @@ export default function ReportsDashboard() {
                     netProfit >= 0 ? "text-primary" : "text-destructive"
                   }
                 >
-                  {netProfit < 0 ? "-" : ""}${Math.abs(netProfit).toFixed(2)}
+                  {netProfit < 0 ? "-" : ""}₹{Math.abs(netProfit).toFixed(2)}
                 </span>
               </div>
             </div>

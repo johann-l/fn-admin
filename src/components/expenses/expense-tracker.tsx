@@ -383,7 +383,7 @@ export default function ExpenseTracker() {
               {filter === 'all' && <TableCell><Badge variant={getTypeVariant(expense.type)}>{expense.type}</Badge></TableCell>}
               <TableCell>{dateObj ? format(dateObj, "LLL dd, y") : "-"}</TableCell>
               <TableCell><Badge variant={getStatusVariant(expense.status)}>{expense.status ?? "-"}</Badge></TableCell>
-              <TableCell className="text-right">${(isNaN(amountNum) ? 0 : amountNum).toFixed(2)}</TableCell>
+              <TableCell className="text-right">₹{(isNaN(amountNum) ? 0 : amountNum).toFixed(2)}</TableCell>
               <TableCell className="text-right">
                 <div className="flex items-center justify-end space-x-1">
                   {expense.file_url && (
@@ -434,7 +434,7 @@ export default function ExpenseTracker() {
                 <CardDescription>This month</CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-3xl font-bold">${totalExpenses.toFixed(2)}</p>
+                <p className="text-3xl font-bold">₹{totalExpenses.toFixed(2)}</p>
                 <p className="text-xs text-muted-foreground">Across all categories</p>
               </CardContent>
             </Card>
@@ -449,7 +449,7 @@ export default function ExpenseTracker() {
                   <BarChart accessibilityLayer data={chartData} margin={{ top: 20, right: 20, left: 0, bottom: 5 }}>
                     <CartesianGrid vertical={false} />
                     <XAxis dataKey="name" tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value} />
-                    <YAxis domain={[0, 'dataMax + 100']} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value}`} />
+                    <YAxis domain={[0, 'dataMax + 100']} tickLine={false} axisLine={false} tickFormatter={(value) => `₹${value}`} />
                     <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
                     <Bar dataKey="total" radius={4}>
                       {chartData.map((entry) => (

@@ -19,7 +19,10 @@ import {
   generateHistoricalExpenses,
   generateHistoricalPayments,
 } from "@/lib/data";
-import { fetchTransactions, subscribeToTransactions } from "@/lib/supabaseService";
+import {
+  fetchTransactions,
+  subscribeToTransactions,
+} from "@/lib/supabaseService";
 
 type VehicleFormData = Omit<
   Vehicle,
@@ -67,26 +70,29 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
   const [documents, setDocuments] =
     React.useState<Document[]>(initialDocuments);
   const [expenses, setExpenses] = React.useState<Expense[] | null>(null);
-  const [payments, setPayments] = React.useState<Payment[] | null>(null);
+  // Seed with generated historical payments so charts have data before Supabase loads
+  const [payments, setPayments] = React.useState<Payment[] | null>(
+    generateHistoricalPayments()
+  );
   const [routes, setRoutes] = React.useState<Route[]>(initialRoutes);
   const [alerts, setAlerts] = React.useState<Alert[]>(initialAlerts);
 
   React.useEffect(() => {
     // Generate expenses data on the client-side
     setExpenses(generateHistoricalExpenses());
-    
+
     // Fetch real transactions from Supabase
     async function loadTransactions() {
       const transactions = await fetchTransactions();
-      console.log('Loaded transactions from Supabase:', transactions.length);
+      console.log("Loaded transactions from Supabase:", transactions.length);
       setPayments(transactions);
     }
-    
+
     loadTransactions();
-    
+
     // Subscribe to realtime transaction updates
     const unsubscribe = subscribeToTransactions((updatedPayment) => {
-      console.log('Transaction updated:', updatedPayment);
+      console.log("Transaction updated:", updatedPayment);
       setPayments((prev) => {
         if (!prev) return [updatedPayment];
         const index = prev.findIndex((p) => p.id === updatedPayment.id);
@@ -101,7 +107,7 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
         }
       });
     });
-    
+
     return () => {
       unsubscribe();
     };

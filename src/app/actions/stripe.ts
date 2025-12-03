@@ -43,7 +43,7 @@ export async function createCheckoutSession(formData: FormData) {
     line_items: [
       {
         price_data: {
-          currency: "usd",
+          currency: "inr",
           product_data: {
             name: expenseDescription,
             description: `Expense ID: ${expenseId}`,
@@ -108,7 +108,7 @@ export async function createTransactionCheckoutSession(formData: FormData) {
     line_items: [
       {
         price_data: {
-          currency: "usd", // Changed to USD to allow smaller amounts
+          currency: "inr",
           product_data: {
             name: transactionDescription,
             description: `Transaction ID: ${transactionId}`,

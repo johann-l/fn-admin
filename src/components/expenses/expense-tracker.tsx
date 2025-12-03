@@ -1,21 +1,34 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useSearchParams } from 'next/navigation'
-import { format } from "date-fns"
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Cell } from "recharts"
-import { useFormStatus } from "react-dom"
-import { Loader2, Eye, PlusCircle, CalendarIcon } from "lucide-react"
-import { z } from "zod"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+import * as React from "react";
+import { useSearchParams } from "next/navigation";
+import { format } from "date-fns";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Cell } from "recharts";
+import { useFormStatus } from "react-dom";
+import { Loader2, Eye, PlusCircle, CalendarIcon } from "lucide-react";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-import { supabase } from "@/lib/supabaseClient"
-import type { Database } from "@/lib/supabase-types" // optional, if you have typed DB
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { supabase } from "@/lib/supabaseClient";
+import type { Database } from "@/lib/supabase-types"; // optional, if you have typed DB
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -23,7 +36,7 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -31,27 +44,51 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Calendar } from "@/components/ui/calendar"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig } from "@/components/ui/chart"
-import { useToast } from "@/hooks/use-toast"
-import { createCheckoutSession } from "@/app/actions/stripe"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { cn } from "@/lib/utils"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartConfig,
+} from "@/components/ui/chart";
+import { useToast } from "@/hooks/use-toast";
+import { createCheckoutSession } from "@/app/actions/stripe";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 
 const expenseFormSchema = z.object({
   description: z.string().min(1, "Description is required"),
   vehicleId: z.string().min(1, "Vehicle is required"),
-  type: z.enum(['Fuel', 'Maintenance', 'Insurance', 'Tolls', 'Misc', 'Other']),
+  type: z.enum(["Fuel", "Maintenance", "Insurance", "Tolls", "Misc", "Other"]),
   date: z.date({ required_error: "An expense date is required." }),
   amount: z.coerce.number().min(0.01, "Amount must be greater than zero."),
-  status: z.enum(['Paid', 'Unpaid']),
-  billUrl: z.string().url({ message: "Please enter a valid URL." }).optional().or(z.literal('')),
-})
+  status: z.enum(["Paid", "Unpaid"]),
+  billUrl: z
+    .string()
+    .url({ message: "Please enter a valid URL." })
+    .optional()
+    .or(z.literal("")),
+});
 
 type ExpenseFormValues = z.infer<typeof expenseFormSchema>;
 
@@ -60,18 +97,18 @@ type ExpenseFormValues = z.infer<typeof expenseFormSchema>;
  * Note: You can replace this with a generated type from your supabase typings if you have them.
  */
 type DBExpense = {
-  id: string
-  vehicle_id: string | null
-  filename: string | null
-  description: string | null
-  vehicle: string | null
-  type: string | null
-  status: string | null
-  amount: string | number | null // numeric arrives as string from supabase
-  date: string | null // ISO string
-  file_url: string | null
-  created_at?: string | null
-}
+  id: string;
+  vehicle_id: string | null;
+  filename: string | null;
+  description: string | null;
+  vehicle: string | null;
+  type: string | null;
+  status: string | null;
+  amount: string | number | null; // numeric arrives as string from supabase
+  date: string | null; // ISO string
+  file_url: string | null;
+  created_at?: string | null;
+};
 
 const chartConfig = {
   total: { label: "Total" },
@@ -84,7 +121,7 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 function PayButton() {
-  const { pending } = useFormStatus()
+  const { pending } = useFormStatus();
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -96,21 +133,42 @@ function PayButton() {
         <p>Pay with Stripe</p>
       </TooltipContent>
     </Tooltip>
-  )
+  );
 }
 
-const expenseTypes = ['Fuel', 'Maintenance', 'Insurance', 'Tolls', 'Misc', 'Other'] as const
-type ExpenseType = (typeof expenseTypes)[number]
-type ExpenseFilter = 'all' | ExpenseType
+const expenseTypes = [
+  "Fuel",
+  "Maintenance",
+  "Insurance",
+  "Tolls",
+  "Misc",
+  "Other",
+] as const;
+type ExpenseType = (typeof expenseTypes)[number];
+type ExpenseFilter = "all" | ExpenseType;
 
 export default function ExpenseTracker() {
-  const searchParams = useSearchParams()
-  const { toast } = useToast()
-  const [isDialogOpen, setIsDialogOpen] = React.useState(false)
+  const searchParams = useSearchParams();
+  const { toast } = useToast();
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
 
-  const [loading, setLoading] = React.useState(true)
-  const [expenses, setExpenses] = React.useState<DBExpense[]>([])
-  const [vehicles, setVehicles] = React.useState<{ id: string; name: string }[]>([])
+  const [loading, setLoading] = React.useState(true);
+  const [expenses, setExpenses] = React.useState<DBExpense[]>([]);
+  const [vehicles, setVehicles] = React.useState<
+    { id: string; name: string }[]
+  >([]);
+
+  const formatINR = React.useMemo(() => {
+    try {
+      return new Intl.NumberFormat("en-IN", {
+        style: "currency",
+        currency: "INR",
+        maximumFractionDigits: 2,
+      });
+    } catch {
+      return { format: (n: number) => `₹${n.toFixed(2)}` } as Intl.NumberFormat;
+    }
+  }, []);
 
   const form = useForm<ExpenseFormValues>({
     resolver: zodResolver(expenseFormSchema),
@@ -123,241 +181,274 @@ export default function ExpenseTracker() {
       status: "Unpaid",
       billUrl: "",
     },
-  })
+  });
 
   const handleCreateClick = () => {
-    form.reset()
-    setIsDialogOpen(true)
-  }
+    form.reset();
+    setIsDialogOpen(true);
+  };
 
   // Fetch vehicles and expenses from Supabase
   const fetchData = React.useCallback(async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       const { data: vData, error: vErr } = await supabase
         .from("vehicles")
         .select("id, name")
-        .order("name", { ascending: true })
+        .order("name", { ascending: true });
 
-      if (vErr) throw vErr
-      setVehicles(vData ?? [])
+      if (vErr) throw vErr;
+      setVehicles(vData ?? []);
 
       const { data: eData, error: eErr } = await supabase
         .from("expenses")
         .select("*")
-        .order("date", { ascending: false })
+        .order("date", { ascending: false });
 
-      if (eErr) throw eErr
-      setExpenses(eData ?? [])
+      if (eErr) throw eErr;
+      setExpenses(eData ?? []);
     } catch (err: any) {
-      console.error("Error fetching expenses/vehicles:", err)
+      console.error("Error fetching expenses/vehicles:", err);
       toast({
         title: "Error loading data",
         description: err?.message ?? "Failed to fetch data",
         variant: "destructive",
-      })
+      });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [toast])
+  }, [toast]);
 
   React.useEffect(() => {
-    fetchData()
-    
+    fetchData();
+
     // Subscribe to real-time updates for expenses
     const channel = supabase
-      .channel('expenses-changes')
+      .channel("expenses-changes")
       .on(
-        'postgres_changes',
+        "postgres_changes",
         {
-          event: '*',
-          schema: 'public',
-          table: 'expenses',
+          event: "*",
+          schema: "public",
+          table: "expenses",
         },
         (payload) => {
-          console.log('Expense changed:', payload)
-          if (payload.eventType === 'INSERT') {
-            setExpenses(prev => [payload.new as DBExpense, ...prev])
-          } else if (payload.eventType === 'UPDATE') {
-            setExpenses(prev => prev.map(e => e.id === payload.new.id ? payload.new as DBExpense : e))
-          } else if (payload.eventType === 'DELETE') {
-            setExpenses(prev => prev.filter(e => e.id !== payload.old.id))
+          console.log("Expense changed:", payload);
+          if (payload.eventType === "INSERT") {
+            setExpenses((prev) => [payload.new as DBExpense, ...prev]);
+          } else if (payload.eventType === "UPDATE") {
+            setExpenses((prev) =>
+              prev.map((e) =>
+                e.id === payload.new.id ? (payload.new as DBExpense) : e
+              )
+            );
+          } else if (payload.eventType === "DELETE") {
+            setExpenses((prev) => prev.filter((e) => e.id !== payload.old.id));
           }
         }
       )
-      .subscribe()
+      .subscribe();
 
     return () => {
-      supabase.removeChannel(channel)
-    }
-  }, [fetchData])
+      supabase.removeChannel(channel);
+    };
+  }, [fetchData]);
 
   // Handle Stripe redirect status (success/cancel)
   React.useEffect(() => {
-    if (searchParams.get('success')) {
-      const expenseId = searchParams.get('expense_id')
+    if (searchParams.get("success")) {
+      const expenseId = searchParams.get("expense_id");
       toast({
         title: "Payment Successful!",
         description: "Thank you for your payment.",
-      })
+      });
       if (expenseId) {
-        ;(async () => {
+        (async () => {
           const { error } = await supabase
             .from("expenses")
             .update({ status: "Paid" })
-            .eq("id", expenseId)
+            .eq("id", expenseId);
 
           if (error) {
             toast({
               title: "Error updating expense",
               description: error.message,
               variant: "destructive",
-            })
+            });
           } else {
             // Optimistically update local state
-            setExpenses(prev => prev.map(e => (e.id === expenseId ? { ...e, status: "Paid" } : e)))
+            setExpenses((prev) =>
+              prev.map((e) =>
+                e.id === expenseId ? { ...e, status: "Paid" } : e
+              )
+            );
           }
-        })()
+        })();
       }
     }
 
-    if (searchParams.get('canceled')) {
+    if (searchParams.get("canceled")) {
       toast({
         title: "Payment Canceled",
         description: "Your payment was not processed.",
         variant: "destructive",
-      })
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams])
+  }, [searchParams]);
 
   const totalExpenses = React.useMemo(() => {
-    if (!expenses) return 0
+    if (!expenses) return 0;
     return expenses.reduce((acc, expense) => {
-      const amt = typeof expense.amount === "string" ? Number(expense.amount) : (expense.amount ?? 0)
-      return acc + (isNaN(amt) ? 0 : amt)
-    }, 0)
-  }, [expenses])
+      const amt =
+        typeof expense.amount === "string"
+          ? Number(expense.amount)
+          : expense.amount ?? 0;
+      return acc + (isNaN(amt) ? 0 : amt);
+    }, 0);
+  }, [expenses]);
 
   const expensesByType = React.useMemo(() => {
-    if (!expenses) return {}
+    if (!expenses) return {};
     return expenses.reduce((acc: Record<string, number>, expense) => {
-      const type = expense.type ?? "Other"
-      const amt = typeof expense.amount === "string" ? Number(expense.amount) : (expense.amount ?? 0)
-      acc[type] = (acc[type] || 0) + (isNaN(amt) ? 0 : amt)
-      return acc
-    }, {})
-  }, [expenses])
+      const type = expense.type ?? "Other";
+      const amt =
+        typeof expense.amount === "string"
+          ? Number(expense.amount)
+          : expense.amount ?? 0;
+      acc[type] = (acc[type] || 0) + (isNaN(amt) ? 0 : amt);
+      return acc;
+    }, {});
+  }, [expenses]);
 
   const chartData = React.useMemo(() => {
-    if (!expensesByType) return []
-    return Object.entries(expensesByType).map(([name, total]) => ({ name, total: Math.floor(total) }))
-  }, [expensesByType])
+    if (!expensesByType) return [];
+    return Object.entries(expensesByType).map(([name, total]) => ({
+      name,
+      total: Math.floor(total),
+    }));
+  }, [expensesByType]);
 
   const getVehicleName = (vehicleId?: string | null) => {
-    if (!vehicleId) return 'N/A'
-    return vehicles.find(v => v.id === vehicleId)?.name || 'N/A'
-  }
+    if (!vehicleId) return "N/A";
+    return vehicles.find((v) => v.id === vehicleId)?.name || "N/A";
+  };
 
-  const getTypeVariant = (type?: string | null): "default" | "secondary" | "destructive" | "outline" => {
+  const getTypeVariant = (
+    type?: string | null
+  ): "default" | "secondary" | "destructive" | "outline" => {
     switch (type) {
-      case 'Fuel': return "default";
-      case 'Maintenance': return "destructive";
-      case 'Insurance': return "secondary";
-      case 'Tolls': return "outline";
-      case 'Misc': return "outline";
-      case 'Other': return "outline";
-      default: return "default";
+      case "Fuel":
+        return "default";
+      case "Maintenance":
+        return "destructive";
+      case "Insurance":
+        return "secondary";
+      case "Tolls":
+        return "outline";
+      case "Misc":
+        return "outline";
+      case "Other":
+        return "outline";
+      default:
+        return "default";
     }
-  }
+  };
 
-  const getStatusVariant = (status?: string | null): "default" | "destructive" => {
-    return status === 'Paid' ? 'default' : 'destructive';
-  }
+  const getStatusVariant = (
+    status?: string | null
+  ): "default" | "destructive" => {
+    return status === "Paid" ? "default" : "destructive";
+  };
 
   const filteredExpenses = (filter: ExpenseFilter) => {
-    if (!expenses) return []
-    if (filter === 'all') return expenses
-    return expenses.filter(e => e.type === filter)
-  }
+    if (!expenses) return [];
+    if (filter === "all") return expenses;
+    return expenses.filter((e) => e.type === filter);
+  };
 
   const handlePreviewClick = (expense: DBExpense) => {
     if (expense.file_url) {
-      window.open(expense.file_url, "_blank")
+      window.open(expense.file_url, "_blank");
     }
-  }
+  };
 
   // Convert DBExpense to display-friendly object (date as Date, amount number)
   const displayDate = (rawDate: string | null) => {
-    if (!rawDate) return null
-    const d = new Date(rawDate)
-    return isNaN(d.getTime()) ? null : d
-  }
+    if (!rawDate) return null;
+    const d = new Date(rawDate);
+    return isNaN(d.getTime()) ? null : d;
+  };
 
   // Add expense -> insert into Supabase
   const onSubmit = async (values: ExpenseFormValues) => {
     // derive filename from URL if provided
-    let filename = '';
-    if (values.billUrl && values.billUrl.trim() !== '') {
+    let filename = "";
+    if (values.billUrl && values.billUrl.trim() !== "") {
       try {
-        filename = new URL(values.billUrl).pathname.split("/").pop() || '';
+        filename = new URL(values.billUrl).pathname.split("/").pop() || "";
       } catch {
-        filename = ''; // Invalid URL, use empty string
+        filename = ""; // Invalid URL, use empty string
       }
     }
-    const vehicleName = vehicles.find(v => v.id === values.vehicleId)?.name ?? ''
+    const vehicleName =
+      vehicles.find((v) => v.id === values.vehicleId)?.name ?? "";
 
     try {
       const insertRow = {
         description: values.description,
         vehicle_id: values.vehicleId || null,
-        vehicle: vehicleName || '',
+        vehicle: vehicleName || "",
         type: values.type,
         status: values.status,
         amount: values.amount, // numeric column — supabase will accept number
         date: values.date.toISOString(),
-        file_url: (values.billUrl && values.billUrl.trim() !== '') ? values.billUrl : '',
+        file_url:
+          values.billUrl && values.billUrl.trim() !== "" ? values.billUrl : "",
         filename: filename,
-      }
+      };
 
-      console.log('Attempting to insert expense:', insertRow)
-      
+      console.log("Attempting to insert expense:", insertRow);
+
       const { data: inserted, error: insertError } = await supabase
         .from("expenses")
         .insert([insertRow])
         .select("*")
-        .single()
+        .single();
 
       if (insertError) {
-        console.error('Supabase insert error:', insertError)
-        throw insertError
+        console.error("Supabase insert error:", insertError);
+        throw insertError;
       }
 
-      console.log('Expense inserted successfully:', inserted)
-      
+      console.log("Expense inserted successfully:", inserted);
+
       // append to local state
-      setExpenses(prev => [inserted as DBExpense, ...prev])
-      setIsDialogOpen(false)
+      setExpenses((prev) => [inserted as DBExpense, ...prev]);
+      setIsDialogOpen(false);
       toast({
         title: "Expense Added",
         description: "The new expense has been successfully recorded.",
-      })
-      form.reset()
+      });
+      form.reset();
     } catch (err: any) {
       console.error("Insert error details:", {
         error: err,
         message: err?.message,
         details: err?.details,
         hint: err?.hint,
-        code: err?.code
-      })
+        code: err?.code,
+      });
       toast({
         title: "Error adding expense",
-        description: err?.message || err?.hint || "Failed to add expense. Check console for details.",
+        description:
+          err?.message ||
+          err?.hint ||
+          "Failed to add expense. Check console for details.",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   const ExpenseTable: React.FC<{ filter: ExpenseFilter }> = ({ filter }) => (
     <Table>
@@ -365,7 +456,7 @@ export default function ExpenseTracker() {
         <TableRow>
           <TableHead>Description</TableHead>
           <TableHead>Vehicle</TableHead>
-          {filter === 'all' && <TableHead>Type</TableHead>}
+          {filter === "all" && <TableHead>Type</TableHead>}
           <TableHead>Date</TableHead>
           <TableHead>Status</TableHead>
           <TableHead className="text-right">Amount</TableHead>
@@ -374,22 +465,45 @@ export default function ExpenseTracker() {
       </TableHeader>
       <TableBody>
         {filteredExpenses(filter)?.map((expense) => {
-          const amountNum = typeof expense.amount === "string" ? Number(expense.amount) : (expense.amount ?? 0)
-          const dateObj = displayDate(expense.date)
+          const amountNum =
+            typeof expense.amount === "string"
+              ? Number(expense.amount)
+              : expense.amount ?? 0;
+          const dateObj = displayDate(expense.date);
           return (
             <TableRow key={expense.id}>
-              <TableCell className="font-medium">{expense.description}</TableCell>
+              <TableCell className="font-medium">
+                {expense.description}
+              </TableCell>
               <TableCell>{expense.vehicle || "N/A"}</TableCell>
-              {filter === 'all' && <TableCell><Badge variant={getTypeVariant(expense.type)}>{expense.type}</Badge></TableCell>}
-              <TableCell>{dateObj ? format(dateObj, "LLL dd, y") : "-"}</TableCell>
-              <TableCell><Badge variant={getStatusVariant(expense.status)}>{expense.status ?? "-"}</Badge></TableCell>
-              <TableCell className="text-right">₹{(isNaN(amountNum) ? 0 : amountNum).toFixed(2)}</TableCell>
+              {filter === "all" && (
+                <TableCell>
+                  <Badge variant={getTypeVariant(expense.type)}>
+                    {expense.type}
+                  </Badge>
+                </TableCell>
+              )}
+              <TableCell>
+                {dateObj ? format(dateObj, "LLL dd, y") : "-"}
+              </TableCell>
+              <TableCell>
+                <Badge variant={getStatusVariant(expense.status)}>
+                  {expense.status ?? "-"}
+                </Badge>
+              </TableCell>
+              <TableCell className="text-right">
+                {formatINR.format(isNaN(amountNum) ? 0 : amountNum)}
+              </TableCell>
               <TableCell className="text-right">
                 <div className="flex items-center justify-end space-x-1">
                   {expense.file_url && (
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button variant="ghost" size="icon" onClick={() => handlePreviewClick(expense)}>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handlePreviewClick(expense)}
+                        >
                           <Eye className="h-4 w-4" />
                         </Button>
                       </TooltipTrigger>
@@ -398,30 +512,51 @@ export default function ExpenseTracker() {
                       </TooltipContent>
                     </Tooltip>
                   )}
-                  {expense.status !== 'Paid' && (
+                  {expense.status !== "Paid" && (
                     <form action={createCheckoutSession}>
-                      <input type="hidden" name="expenseId" value={expense.id} />
-                      <input type="hidden" name="expenseDescription" value={expense.description || ""} />
-                      <input type="hidden" name="expenseAmount" value={String(amountNum)} />
-                      <input type="hidden" name="expenseVehicleId" value={expense.vehicle_id || ""} />
-                      <input type="hidden" name="expenseType" value={expense.type || ""} />
+                      <input
+                        type="hidden"
+                        name="expenseId"
+                        value={expense.id}
+                      />
+                      <input
+                        type="hidden"
+                        name="expenseDescription"
+                        value={expense.description || ""}
+                      />
+                      <input
+                        type="hidden"
+                        name="expenseAmount"
+                        value={String(amountNum)}
+                      />
+                      <input
+                        type="hidden"
+                        name="expenseVehicleId"
+                        value={expense.vehicle_id || ""}
+                      />
+                      <input
+                        type="hidden"
+                        name="expenseType"
+                        value={expense.type || ""}
+                      />
                       <PayButton />
                     </form>
                   )}
                 </div>
               </TableCell>
             </TableRow>
-          )
+          );
         })}
       </TableBody>
     </Table>
-  )
+  );
 
-  if (loading) return (
-    <div className="flex items-center justify-center h-full">
-      <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-    </div>
-  )
+  if (loading)
+    return (
+      <div className="flex items-center justify-center h-full">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
 
   return (
     <>
@@ -434,26 +569,62 @@ export default function ExpenseTracker() {
                 <CardDescription>This month</CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-3xl font-bold">₹{totalExpenses.toFixed(2)}</p>
-                <p className="text-xs text-muted-foreground">Across all categories</p>
+                <p className="text-3xl font-bold">
+                  {formatINR.format(totalExpenses)}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Across all categories
+                </p>
               </CardContent>
             </Card>
 
             <Card className="group transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20">
               <CardHeader>
                 <CardTitle>Expenses by Category</CardTitle>
-                <CardDescription>A visual breakdown of spending for this month.</CardDescription>
+                <CardDescription>
+                  A visual breakdown of spending for this month.
+                </CardDescription>
               </CardHeader>
               <CardContent className="pl-2">
-                <ChartContainer config={chartConfig} className="h-[200px] w-full">
-                  <BarChart accessibilityLayer data={chartData} margin={{ top: 20, right: 20, left: 0, bottom: 5 }}>
+                <ChartContainer
+                  config={chartConfig}
+                  className="h-[200px] w-full"
+                >
+                  <BarChart
+                    accessibilityLayer
+                    data={chartData}
+                    margin={{ top: 20, right: 20, left: 0, bottom: 5 }}
+                  >
                     <CartesianGrid vertical={false} />
-                    <XAxis dataKey="name" tickLine={false} tickMargin={10} axisLine={false} tickFormatter={(value) => value} />
-                    <YAxis domain={[0, 'dataMax + 100']} tickLine={false} axisLine={false} tickFormatter={(value) => `₹${value}`} />
-                    <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
+                    <XAxis
+                      dataKey="name"
+                      tickLine={false}
+                      tickMargin={10}
+                      axisLine={false}
+                      tickFormatter={(value) => value}
+                    />
+                    <YAxis
+                      domain={[0, "dataMax + 100"]}
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(value) => `₹${value}`}
+                    />
+                    <ChartTooltip
+                      cursor={false}
+                      content={<ChartTooltipContent indicator="dot" />}
+                    />
                     <Bar dataKey="total" radius={4}>
                       {chartData.map((entry) => (
-                        <Cell key={`cell-${entry.name}`} fill={(chartConfig[entry.name as keyof typeof chartConfig] as any)?.color} />
+                        <Cell
+                          key={`cell-${entry.name}`}
+                          fill={
+                            (
+                              chartConfig[
+                                entry.name as keyof typeof chartConfig
+                              ] as any
+                            )?.color
+                          }
+                        />
                       ))}
                     </Bar>
                   </BarChart>
@@ -466,7 +637,9 @@ export default function ExpenseTracker() {
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Expense History</CardTitle>
-                <CardDescription>View and pay for fleet expenses.</CardDescription>
+                <CardDescription>
+                  View and pay for fleet expenses.
+                </CardDescription>
               </div>
               <Button onClick={handleCreateClick}>
                 <PlusCircle className="mr-2 h-4 w-4" />
@@ -478,8 +651,10 @@ export default function ExpenseTracker() {
               <Tabs defaultValue="all">
                 <TabsList className="h-auto flex-wrap justify-start gap-1">
                   <TabsTrigger value="all">All Expenses</TabsTrigger>
-                  {expenseTypes.map(type => (
-                    <TabsTrigger key={type} value={type}>{type}</TabsTrigger>
+                  {expenseTypes.map((type) => (
+                    <TabsTrigger key={type} value={type}>
+                      {type}
+                    </TabsTrigger>
                   ))}
                 </TabsList>
 
@@ -487,7 +662,7 @@ export default function ExpenseTracker() {
                   <ExpenseTable filter="all" />
                 </TabsContent>
 
-                {expenseTypes.map(type => (
+                {expenseTypes.map((type) => (
                   <TabsContent key={type} value={type}>
                     <ExpenseTable filter={type} />
                   </TabsContent>
@@ -503,12 +678,16 @@ export default function ExpenseTracker() {
           <DialogHeader>
             <DialogTitle>Add New Expense</DialogTitle>
             <DialogDescription>
-              Enter the details for the new expense. Click save when you're done.
+              Enter the details for the new expense. Click save when you're
+              done.
             </DialogDescription>
           </DialogHeader>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-4 py-4"
+            >
               <FormField
                 control={form.control}
                 name="description"
@@ -516,7 +695,10 @@ export default function ExpenseTracker() {
                   <FormItem>
                     <FormLabel>Description</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="e.g., Fuel top-up for Bus 1" />
+                      <Input
+                        {...field}
+                        placeholder="e.g., Fuel top-up for Bus 1"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -530,15 +712,20 @@ export default function ExpenseTracker() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Vehicle</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select a vehicle" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {vehicles.map(vehicle => (
-                            <SelectItem key={vehicle.id} value={vehicle.id}>{vehicle.name}</SelectItem>
+                          {vehicles.map((vehicle) => (
+                            <SelectItem key={vehicle.id} value={vehicle.id}>
+                              {vehicle.name}
+                            </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -553,15 +740,20 @@ export default function ExpenseTracker() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Type</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select a type" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {expenseTypes.map(type => (
-                            <SelectItem key={type} value={type}>{type}</SelectItem>
+                          {expenseTypes.map((type) => (
+                            <SelectItem key={type} value={type}>
+                              {type}
+                            </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -577,7 +769,7 @@ export default function ExpenseTracker() {
                   name="amount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Amount ($)</FormLabel>
+                      <FormLabel>Amount (₹)</FormLabel>
                       <FormControl>
                         <Input type="number" step="0.01" {...field} />
                       </FormControl>
@@ -592,7 +784,10 @@ export default function ExpenseTracker() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Status</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select a status" />
@@ -618,14 +813,29 @@ export default function ExpenseTracker() {
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
-                          <Button variant={"outline"} className={cn("pl-3 text-left font-normal", !field.value && "text-muted-foreground")}>
-                            {field.value ? (format(field.value, "PPP")) : (<span>Pick a date</span>)}
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
                             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                           </Button>
                         </FormControl>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus />
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          initialFocus
+                        />
                       </PopoverContent>
                     </Popover>
                     <FormMessage />
@@ -640,7 +850,10 @@ export default function ExpenseTracker() {
                   <FormItem>
                     <FormLabel>Bill URL (Optional)</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="https://example.com/bill.pdf" />
+                      <Input
+                        {...field}
+                        placeholder="https://example.com/bill.pdf"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -648,7 +861,13 @@ export default function ExpenseTracker() {
               />
 
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsDialogOpen(false)}
+                >
+                  Cancel
+                </Button>
                 <Button type="submit">Save Expense</Button>
               </DialogFooter>
             </form>
@@ -656,5 +875,5 @@ export default function ExpenseTracker() {
         </DialogContent>
       </Dialog>
     </>
-  )
+  );
 }

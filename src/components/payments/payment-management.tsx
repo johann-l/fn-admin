@@ -243,6 +243,14 @@ export default function PaymentManagement() {
     .filter((p) => p.type === "Outgoing" && p.status === "Paid")
     .reduce((acc, p) => acc + p.amount, 0);
 
+  // Format amounts as Indian Rupees (INR)
+  const formatINR = (value: number) =>
+    new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 2,
+    }).format(value);
+
   const handlePaymentClick = (payment: Payment) => {
     setSelectedPayment(payment);
     setIsDetailOpen(true);
@@ -326,8 +334,8 @@ export default function PaymentManagement() {
                     : "text-destructive"
                 }`}
               >
-                {payment.type === "Incoming" ? "+" : "-"}$
-                {payment.amount.toFixed(2)}
+                {payment.type === "Incoming" ? "+" : "-"}
+                {formatINR(payment.amount)}
               </div>
               <div className="flex justify-between items-center text-xs text-muted-foreground">
                 {(() => {
@@ -430,8 +438,8 @@ export default function PaymentManagement() {
                         : "text-destructive"
                     }`}
                   >
-                    {payment.type === "Incoming" ? "+" : "-"}$
-                    {payment.amount.toFixed(2)}
+                    {payment.type === "Incoming" ? "+" : "-"}
+                    {formatINR(payment.amount)}
                   </div>
                 </TableCell>
                 <TableCell>
@@ -523,7 +531,7 @@ export default function PaymentManagement() {
               <ArrowUpRight className="h-4 w-4 text-primary" />
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold">${totalRevenue.toFixed(2)}</p>
+              <p className="text-3xl font-bold">{formatINR(totalRevenue)}</p>
               <p className="text-xs text-muted-foreground">
                 This month's paid income
               </p>
@@ -537,7 +545,7 @@ export default function PaymentManagement() {
               <ArrowDownLeft className="h-4 w-4 text-destructive" />
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold">${totalExpenses.toFixed(2)}</p>
+              <p className="text-3xl font-bold">{formatINR(totalExpenses)}</p>
               <p className="text-xs text-muted-foreground">
                 This month's paid expenses
               </p>
@@ -682,7 +690,7 @@ export default function PaymentManagement() {
                   name="amount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Amount ($)</FormLabel>
+                      <FormLabel>Amount (₹)</FormLabel>
                       <FormControl>
                         <Input type="number" step="0.01" {...field} />
                       </FormControl>

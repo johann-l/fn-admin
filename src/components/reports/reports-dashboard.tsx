@@ -155,17 +155,14 @@ interface AppDataVehicle {
   };
   status: string;
 }
-interface AppDataExpense {
-  type: string;
-  amount: number;
-}
+import type { Expense as LibExpense } from "../../lib/data";
 // --- END FIX ---
 
 export default function ReportsDashboard() {
   // --- FIX ---
   // Apply types to destructured context values
   const { expenses, vehicles, payments } = useAppData() as {
-    expenses: AppDataExpense[];
+    expenses: LibExpense[];
     vehicles: AppDataVehicle[];
     payments: AppDataPayment[];
   };
@@ -177,6 +174,20 @@ export default function ReportsDashboard() {
   const [summaryTimeFrame, setSummaryTimeFrame] = React.useState<
     "monthly" | "quarterly" | "6-months" | "yearly"
   >("monthly");
+
+  const formatINR = React.useMemo(() => {
+    try {
+      return new Intl.NumberFormat("en-IN", {
+        style: "currency",
+        currency: "INR",
+        maximumFractionDigits: 0,
+      });
+    } catch {
+      return {
+        format: (n: number) => `₹${Math.round(n).toString()}`,
+      } as Intl.NumberFormat;
+    }
+  }, []);
 
   const expenseData = React.useMemo(() => {
     if (!expenses) return [];
@@ -367,18 +378,35 @@ export default function ReportsDashboard() {
 
     const startDate = subMonths(now, months);
 
+    // Track whether we saw any outgoing payments
+    let sawOutgoing = false;
+
     payments.forEach((payment) => {
       if (payment.date >= startDate && payment.status === "Paid") {
         const monthKey = format(payment.date, "yyyy-MM");
         if (monthlyRecords[monthKey]) {
-          if (payment.type === "Incoming") {
+          const typeLower = (payment.type || "").toLowerCase();
+          if (typeLower === "incoming") {
             monthlyRecords[monthKey].revenue += payment.amount;
-          } else {
+          } else if (typeLower === "outgoing") {
             monthlyRecords[monthKey].expenses += payment.amount;
+            sawOutgoing = true;
           }
         }
       }
     });
+
+    // If there are no outgoing payments captured, fallback to context expenses
+    if (!sawOutgoing && Array.isArray(expenses)) {
+      expenses.forEach((exp) => {
+        if (exp.date >= startDate && exp.status === "Paid") {
+          const monthKey = format(exp.date, "yyyy-MM");
+          if (monthlyRecords[monthKey]) {
+            monthlyRecords[monthKey].expenses += exp.amount;
+          }
+        }
+      });
+    }
 
     return Object.keys(monthlyRecords)
       .sort()
@@ -448,21 +476,23 @@ export default function ReportsDashboard() {
     }
   }, [summaryTimeFrame]);
 
-  const fetchIncomingReports = React.useCallback(async () => {
+  const fetchIncomingTransactions = React.useCallback(async () => {
     try {
       const start = getSummaryRange().toISOString();
-      const { data: incomingData, error: incomingError } = await supabase
-        .from("incoming_reports")
-        .select("*")
-        .gte("created_at", start);
+      const { data, error } = await supabase
+        .from("transactions")
+        .select("id, amount, date, status, type, description")
+        .eq("type", "Incoming")
+        .eq("status", "Paid")
+        .gte("date", start);
 
-      if (incomingError) {
-        console.error("Error fetching incoming reports:", incomingError);
+      if (error) {
+        console.error("Error fetching incoming transactions:", error);
       } else {
-        setSbIncomePayments((incomingData as SupabaseTransaction[]) || []);
+        setSbIncomePayments((data as SupabaseTransaction[]) || []);
       }
     } catch (err) {
-      console.error("fetchIncomingReports error:", err);
+      console.error("fetchIncomingTransactions error:", err);
     }
   }, [getSummaryRange]);
 
@@ -485,14 +515,14 @@ export default function ReportsDashboard() {
   }, [getSummaryRange]);
 
   React.useEffect(() => {
-    fetchIncomingReports();
+    fetchIncomingTransactions();
     const incomeChannel = supabase
-      .channel("incoming-reports-changes")
+      .channel("transactions-incoming-changes")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "incoming_reports" },
+        { event: "*", schema: "public", table: "transactions" },
         () => {
-          fetchIncomingReports();
+          fetchIncomingTransactions();
         }
       )
       .subscribe();
@@ -500,7 +530,7 @@ export default function ReportsDashboard() {
     return () => {
       supabase.removeChannel(incomeChannel).catch(() => {});
     };
-  }, [fetchIncomingReports]);
+  }, [fetchIncomingTransactions]);
 
   React.useEffect(() => {
     fetchSummaryExpenses();
@@ -546,9 +576,10 @@ export default function ReportsDashboard() {
   // The old, problematic categorizedIncome block has been removed.
   // This new block correctly displays the total income under a single category.
   const categorizedIncome = React.useMemo(() => {
+    // Single category (Incoming payments) reflecting real transactions
     return [
       {
-        category: "Bus Pass Fees",
+        category: "Incoming Payments",
         amount: totalIncome,
       },
     ];
@@ -637,11 +668,16 @@ export default function ReportsDashboard() {
                   tickLine={false}
                   axisLine={false}
                   tickMargin={8}
-                  tickFormatter={(value) => `₹${value / 1000}k`}
+                  tickFormatter={(value) => formatINR.format(Number(value))}
                 />
                 <ChartTooltip
                   cursor={false}
-                  content={<ChartTooltipContent indicator="dot" />}
+                  content={
+                    <ChartTooltipContent
+                      indicator="dot"
+                      formatter={(value) => formatINR.format(Number(value))}
+                    />
+                  }
                 />
                 <ChartLegend content={<ChartLegendContent />} />
                 <Bar
@@ -751,11 +787,16 @@ export default function ReportsDashboard() {
                   type="number"
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={(value) => `₹${value / 1000}k`}
+                  tickFormatter={(value) => formatINR.format(Number(value))}
                 />
                 <ChartTooltip
                   cursor={false}
-                  content={<ChartTooltipContent indicator="dot" />}
+                  content={
+                    <ChartTooltipContent
+                      indicator="dot"
+                      formatter={(value) => formatINR.format(Number(value))}
+                    />
+                  }
                 />
                 <Bar dataKey="amount" fill="var(--color-amount)" radius={4} />
               </BarChart>

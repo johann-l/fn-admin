@@ -33,6 +33,7 @@ import {
   Moon,
   Truck,
   AreaChart,
+  Megaphone,
   Route,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -47,6 +48,7 @@ const links = [
   { href: "/expenses", label: "Expenses", icon: Banknote },
   { href: "/payments", label: "Payments", icon: CreditCard },
   { href: "/communication", label: "Communication", icon: MessageSquare },
+  { href: "/announcements", label: "Announcements", icon: Megaphone },
   { href: "/reports", label: "Reports", icon: AreaChart },
 ];
 

@@ -99,6 +99,17 @@ export type Payment = {
   method: 'Credit Card' | 'Bank Transfer' | 'Cash';
 };
 
+export type Announcement = {
+  id: string;
+  title: string;
+  content: string;
+  category: string;
+  author: string;
+  images: string[]; // ARRAY in DB
+  timestamp: string; // or Date
+  created_at: string; // or Date
+};
+
 export type Alert = {
   id: string;
   title: string;

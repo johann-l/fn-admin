@@ -24,6 +24,10 @@ import {
   subscribeToTransactions,
 } from "@/lib/supabaseService";
 
+// ⭐ Import Announcement type
+
+import type { Announcement } from "@/lib/data";
+
 type VehicleFormData = Omit<
   Vehicle,
   "id" | "availability" | "location" | "currentStopIndex"
@@ -42,6 +46,13 @@ type AppDataContextType = {
   payments: Payment[];
   routes: Route[];
   alerts: Alert[];
+
+  // ⭐ Added announcements state to context type
+
+  announcements: Announcement[];
+
+  setAnnouncements: React.Dispatch<React.SetStateAction<Announcement[]>>;
+
   addVehicle: (vehicle: VehicleFormData) => void;
   updateVehicle: (vehicle: Vehicle) => void;
   removeVehicle: (vehicleId: string) => void;
@@ -76,6 +87,9 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
   );
   const [routes, setRoutes] = React.useState<Route[]>(initialRoutes);
   const [alerts, setAlerts] = React.useState<Alert[]>(initialAlerts);
+  // ⭐ Added state for announcements
+
+  const [announcements, setAnnouncements] = React.useState<Announcement[]>([]);
 
   React.useEffect(() => {
     // Generate expenses data on the client-side
@@ -239,6 +253,12 @@ export function AppDataProvider({ children }: { children: React.ReactNode }) {
         payments: payments || [],
         routes,
         alerts,
+        // ⭐ Added announcements + setter to provider value
+
+        announcements,
+
+        setAnnouncements,
+
         addVehicle,
         updateVehicle,
         removeVehicle,
